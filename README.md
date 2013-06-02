@@ -8,7 +8,9 @@ Botto has out-of-the-box support for:
 * multiple components per instance, each with multiple bots (bot@service.example.com)
 * metrics [todo]
 
+Readme:
 
+```java
     public class EchoBot {
         @Receive
         public Message echo(Message msg) {
@@ -21,6 +23,7 @@ Botto has out-of-the-box support for:
     }
 
     environment.getSubdomain("services").addBot(new EchoBot(), "echo");
+```
 
 ### Types of bot output:
 * one packet
