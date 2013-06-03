@@ -6,7 +6,9 @@ Botto has out-of-the-box support for:
 * annotation-only pojo bots
 * multiple components per instance, each with multiple bots (bot@service.example.com)
 
-### Maven:
+### Quick start:
+
+Import using maven:
 
 ```xml
     <repositories>
@@ -29,11 +31,33 @@ Botto has out-of-the-box support for:
     </dependencies>
 ```
 
-### Examples:
+Create a new botService:
 
-For a working example, see: https://github.com/mcaprari/botto/blob/master/botto-service/src/test/java/net/caprazzi/xmpp/EchoBotService.java
+```java
+public class EchoBotService extends AbstractBotService {
 
-For integration with Dropwizard, see: https://github.com/mcaprari/botto/tree/master/botto-examples/botto-examples-dropwizard
+    public static void main(String[] main) {
+        BotServiceConfiguration configuration = new BotServiceConfiguration();
+        configuration.setHost("localhost");
+        configuration.setPort(5275);
+        configuration.setSecret("secret");
+        new EchoBotService().run(configuration);
+    }
+
+    @Override
+    public void run(ServiceEnvironment environment) {
+        EchoBot echoBot = new EchoBot();
+
+        // setup echo bot to listen at echo@subdomain1.yourdomain.com
+        SubdomainEnvironment subdomain = environment.getSubdomain("subdomain1");
+        subdomain.addBot(echoBot, "echo");
+
+        RelayBot relayBot = new RelayBot();
+
+        // setup echo bot to listen at relay@subdomain2.yourdomain.com
+        SubdomainEnvironment subdomain2 = environment.getSubdomain("subdomain2");
+        subdomain2.addBot(relayBot, "relay");
+
 
 Echo Bot:
 
@@ -84,22 +108,9 @@ public class RelayBot {
 }
 ```
 
-Setup:
-```java
-public void run(ServiceEnvironment environment) {
-    EchoBot echoBot = new EchoBot();
+For a working example, see: https://github.com/mcaprari/botto/blob/master/botto-service/src/test/java/net/caprazzi/xmpp/EchoBotService.java
 
-    // setup echo bot to listen at echo@subdomain1.yourdomain.com
-    SubdomainEnvironment subdomain = environment.getSubdomain("subdomain1");
-    subdomain.addBot(echoBot, "echo");
-
-    RelayBot relayBot = new RelayBot();
-
-    // setup echo bot to listen at relay@subdomain2.yourdomain.com
-    SubdomainEnvironment subdomain2 = environment.getSubdomain("subdomain2");
-    subdomain2.addBot(relayBot, "relay");
-}
-```
+For integration with Dropwizard, see: https://github.com/mcaprari/botto/tree/master/botto-examples/botto-examples-dropwizard
 
 
 
