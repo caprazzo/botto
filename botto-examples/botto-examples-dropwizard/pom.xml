@@ -11,20 +11,28 @@
 
     <artifactId>botto-examples-dropwizard</artifactId>
 
-    <dependencies>
+    <repositories>
+        <repository>
+            <id>mcaprari-releases</id>
+            <url>https://github.com/mcaprari/mcaprari-maven-repo/raw/master/releases</url>
+        </repository>
+        <repository>
+            <id>mcaprari-snapshots</id>
+            <url>https://github.com/mcaprari/mcaprari-maven-repo/raw/master/snapshots</url>
+        </repository>
+    </repositories>
 
+    <dependencies>
         <dependency>
             <groupId>botto.xmpp</groupId>
             <artifactId>botto-service</artifactId>
             <version>0.5.0-SNAPSHOT</version>
         </dependency>
-
         <dependency>
             <groupId>com.yammer.dropwizard</groupId>
             <artifactId>dropwizard-core</artifactId>
             <version>0.6.2</version>
         </dependency>
-
     </dependencies>
 
 </project>
