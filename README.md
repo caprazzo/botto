@@ -54,11 +54,10 @@ public class EchoBotService extends AbstractBotService {
 
         RelayBot relayBot = new RelayBot();
 
-      'presence: sahithi'
-       grep company
-        tup echo bot to listen at relay@subdomain2.yourdomain.cgrep type=presence
-             SubdomainEnvironment subdomain2 = environment.getSubdomain("subdomain2");
+        // setup echo bot to listen at relay@subdomain2.yourdomain.com
+        SubdomainEnvironment subdomain2 = environment.getSubdomain("subdomain2");
         subdomain2.addBot(relayBot, "relay");
+    }
 ```
 
 Echo Bot:
