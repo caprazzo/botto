@@ -4,7 +4,7 @@ import org.xmpp.packet.JID;
 import org.xmpp.packet.Message;
 
 /**
- * A bot that can say hello to an arbitrary xmpp user
+ * A bot that can say hello to an arbitrary XMPP user
  */
 public class SayHelloBot {
 
@@ -22,5 +22,4 @@ public class SayHelloBot {
         message.setFrom("hello");
         output.send(message);
     }
-
 }

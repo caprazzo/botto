@@ -1,4 +1,10 @@
+# configure the botService
 botService:
-    port: 5275
+    # xmpp server host
     host: localhost
+
+    # xmpp server Component port
+    port: 5275
+
+    # xmpp server Component password
     secret: secret
