@@ -6,6 +6,35 @@ Botto has out-of-the-box support for:
 * annotation-only pojo bots
 * multiple components per instance, each with multiple bots (bot@service.example.com)
 
+### Maven:
+
+```xml
+    <repositories>
+        <repository>
+            <id>mcaprari-releases</id>
+            <url>https://github.com/mcaprari/mcaprari-maven-repo/raw/master/releases</url>
+        </repository>
+        <repository>
+            <id>mcaprari-snapshots</id>
+            <url>https://github.com/mcaprari/mcaprari-maven-repo/raw/master/snapshots</url>
+        </repository>
+    </repositories>
+
+    <dependencies>
+        <dependency>
+            <groupId>botto.xmpp</groupId>
+            <artifactId>botto-service</artifactId>
+            <version>0.5.0-SNAPSHOT</version>
+        </dependency>
+    </dependencies>
+```
+
+### Examples:
+
+For a working example, see: https://github.com/mcaprari/botto/blob/master/botto-service/src/test/java/net/caprazzi/xmpp/EchoBotService.java
+
+For integration with Dropwizard, see: https://github.com/mcaprari/botto/tree/master/botto-examples/botto-examples-dropwizard
+
 Echo Bot:
 
 ```java
@@ -72,7 +101,5 @@ public void run(ServiceEnvironment environment) {
 }
 ```
 
-For a working example, see: https://github.com/mcaprari/botto/blob/master/botto-service/src/test/java/net/caprazzi/xmpp/EchoBotService.java
 
-For integration with Dropwizard, see: https://github.com/mcaprari/botto/tree/master/botto-examples/botto-examples-dropwizard
 
