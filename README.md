@@ -26,7 +26,7 @@ public class EchoBot {
 
 Relay Bot:
 
-```java:
+```java
 /**
  * Simple bot that relays any received message
  * to multiple addresses
