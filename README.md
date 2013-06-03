@@ -39,12 +39,14 @@ public class RelayBot {
     @Receive
     public void Receive(Message msg) {
         Message relayOne = new Message();
+        relayOne.setFrom("relay");
         relayOne.setTo(new JID("bigbrother@example.com"));
         relayOne.setBody(msg.getFrom() + " just said " + msg.getBody());
 
         output.send(relayOne);
 
         Message relayTwo = new Message();
+        relayOne.setFrom("relay");
         relayTwo.setTo(new JID("bigsister@example.com"));
         relayTwo.setBody(msg.getFrom() + " just said " + msg.getBody());
 
