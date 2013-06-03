@@ -56,6 +56,27 @@ public class SayHelloResource {
 }
 ```
 
+Dropwizrd Configuration Class:
+```java
+/**
+ * To configure a BotService from a Dropwizard configuration,
+ * simply add BotServiceConfiguration as JsonProperty
+ *
+ * See botto-dropwizard-service.yml for how to add values to the configuration
+ */
+public class BottoDropwizardServiceConfiguration extends Configuration {
+
+    @JsonProperty
+    private BotServiceConfiguration botService = new BotServiceConfiguration();
+
+    public BotServiceConfiguration getBotService( ){
+        return botService;
+    }
+}
+```
+
+Putting it all together:
+
 ```java
 public void run(BottoDropwizardServiceConfiguration dropwizardConfig, Environment dropwizardEnvironment) throws Exception {
 
