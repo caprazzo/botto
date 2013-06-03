@@ -17,7 +17,7 @@ Readme:
             Message reply = new Message();
             reply.setTo(msg.getFrom());
             reply.setFrom(msg.getTo());
-            reply.setBody("You said xx: " + msg.getBody());
+            reply.setBody("You said : " + msg.getBody());
             return reply;
         }
     }

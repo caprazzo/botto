@@ -1,10 +1,10 @@
 package net.caprazzi.xmpp;
 
-import net.caprazzi.xmpp.bot.api.Receive;
-import net.caprazzi.xmpp.bot.service.AbstractBotService;
-import net.caprazzi.xmpp.bot.service.ServiceConfiguration;
-import net.caprazzi.xmpp.bot.service.ServiceEnvironment;
-import net.caprazzi.xmpp.bot.service.SubdomainEnvironment;
+import botto.xmpp.annotations.Receive;
+import botto.xmpp.service.AbstractBotService;
+import botto.xmpp.service.ServiceConfiguration;
+import botto.xmpp.service.ServiceEnvironment;
+import botto.xmpp.service.SubdomainEnvironment;
 import org.xmpp.packet.Message;
 
 public class EchoBotService extends AbstractBotService {

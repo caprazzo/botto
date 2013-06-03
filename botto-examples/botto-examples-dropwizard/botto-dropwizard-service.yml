@@ -1,0 +1,3 @@
+xmppServer: localhost
+xmppServerPort: 5275
+xmppServerComponentSecret: secret
