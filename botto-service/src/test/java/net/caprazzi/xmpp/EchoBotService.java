@@ -2,7 +2,7 @@ package net.caprazzi.xmpp;
 
 import botto.xmpp.annotations.Receive;
 import botto.xmpp.service.AbstractBotService;
-import botto.xmpp.service.ServiceConfiguration;
+import botto.xmpp.service.BotServiceConfiguration;
 import botto.xmpp.service.ServiceEnvironment;
 import botto.xmpp.service.SubdomainEnvironment;
 import org.xmpp.packet.Message;
@@ -10,7 +10,7 @@ import org.xmpp.packet.Message;
 public class EchoBotService extends AbstractBotService {
 
     public static void main(String[] main) {
-        ServiceConfiguration configuration = new ServiceConfiguration();
+        BotServiceConfiguration configuration = new BotServiceConfiguration();
         configuration.setHost("localhost");
         configuration.setPort(5275);
         configuration.setSecret("secret");

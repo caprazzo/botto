@@ -1,6 +1,6 @@
 package botto.xmpp.service;
 
-public class ServiceConfiguration {
+public class BotServiceConfiguration {
     private String host;
     private int port;
     private String secret;

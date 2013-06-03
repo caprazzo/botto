@@ -18,7 +18,7 @@ public abstract class AbstractBotService {
 
     private final Logger Log = LoggerFactory.getLogger(AbstractBotService.class);
 
-    public final void run(ServiceConfiguration configuration) {
+    public final void run(BotServiceConfiguration configuration) {
         final ServiceEnvironment environment = new ServiceEnvironment(configuration);
         run(environment);
 

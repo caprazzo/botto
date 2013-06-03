@@ -1,3 +1,4 @@
-xmppServer: localhost
-xmppServerPort: 5275
-xmppServerComponentSecret: secret
+botService:
+    port: 5275
+    host: localhost
+    secret: secret

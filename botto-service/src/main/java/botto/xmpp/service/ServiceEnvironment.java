@@ -12,9 +12,9 @@ public class ServiceEnvironment {
     private final Logger Log = LoggerFactory.getLogger(ServiceEnvironment.class);
 
     private final HashMap<String, SubdomainEnvironment> subdomains = new HashMap<String, SubdomainEnvironment>();
-    private final ServiceConfiguration configuration;
+    private final BotServiceConfiguration configuration;
 
-    ServiceEnvironment(ServiceConfiguration configuration) {
+    ServiceEnvironment(BotServiceConfiguration configuration) {
         Preconditions.checkNotNull(configuration, "Configuration can't be null.");
         this.configuration = configuration;
     }
