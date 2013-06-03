@@ -4,69 +4,73 @@ Botto is a Java framework for easy development on XMPP Bots
 
 Botto has out-of-the-box support for:
 * annotation-only pojo bots
-* multiple bots per instance (bot@example.com)
 * multiple components per instance, each with multiple bots (bot@service.example.com)
-* metrics [todo]
 
-Readme:
+Echo Bot:
 
 ```java
-    public class EchoBot {
-        @Receive
-        public Message echo(Message msg) {
-            Message reply = new Message();
-            reply.setTo(msg.getFrom());
-            reply.setFrom(msg.getTo());
-            reply.setBody("You said : " + msg.getBody());
-            return reply;
-        }
+/**
+ * Simple bot echoes back any received message
+ */
+public class EchoBot {
+    @Receive
+    public Message echo(Message msg) {
+        Message reply = new Message();
+        reply.setTo(msg.getFrom());
+        reply.setFrom(msg.getTo());
+        reply.setBody("You said xx: " + msg.getBody());
+        return reply;
     }
-
-    environment.getSubdomain("services").addBot(new EchoBot(), "echo");
+}
 ```
 
-### Types of bot output:
-* one packet
-* an iterable of packets
-* something that allows to program timed release of packets
+Relay Bot:
 
-### Annotations:
-    @Receive(in = {Packet | Message | Presence | Command})
-    @Reply(in = { Packet | Message | Presence | Command }, out = [ ... ])
-    @Sender
+```java:
+/**
+ * Simple bot that relays any received message
+ * to multiple addresses
+ */
+public class RelayBot {
 
-### General Structure:
-   - AbstractBotService: implement this to embed the service
-        - implement initialize to configure the service
-        - implement run to add subdomains and bots
+    @Context
+    private PacketOutput output;
 
-#### Types of bots:
+    @Receive
+    public void Receive(Message msg) {
+        Message relayOne = new Message();
+        relayOne.setTo(new JID("bigbrother@example.com"));
+        relayOne.setBody(msg.getFrom() + " just said " + msg.getBody());
 
-* Receive bot: simply receives packets and does nothing
-    * configured using @Packet / @Message / ...
-    * configured using @Command(class)
-    * maybe @Receive(Packet | Message | Presence | Command)
+        output.send(relayOne);
 
-* Reply bot: responds to an event (packet or subtype of packet) with
-    * echo bot
-    * echo bot with multiple responses
-    * weather bot
-    * stopwatch bot, alarm bot
-    * ad-hoc command reply bot
-    * configured using method-based @Reply
+        Message relayTwo = new Message();
+        relayTwo.setTo(new JID("bigsister@example.com"));
+        relayTwo.setBody(msg.getFrom() + " just said " + msg.getBody());
 
-* Action bot: can send packets on its own, to any recipient
-    * same response types of the Reply bot
-    * can specify recipient (? infrastructure-controlled)
-    * can specify sender (? implementation specific - requires plugin)
-    * integration bot: interaction initiated not necessarily from XMPP
-    * ad-hoc command action bot
-    * obtain botService instance using @BotService on a setter
+        output.send(relayTwo);
+    }
+}
+```
 
-* Questions:
-- how to negotiate roster subscription ? (infrastructure, configuration-based "auto-add-to-reoster")
--
+Setup:
+```java
+public void run(ServiceEnvironment environment) {
+    EchoBot echoBot = new EchoBot();
 
-### Other Ideas
+    // setup echo bot to listen at echo@subdomain1.yourdomain.com
+    SubdomainEnvironment subdomain = environment.getSubdomain("subdomain1");
+    subdomain.addBot(echoBot, "echo");
 
-Use this to build an "external plugin" infrastructure
+    RelayBot relayBot = new RelayBot();
+
+    // setup echo bot to listen at relay@subdomain2.yourdomain.com
+    SubdomainEnvironment subdomain2 = environment.getSubdomain("subdomain2");
+    subdomain2.addBot(relayBot, "relay");
+}
+```
+
+For a working example, see: https://github.com/mcaprari/botto/blob/master/botto-service/src/test/java/net/caprazzi/xmpp/EchoBotService.java
+
+For integration with Dropwizard, see: https://github.com/mcaprari/botto/tree/master/botto-examples/botto-examples-dropwizard
+
