@@ -1,5 +1,7 @@
 package botto.xmpp.service.component;
 
+import botto.xmpp.service.utils.QueueExecutor;
+import com.google.common.base.Preconditions;
 import org.jivesoftware.whack.ExternalComponentManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,55 +14,33 @@ import java.util.concurrent.*;
  * Sends packets from xmpp components.
  * Incoming messages are queued up and sent asynchronously.
  */
-public class ComponentPacketSender {
+public class ComponentPacketSender extends QueueExecutor<ComponentPacketSender.ComponentPacket> {
 
     private final Logger Log = LoggerFactory.getLogger(ComponentPacketSender.class);
 
     private final ExternalComponentManager manager;
 
-    private BlockingQueue<ComponentPacket> outbox = new LinkedBlockingQueue<ComponentPacket>();
-
-    final ExecutorService executor = Executors.newSingleThreadExecutor();
-
     public ComponentPacketSender(ExternalComponentManager manager) {
         this.manager = manager;
     }
 
-    public void start() {
-        executor.submit(new Runnable() {
-            @Override
-            public void run() {
-                while(!Thread.currentThread().isInterrupted()) {
-                    try {
-                        ComponentPacket response = outbox.take();
-                        Log.debug("Sending response {}", response.getPacket());
-                        if (response.getPacket() == null) {
-                            Log.warn("Response packet is null, not sending. {}", response);
-                            return;
-                        }
-                        manager.sendPacket(response.getComponent(), response.getPacket());
-                    } catch (InterruptedException e) {
-                        // it's ok, we are shutting down now
-                    }
-                }
-            }
-        });
-    }
-
-    public void shutdown() {
-        executor.shutdownNow();
-        Log.info("Shut down complete");
+    @Override
+    public void doProcess(ComponentPacket packet) {
+        Log.debug("Sending response {}", packet.getPacket());
+        if (packet.getPacket() == null) {
+            Log.warn("Outgoing packet is null, not sending. {}", packet);
+            return;
+        }
+        manager.sendPacket(packet.getComponent(), packet.getPacket());
     }
 
     public void send(Component component, Packet packet) {
-        try {
-            outbox.put(new ComponentPacket(component, packet));
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
+        Preconditions.checkNotNull(component, "Component can't be null");
+        Preconditions.checkNotNull(packet, "Packet can't be null");
+        enqueue(new ComponentPacket(component, packet));
     }
 
-    private static class ComponentPacket {
+    public static class ComponentPacket {
         private final Component component;
         private final Packet packet;
 

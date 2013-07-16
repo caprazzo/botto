@@ -1,21 +1,17 @@
 package botto.xmpp.service.connection;
 
+import botto.xmpp.annotations.PacketOutput;
+import botto.xmpp.service.AbstractBot;
 import botto.xmpp.service.reflection.AnnotatedBotObject;
 import botto.xmpp.utils.PacketTypeConverter;
-import org.dom4j.Document;
-import org.dom4j.DocumentException;
-import org.dom4j.Element;
-import org.dom4j.io.SAXReader;
+
+import com.google.common.base.Preconditions;
 import org.jivesoftware.smack.ConnectionConfiguration;
 import org.jivesoftware.smack.PacketListener;
 import org.jivesoftware.smack.XMPPConnection;
 
-import org.xmpp.packet.IQ;
-import org.xmpp.packet.Message;
 import org.xmpp.packet.Packet;
-import org.xmpp.packet.Presence;
 
-import javax.xml.parsers.SAXParser;
 import java.util.HashMap;
 
 public class BotSessionManager {
@@ -24,6 +20,8 @@ public class BotSessionManager {
     private final int port;
 
     private final HashMap<String, XMPPConnection> connections = new HashMap<String, XMPPConnection>();
+
+    private final BotPacketSender sender = new BotPacketSender();
 
     public BotSessionManager(String host, int port) {
         this.host = host;
@@ -34,30 +32,49 @@ public class BotSessionManager {
     // TODO: incoming packets should all go to the same queue
     // TODO: outgoing packets should be put in a queue
 
-    public void createSession(final AnnotatedBotObject bot, final String node, String secret, String resource) {
+    public void createSession(final AbstractBot bot, final String node, String secret, String resource) {
         ConnectionConfiguration configuration = new ConnectionConfiguration(host, port);
         configuration.setReconnectionAllowed(true);
         configuration.setSendPresence(true);
         configuration.setCompressionEnabled(true);
-        XMPPConnection connection = new XMPPConnection(configuration);
+
+        final XMPPConnection connection = new XMPPConnection(configuration);
         connections.put(node, connection);
 
         connection.addPacketListener(new PacketListener() {
             @Override
             public void processPacket(org.jivesoftware.smack.packet.Packet packet) {
-                Packet response = bot.doReceive(PacketTypeConverter.converttoTinder(packet));
+                Packet response = bot.receive(PacketTypeConverter.converttoTinder(packet));
                 if (response != null) {
-                    send(node, response);
+                    sender.send(connection, packet);
                 }
             }
         }, null);
+
+        bot.setPacketOutput(new PacketOutput() {
+            @Override
+            public void send(Packet packet) {
+                Preconditions.checkNotNull(packet, "Packet can't be null");
+                sender.send(connection, PacketTypeConverter.convertFromTinder(packet, connection));
+            }
+        });
     }
 
-    public void send(String node, Packet packet) {
-        XMPPConnection connection = connections.get(node);
-        if (connection != null && connection.isConnected() && connection.isAuthenticated()) {
-            connection.sendPacket(PacketTypeConverter.convertFromTinder(packet, connection));
+    public void start() {
+        // connect all
+
+        for(XMPPConnection connection : connections.values()) {
+            connection.connect();
+
+            connection.login();
+
         }
+
+        // start sender
+    }
+
+    public void shutdown() {
+
     }
 
 }

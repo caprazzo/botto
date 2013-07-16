@@ -80,7 +80,7 @@ public class AnnotatedBotObject extends AbstractBot {
         }
     }
 
-    public Packet doReceive(Packet packet) {
+    protected Packet doReceive(Packet packet) {
         for (ReceiverMethod method : receiverMethods) {
             if (method.canReceive(packet)) {
                 return method.receive(obj, packet).orNull();
@@ -111,7 +111,7 @@ public class AnnotatedBotObject extends AbstractBot {
     }
 
     @Override
-    public void doSetPacketOutput(PacketOutput output) {
+    protected void doSetPacketOutput(PacketOutput output) {
         inject(output);
     }
 
