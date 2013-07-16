@@ -9,13 +9,17 @@
     <parent>
         <groupId>botto.xmpp</groupId>
         <artifactId>botto</artifactId>
-        <version>0.6-SNAPSHOT</version>
+        <version>0.6.0-SNAPSHOT</version>
     </parent>
 
     <repositories>
         <repository>
-            <id>jenkins-releases</id>
-            <url>http://repo.jenkins-ci.org/releases/</url>
+            <id>mcaprari-releases</id>
+            <url>https://github.com/mcaprari/mcaprari-maven-repo/raw/master/releases</url>
+        </repository>
+        <repository>
+            <id>mcaprari-snapshots</id>
+            <url>https://github.com/mcaprari/mcaprari-maven-repo/raw/master/snapshots</url>
         </repository>
     </repositories>
 
@@ -23,7 +27,7 @@
         <dependency>
             <groupId>botto.xmpp</groupId>
             <artifactId>botto-annotations</artifactId>
-            <version>0.5.1-SNAPSHOT</version>
+            <version>0.6.0-SNAPSHOT</version>
         </dependency>
 
         <dependency>
@@ -49,9 +53,8 @@
         <dependency>
             <groupId>jivesoftware</groupId>
             <artifactId>smack</artifactId>
-            <version>3.1.0</version>
+            <version>3.3.0</version>
         </dependency>
-
 
         <dependency>
             <groupId>com.google.guava</groupId>

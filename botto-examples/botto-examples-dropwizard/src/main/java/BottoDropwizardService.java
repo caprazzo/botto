@@ -40,7 +40,7 @@ public class BottoDropwizardService extends Service<BottoDropwizardServiceConfig
                 // so that bot will be addressable as hello@dropwizard.example.com
                 subdomain.addBot(helloBot, "hello");
 
-                // create a simple bot
+                // setup a single-node bot
                 BotEnvironment botEnv = environment.getBot("counter");
                 botEnv.setBot(countUpBot);
                 botEnv.setSecret("secret");
