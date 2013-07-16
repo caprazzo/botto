@@ -58,6 +58,7 @@ public class EchoBotService extends AbstractBotService {
         SubdomainEnvironment subdomain2 = environment.getSubdomain("subdomain2");
         subdomain2.addBot(relayBot, "relay");
     }
+}
 ```
 
 Echo Bot:
