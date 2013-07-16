@@ -1,7 +1,4 @@
-import botto.xmpp.service.AbstractBotService;
-import botto.xmpp.service.BotServiceConfiguration;
-import botto.xmpp.service.ServiceEnvironment;
-import botto.xmpp.service.SubdomainEnvironment;
+import botto.xmpp.service.*;
 import com.yammer.dropwizard.Service;
 import com.yammer.dropwizard.config.Bootstrap;
 import com.yammer.dropwizard.config.Environment;
@@ -22,10 +19,12 @@ public class BottoDropwizardService extends Service<BottoDropwizardServiceConfig
     public void run(BottoDropwizardServiceConfiguration dropwizardConfig, Environment dropwizardEnvironment) throws Exception {
 
         // create an instance of the simple Bot
-        final SayHelloBot bot = new SayHelloBot();
+        final SayHelloBot helloBot = new SayHelloBot();
+
+        final CountUpBot countUpBot = new CountUpBot();
 
         // create an instance of the simple resource and reference the bot
-        SayHelloResource resource = new SayHelloResource(bot);
+        SayHelloResource resource = new SayHelloResource(helloBot);
 
         // configure the resource
         dropwizardEnvironment.addResource(resource);
@@ -39,7 +38,12 @@ public class BottoDropwizardService extends Service<BottoDropwizardServiceConfig
 
                 // add the bot to this subdomain, and assigne the node "hello" to it
                 // so that bot will be addressable as hello@dropwizard.example.com
-                subdomain.addBot(bot, "hello");
+                subdomain.addBot(helloBot, "hello");
+
+                // create a simple bot
+                BotEnvironment botEnv = environment.getBot("counter");
+                botEnv.setBot(countUpBot);
+                botEnv.setSecret("secret");
             }
         };
 

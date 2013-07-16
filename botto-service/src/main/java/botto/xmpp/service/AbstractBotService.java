@@ -28,6 +28,7 @@ public abstract class AbstractBotService {
         final ComponentBotExecutor botExecutor = new ComponentBotExecutor(Executors.newFixedThreadPool(10));
         ComponentBotRouter router = new ComponentBotRouter(botExecutor);
 
+        // setup sub-domains
         for(SubdomainEnvironment subdomain : environment.getSubdomains()) {
 
             // create a component for each subdomain
@@ -50,10 +51,19 @@ public abstract class AbstractBotService {
                 manager.setMultipleAllowed(subdomain.getName(), true);
                 manager.removeComponent(subdomain.getName());
                 manager.addComponent(subdomain.getName(), component);
-                Log.info("Connected");
+                Log.info("Components Connected");
             } catch (ComponentException e) {
                 throw new RuntimeException(e);
             }
+        }
+
+        // setup single bots
+        for(BotEnvironment botEnv : environment.getBots()) {
+            // for each bot create a new connection
+
+            // route connection receiver to the bot
+
+            // set bot packet output
         }
 
         sender.start();

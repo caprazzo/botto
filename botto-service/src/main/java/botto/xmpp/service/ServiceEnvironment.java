@@ -12,6 +12,7 @@ public class ServiceEnvironment {
     private final Logger Log = LoggerFactory.getLogger(ServiceEnvironment.class);
 
     private final HashMap<String, SubdomainEnvironment> subdomains = new HashMap<String, SubdomainEnvironment>();
+    private final HashMap<String, BotEnvironment> bots = new HashMap<String, BotEnvironment>();
     private final BotServiceConfiguration configuration;
 
     ServiceEnvironment(BotServiceConfiguration configuration) {
@@ -29,6 +30,15 @@ public class ServiceEnvironment {
         return env;
     }
 
+    public BotEnvironment getBot(String id) {
+        BotEnvironment env = bots.get(id);
+        if (env == null) {
+            env = new BotEnvironment(id);
+            bots.put(id, env);
+        }
+        return env;
+    }
+
     Collection<SubdomainEnvironment> getSubdomains() {
         return subdomains.values();
     }
@@ -42,5 +52,9 @@ public class ServiceEnvironment {
                 return true;
         }
         return false;
+    }
+
+    public Collection<BotEnvironment> getBots() {
+        return bots.values();
     }
 }
