@@ -1,4 +1,6 @@
 target/
 .iml
 .settings
-.DS_Store.idea
+.DS_Store
+.idea
+*.iml

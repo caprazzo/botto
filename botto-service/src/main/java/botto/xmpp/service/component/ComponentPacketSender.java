@@ -34,6 +34,10 @@ public class ComponentPacketSender {
                     try {
                         ComponentPacket response = outbox.take();
                         Log.debug("Sending response {}", response.getPacket());
+                        if (response.getPacket() == null) {
+                            Log.warn("Response packet is null, not sending. {}", response);
+                            return;
+                        }
                         manager.sendPacket(response.getComponent(), response.getPacket());
                     } catch (InterruptedException e) {
                         // it's ok, we are shutting down now

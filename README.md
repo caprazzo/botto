@@ -26,7 +26,7 @@ Import using maven:
         <dependency>
             <groupId>botto.xmpp</groupId>
             <artifactId>botto-service</artifactId>
-            <version>0.5.0-SNAPSHOT</version>
+            <version>0.5.1-SNAPSHOT</version>
         </dependency>
     </dependencies>
 ```
