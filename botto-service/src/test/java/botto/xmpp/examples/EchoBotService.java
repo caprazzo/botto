@@ -1,4 +1,4 @@
-package net.caprazzi.xmpp;
+package botto.xmpp.examples;
 
 import botto.xmpp.annotations.Context;
 import botto.xmpp.annotations.PacketOutput;

@@ -54,7 +54,9 @@ public class PacketTypeConverter {
             factory.setNamespaceAware(true);
             XmlPullParser xpp = factory.newPullParser();
 
-            xpp.setInput(new StringReader(packet.toXML()));
+            xpp.setInput(new ByteArrayInputStream(packet.toXML().getBytes("utf-8")), "utf-8");
+
+            xpp.next();
 
             if (packet.getElement().getName().equalsIgnoreCase("iq")) {
                 return PacketParserUtils.parseIQ(xpp, connection);
