@@ -41,9 +41,9 @@ public class BottoDropwizardService extends Service<BottoDropwizardServiceConfig
                 subdomain.addBot(helloBot, "hello");
 
                 // setup a single-node bot
-                BotEnvironment botEnv = environment.getBot("counter");
+                BotEnvironment botEnv = environment.getBot("countup");
                 botEnv.setBot(countUpBot);
-                botEnv.setSecret("secret");
+                botEnv.setSecret("countup");
             }
         };
 

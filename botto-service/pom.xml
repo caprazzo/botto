@@ -55,6 +55,11 @@
             <artifactId>smack</artifactId>
             <version>3.3.0</version>
         </dependency>
+        <dependency>
+            <groupId>jivesoftware</groupId>
+            <artifactId>smackx</artifactId>
+            <version>3.3.0</version>
+        </dependency>
 
         <dependency>
             <groupId>com.google.guava</groupId>

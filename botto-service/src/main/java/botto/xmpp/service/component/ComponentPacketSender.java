@@ -8,8 +8,6 @@ import org.slf4j.LoggerFactory;
 import org.xmpp.component.Component;
 import org.xmpp.packet.Packet;
 
-import java.util.concurrent.*;
-
 /**
  * Sends packets from xmpp components.
  * Incoming messages are queued up and sent asynchronously.

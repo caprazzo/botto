@@ -7,11 +7,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class BotEnvironment {
+
+    private final Logger log;
+
     private final String node;
     private AnnotatedBotObject bot;
     private String secret;
-
-    private final Logger log;
+    private String resource;
 
     public BotEnvironment(String node) {
         this.node = node;
@@ -30,5 +32,25 @@ public class BotEnvironment {
 
     public void setSecret(String secret) {
         this.secret = secret;
+    }
+
+    public String getNode() {
+        return node;
+    }
+
+    public AnnotatedBotObject getBot() {
+        return bot;
+    }
+
+    public String getSecret() {
+        return secret;
+    }
+
+    public void setResource(String resource) {
+        this.resource = resource;
+    }
+
+    public String getResource() {
+        return resource;
     }
 }
