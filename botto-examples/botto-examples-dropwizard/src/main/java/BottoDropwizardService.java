@@ -51,7 +51,7 @@ public class BottoDropwizardService extends Service<BottoDropwizardServiceConfig
         BotServiceConfiguration botServiceConfiguration = dropwizardConfig.getBotService();
 
         // run the service
-        //botService.run(botServiceConfiguration);
+        botService.run(botServiceConfiguration);
     }
 
 }
