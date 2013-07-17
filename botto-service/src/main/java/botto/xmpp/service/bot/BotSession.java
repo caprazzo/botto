@@ -46,10 +46,17 @@ class BotSession {
         connection.addPacketListener(new PacketListener() {
             @Override
             public void processPacket(org.jivesoftware.smack.packet.Packet packet) {
+                try {
                 log.info("Received packet {}", packet.toXML());
-                Packet response = bot.receive(PacketTypeConverter.converttoTinder(packet));
-                if (response != null) {
-                    sender.send(session, packet);
+                bot.receive(PacketTypeConverter.converttoTinder(packet));
+                //log.info("Bot generated response {}", response.toXML());
+                //if (response != null) {
+                //    sender.send(session, packet);
+                //}
+                }
+                catch (Exception ex) {
+                    ex.printStackTrace();
+                    log.error("Error while processing packet {}: {}", packet.getPacketID(), ex);
                 }
             }
         }, null);

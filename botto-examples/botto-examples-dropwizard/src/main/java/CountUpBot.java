@@ -17,7 +17,8 @@ public class CountUpBot {
         message.setTo(receive.getFrom());
 
         try {
-            int number = Integer.parseInt(receive.getBody());
+            String body = receive.getBody();
+            int number = Integer.parseInt(body);
             message.setBody(number + " + 1 = " + (number + 1));
         }
         catch(Exception ex) {

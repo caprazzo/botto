@@ -7,6 +7,7 @@ import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
 import org.jivesoftware.smack.Connection;
 import org.jivesoftware.smack.util.PacketParserUtils;
+import org.xml.sax.InputSource;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserFactory;
 import org.xmpp.packet.IQ;
@@ -14,7 +15,9 @@ import org.xmpp.packet.Message;
 import org.xmpp.packet.Packet;
 import org.xmpp.packet.Presence;
 
+import java.io.ByteArrayInputStream;
 import java.io.StringReader;
+import java.io.UnsupportedEncodingException;
 
 public class PacketTypeConverter {
     // this method converts from smack (xmpp bot library) packet types
@@ -22,7 +25,7 @@ public class PacketTypeConverter {
     public static Packet converttoTinder(org.jivesoftware.smack.packet.Packet packet) {
         SAXReader saxReader = new SAXReader();
         try {
-            Document read = saxReader.read(packet.toXML());
+            Document read = saxReader.read(new InputSource(new ByteArrayInputStream(packet.toXML().getBytes("utf-8"))));
             Element element = read.getRootElement();
             if (element.getName().equalsIgnoreCase("iq")) {
                 return new IQ(element);
@@ -37,6 +40,10 @@ public class PacketTypeConverter {
                 throw new RuntimeException("Unknown packet type " + element.getName() + ": " + element.toString());
             }
         } catch (DocumentException e) {
+            e.printStackTrace();
+            throw new RuntimeException("exception while parsing packet " + packet.toXML(), e);
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
             throw new RuntimeException("exception while parsing packet " + packet.toXML(), e);
         }
     }
