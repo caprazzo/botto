@@ -12,6 +12,10 @@ public class CountUpBot {
      */
     @Receive
     public Message countUp(Message receive) {
+
+        if (receive.getBody() == null)
+            return null;
+
         Message message = receive.createCopy();
         message.setFrom(receive.getTo());
         message.setTo(receive.getFrom());

@@ -47,7 +47,7 @@ class BotSession {
             @Override
             public void processPacket(org.jivesoftware.smack.packet.Packet packet) {
                 try {
-                    log.info("Received packet {}", packet.toXML());
+                    log.debug("Received packet {}", packet.toXML());
                     bot.receive(PacketTypeConverter.converttoTinder(packet));
                 }
                 catch (Exception ex) {

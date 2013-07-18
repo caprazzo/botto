@@ -18,9 +18,7 @@ public class BotSessionManager {
         this.port = port;
     }
 
-    // TODO: each bot should be enclosed in its own thread
     // TODO: incoming packets should all go to the same queue
-    // TODO: outgoing packets should be put in a queue
 
     public void createSession(final AbstractBot bot, final String node, String secret, String resource) {
         sessions.put(node, new BotSession(host, port, node, secret, resource, bot, sender));
