@@ -8,3 +8,6 @@ botService:
 
     # xmpp server Component password
     secret: secret
+
+logging:
+    level: INFO

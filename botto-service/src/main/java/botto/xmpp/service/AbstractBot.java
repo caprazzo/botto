@@ -16,10 +16,10 @@ public abstract class AbstractBot implements Bot {
     @Override
     public final Packet receive(Packet packet) {
         Packet response = doReceive(packet);
-        if (response != null) {
+         if (response != null) {
             output.send(response);
         }
-        return packet;
+        return response;
     }
 
     protected abstract Packet doReceive(Packet packet);

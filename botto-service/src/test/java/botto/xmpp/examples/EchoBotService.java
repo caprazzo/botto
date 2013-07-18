@@ -1,12 +1,9 @@
-package net.caprazzi.xmpp;
+package botto.xmpp.examples;
 
 import botto.xmpp.annotations.Context;
 import botto.xmpp.annotations.PacketOutput;
 import botto.xmpp.annotations.Receive;
-import botto.xmpp.service.AbstractBotService;
-import botto.xmpp.service.BotServiceConfiguration;
-import botto.xmpp.service.ServiceEnvironment;
-import botto.xmpp.service.SubdomainEnvironment;
+import botto.xmpp.service.*;
 import org.xmpp.packet.JID;
 import org.xmpp.packet.Message;
 
@@ -30,9 +27,15 @@ public class EchoBotService extends AbstractBotService {
 
         RelayBot relayBot = new RelayBot();
 
-        // setup echo bot to listen at relay@subdomain2.yourdomain.com
+        // setup relay bot to listen at relay@subdomain2.yourdomain.com
         SubdomainEnvironment subdomain2 = environment.getSubdomain("subdomain2");
         subdomain2.addBot(relayBot, "relay");
+
+        // setup relay bot to listen at echo@yourdomain.com
+        // (you need to create a matching user in your xmpp server)
+        BotEnvironment echoSingleBotEnv = environment.getBot("echo");
+        echoSingleBotEnv.setBot(echoBot);
+        echoSingleBotEnv.setSecret("secret");
     }
 
     /**

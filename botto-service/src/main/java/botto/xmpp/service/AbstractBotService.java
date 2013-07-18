@@ -1,5 +1,6 @@
 package botto.xmpp.service;
 
+import botto.xmpp.service.bot.BotSessionManager;
 import botto.xmpp.service.component.ComponentBotExecutor;
 import botto.xmpp.service.component.ComponentBotRouter;
 import botto.xmpp.service.component.ComponentPacketSender;
@@ -28,6 +29,9 @@ public abstract class AbstractBotService {
         final ComponentBotExecutor botExecutor = new ComponentBotExecutor(Executors.newFixedThreadPool(10));
         ComponentBotRouter router = new ComponentBotRouter(botExecutor);
 
+        final BotSessionManager botSessionManager = new BotSessionManager(configuration.getHost(), 5222);
+
+        // setup sub-domains
         for(SubdomainEnvironment subdomain : environment.getSubdomains()) {
 
             // create a component for each subdomain
@@ -50,13 +54,19 @@ public abstract class AbstractBotService {
                 manager.setMultipleAllowed(subdomain.getName(), true);
                 manager.removeComponent(subdomain.getName());
                 manager.addComponent(subdomain.getName(), component);
-                Log.info("Connected");
+                Log.info("Components Connected");
             } catch (ComponentException e) {
                 throw new RuntimeException(e);
             }
         }
 
+        // setup single bots
+        for(BotEnvironment botEnv : environment.getBots()) {
+            botSessionManager.createSession(botEnv.getBot(), botEnv.getNode(), botEnv.getSecret(), botEnv.getResource());
+        }
+
         sender.start();
+        botSessionManager.start();
 
         Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
             @Override
@@ -64,6 +74,7 @@ public abstract class AbstractBotService {
                 Log.info("Running shutdown hook");
                 sender.shutdown();
                 botExecutor.shutdown();
+                botSessionManager.shutdown();
 
                 for(SubdomainEnvironment subdomain : environment.getSubdomains()) {
                     try {

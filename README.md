@@ -4,7 +4,12 @@ Botto is a Java framework for easy development on XMPP Bots
 
 Botto has out-of-the-box support for:
 * annotation-only pojo bots
-* multiple components per instance, each with multiple bots (bot@service.example.com)
+* multiple single-bot per instance (bot@example.com)
+* multiple bot-component per instance (bot@component.example.com)
+
+For a working example, see: https://github.com/mcaprari/botto/blob/master/botto-service/src/test/java/net/caprazzi/xmpp/EchoBotService.java
+
+For integration with Dropwizard, see: https://github.com/mcaprari/botto/tree/master/botto-examples/botto-examples-dropwizard
 
 ### Quick start:
 
@@ -26,7 +31,7 @@ Import using maven:
         <dependency>
             <groupId>botto.xmpp</groupId>
             <artifactId>botto-service</artifactId>
-            <version>0.5.1-SNAPSHOT</version>
+            <version>0.6.0-SNAPSHOT</version>
         </dependency>
     </dependencies>
 ```
@@ -110,9 +115,7 @@ public class RelayBot {
 }
 ```
 
-For a working example, see: https://github.com/mcaprari/botto/blob/master/botto-service/src/test/java/net/caprazzi/xmpp/EchoBotService.java
 
-For integration with Dropwizard, see: https://github.com/mcaprari/botto/tree/master/botto-examples/botto-examples-dropwizard
 
 
 
