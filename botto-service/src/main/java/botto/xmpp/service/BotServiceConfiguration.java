@@ -1,19 +1,22 @@
 package botto.xmpp.service;
 
 public class BotServiceConfiguration {
+    private int componentPort;
+    private int clientPort;
     private String host;
-    private int port;
+
     private String secret;
+
 
     public String getHost() {
         return host;
     }
 
-    public int getPort() {
-        return port;
+    public int getComponentPort() {
+        return componentPort;
     }
 
-    public String getSecret(String subdomain) {
+    public String getComponentSecret(String subdomain) {
         return secret;
     }
 
@@ -21,11 +24,19 @@ public class BotServiceConfiguration {
         this.host = host;
     }
 
-    public void setPort(int port) {
-        this.port = port;
+    public void setComponentPort(int port) {
+        this.componentPort = port;
     }
 
-    public void setSecret(String secret) {
+    public void setComponentSecret(String secret) {
         this.secret = secret;
+    }
+
+    public int getClientPort() {
+        return clientPort;
+    }
+
+    public void setClientPort(int clientPort) {
+        this.clientPort = clientPort;
     }
 }

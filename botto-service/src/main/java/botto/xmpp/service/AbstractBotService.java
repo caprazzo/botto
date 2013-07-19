@@ -23,13 +23,13 @@ public abstract class AbstractBotService {
         final ServiceEnvironment environment = new ServiceEnvironment(configuration);
         run(environment);
 
-        final ExternalComponentManager manager = new ExternalComponentManager(configuration.getHost(), configuration.getPort());
+        final ExternalComponentManager manager = new ExternalComponentManager(configuration.getHost(), configuration.getComponentPort());
         final ComponentPacketSender sender = new ComponentPacketSender(manager);
 
         final ComponentBotExecutor botExecutor = new ComponentBotExecutor(Executors.newFixedThreadPool(10));
         ComponentBotRouter router = new ComponentBotRouter(botExecutor);
 
-        final BotSessionManager botSessionManager = new BotSessionManager(configuration.getHost(), 5222);
+        final BotSessionManager botSessionManager = new BotSessionManager(configuration.getHost(), configuration.getClientPort());
 
         // setup sub-domains
         for(SubdomainEnvironment subdomain : environment.getSubdomains()) {

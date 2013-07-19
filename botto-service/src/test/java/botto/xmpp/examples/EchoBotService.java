@@ -12,8 +12,8 @@ public class EchoBotService extends AbstractBotService {
     public static void main(String[] main) {
         BotServiceConfiguration configuration = new BotServiceConfiguration();
         configuration.setHost("localhost");
-        configuration.setPort(5275);
-        configuration.setSecret("secret");
+        configuration.setComponentPort(5275);
+        configuration.setComponentSecret("secret");
         new EchoBotService().run(configuration);
     }
 

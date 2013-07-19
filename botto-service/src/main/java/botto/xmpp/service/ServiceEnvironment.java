@@ -24,7 +24,7 @@ public class ServiceEnvironment {
         SubdomainEnvironment env = subdomains.get(subdomain);
         if (env == null) {
             env = new SubdomainEnvironment(this, subdomain);
-            env.setSecret(configuration.getSecret(subdomain));
+            env.setSecret(configuration.getComponentSecret(subdomain));
             subdomains.put(subdomain, env);
         }
         return env;
