@@ -9,7 +9,7 @@
     <parent>
         <groupId>botto.xmpp</groupId>
         <artifactId>botto</artifactId>
-        <version>0.6.0</version>
+        <version>${bottoProjectVersion}</version>
     </parent>
 
     <dependencies>
