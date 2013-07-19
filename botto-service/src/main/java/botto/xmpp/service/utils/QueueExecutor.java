@@ -32,10 +32,16 @@ public abstract class QueueExecutor<T> {
                         // get the first element, but don't remove it
                         T element = outbox.take();
                         if (element == null) {
-                            Log.trace("Element is null, not processing");
+
+                            if (Log.isTraceEnabled())
+                                Log.trace("Element is null, not processing");
+
                             continue;
                         }
-                        Log.trace("Processing element {}", element);
+
+                        if (Log.isTraceEnabled())
+                            Log.trace("Processing element {}", element);
+
                         try {
                             doProcess(element);
                         }
@@ -53,6 +59,9 @@ public abstract class QueueExecutor<T> {
 
     public final void enqueue(T element) {
         Preconditions.checkNotNull(element, "Can't enqueue null elements");
+        if (Log.isDebugEnabled()) {
+            Log.debug("Adding element to queue: {}", element);
+        }
         try {
             outbox.put(element);
         } catch (InterruptedException e) {

@@ -98,10 +98,26 @@ class BotSession {
     }
 
     public synchronized boolean sendPacket(org.jivesoftware.smack.packet.Packet packet) {
-        if (connection.isConnected() && connection.isAuthenticated()) {
-            connection.sendPacket(packet);
-            return true;
+
+        if (!connection.isConnected()) {
+            if (log.isDebugEnabled())
+                log.debug("Not sending packet because connection is not connected. Packet: {}", packet);
+
+            return false;
         }
-        return false;
+
+        if (!connection.isAuthenticated()) {
+            if (log.isDebugEnabled())
+                log.debug("Not sending packet because connection is not authenticated. Packet: {}", packet);
+
+            return false;
+        }
+
+        if (log.isDebugEnabled()) {
+            log.debug("Sending packet {}", packet);
+        }
+        connection.sendPacket(packet);
+
+        return true;
     }
 }

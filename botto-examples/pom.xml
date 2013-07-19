@@ -8,7 +8,7 @@
     <parent>
         <artifactId>botto</artifactId>
         <groupId>botto.xmpp</groupId>
-        <version>0.6.2</version>
+        <version>0.6.3-SNAPSHOT</version>
     </parent>
     <artifactId>botto-examples</artifactId>
     <packaging>pom</packaging>
