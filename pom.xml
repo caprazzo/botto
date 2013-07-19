@@ -5,13 +5,9 @@
 
     <modelVersion>4.0.0</modelVersion>
 
-    <properties>
-        <bottoProjectVersion>0.6.1</bottoProjectVersion>
-    </properties>
-
     <groupId>botto.xmpp</groupId>
     <artifactId>botto</artifactId>
-    <version>${bottoProjectVersion}</version>
+    <version>0.6.2</version>
     <packaging>pom</packaging>
 
     <modules>        
