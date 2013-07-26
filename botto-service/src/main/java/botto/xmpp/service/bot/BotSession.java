@@ -101,14 +101,14 @@ class BotSession {
 
         if (!connection.isConnected()) {
             if (log.isDebugEnabled())
-                log.debug("Not sending packet because connection is not connected. Packet: {}", packet);
+                log.debug("Not sending packet because connection is not connected. Packet: {}", packet.toXML());
 
             return false;
         }
 
         if (!connection.isAuthenticated()) {
             if (log.isDebugEnabled())
-                log.debug("Not sending packet because connection is not authenticated. Packet: {}", packet);
+                log.debug("Not sending packet because connection is not authenticated. Packet: {}", packet.toXML());
 
             return false;
         }
@@ -119,5 +119,10 @@ class BotSession {
         connection.sendPacket(packet);
 
         return true;
+    }
+
+    @Override
+    public String toString() {
+        return "BotSession(" + node + ")";
     }
 }

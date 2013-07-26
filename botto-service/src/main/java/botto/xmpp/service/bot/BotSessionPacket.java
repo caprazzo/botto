@@ -20,4 +20,9 @@ public final class BotSessionPacket {
     public Packet getPacket() {
         return packet;
     }
+
+    @Override
+    public String toString() {
+        return "BotSessionPacket(" + session + ", " + packet.toXML() + ")";
+    }
 }

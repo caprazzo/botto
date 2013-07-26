@@ -59,9 +59,10 @@ public abstract class QueueExecutor<T> {
 
     public final void enqueue(T element) {
         Preconditions.checkNotNull(element, "Can't enqueue null elements");
-        if (Log.isDebugEnabled()) {
+
+        if (Log.isDebugEnabled())
             Log.debug("Adding element to queue: {}", element);
-        }
+
         try {
             outbox.put(element);
         } catch (InterruptedException e) {
