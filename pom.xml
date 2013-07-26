@@ -7,7 +7,7 @@
 
     <groupId>botto.xmpp</groupId>
     <artifactId>botto</artifactId>
-    <version>0.6.3-SNAPSHOT</version>
+    <version>0.6.7-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <modules>        

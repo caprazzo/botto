@@ -61,7 +61,12 @@ class BotSession {
             @Override
             public void send(Packet packet) {
                 Preconditions.checkNotNull(packet, "Packet can't be null");
+                try {
                 sender.send(session, PacketTypeConverter.convertFromTinder(packet, connection));
+                }
+                catch (Exception ex) {
+                    log.error("Error while sending packet {}: {}", packet, ex);
+                }
             }
         });
     }

@@ -7,6 +7,8 @@ import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
 import org.jivesoftware.smack.Connection;
 import org.jivesoftware.smack.util.PacketParserUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xml.sax.InputSource;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserFactory;
@@ -20,6 +22,9 @@ import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
 
 public class PacketTypeConverter {
+
+    private final static Logger Log = LoggerFactory.getLogger(PacketTypeConverter.class);
+
     // this method converts from smack (xmpp bot library) packet types
     // to tinder/whack packet types (xmpp component library)
     public static Packet converttoTinder(org.jivesoftware.smack.packet.Packet packet) {
@@ -40,17 +45,17 @@ public class PacketTypeConverter {
                 throw new RuntimeException("Unknown packet type " + element.getName() + ": " + element.toString());
             }
         } catch (DocumentException e) {
-            e.printStackTrace();
+            Log.error("Error while parsing packet {}: {}", packet.toXML(), e);
             throw new RuntimeException("exception while parsing packet " + packet.toXML(), e);
         } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
+            Log.error("Error while parsing packet {}: {}", packet.toXML(), e);
             throw new RuntimeException("exception while parsing packet " + packet.toXML(), e);
         }
     }
 
     public static org.jivesoftware.smack.packet.Packet convertFromTinder(Packet packet, Connection connection) {
         try {
-            XmlPullParserFactory factory = XmlPullParserFactory.newInstance();
+            XmlPullParserFactory factory = XmlPullParserFactory.newInstance("org.xmlpull.mxp1.MXParserFactory", PacketTypeConverter.class); //XmlPullParserFactory.newInstance("org.xmlpull.v1.XmlPullParserFactory", PacketTypeConverter.class);
             factory.setNamespaceAware(true);
             XmlPullParser xpp = factory.newPullParser();
 
@@ -72,6 +77,7 @@ public class PacketTypeConverter {
             }
         }
         catch (Exception e) {
+            Log.error("Error while parsing packet {}: {}", packet.toXML(), e);
             throw new RuntimeException("exception while parsing packet " + packet.toXML(), e);
         }
     }

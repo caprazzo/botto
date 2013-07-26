@@ -9,7 +9,7 @@
     <parent>
         <groupId>botto.xmpp</groupId>
         <artifactId>botto</artifactId>
-        <version>0.6.3-SNAPSHOT</version>
+        <version>0.6.7-SNAPSHOT</version>
     </parent>
 
     <repositories>
@@ -43,9 +43,14 @@
 
     <dependencies>
         <dependency>
+            <groupId>xpp3</groupId>
+            <artifactId>xpp3</artifactId>
+            <version>1.1.4c</version>
+        </dependency>
+        <dependency>
             <groupId>botto.xmpp</groupId>
             <artifactId>botto-annotations</artifactId>
-            <version>0.6.0-SNAPSHOT</version>
+            <version>0.6.7-SNAPSHOT</version>
         </dependency>
         <dependency>
            <groupId>org.igniterealtime</groupId>
