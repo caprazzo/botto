@@ -19,6 +19,13 @@ public class SayHelloBot {
     @Context
     private PacketOutput output;
 
+    @Context
+    private ConnectionInfo connectionInfo;
+
+    public boolean isConnected() {
+        return connectionInfo.isConnected();
+    }
+
     /**
      * Sends an XMPP message that says 'hello'
      * @param dest a valid user JID
@@ -31,6 +38,7 @@ public class SayHelloBot {
         output.send(message);
     }
 }
+
 ```
 
 SayHelloResource:
@@ -39,7 +47,7 @@ SayHelloResource:
  * A simple resource that sends a greeting to
  * an XMPP user via the SayHelloBot
  */
-@Path("/user/{jid}/")
+@Path("/user")
 public class SayHelloResource {
 
     private final SayHelloBot helloBot;
@@ -48,8 +56,14 @@ public class SayHelloResource {
         this.helloBot = helloBot;
     }
 
+    @GET
+    @Path("/check")
+    public boolean isConnected() {
+        return helloBot.isConnected();
+    }
+
     @POST
-    @Path("hello")
+    @Path("/hello/{jid}/")
     public void sayHello(@PathParam("jid") String toJid) {
         helloBot.sayHello(toJid);
     }

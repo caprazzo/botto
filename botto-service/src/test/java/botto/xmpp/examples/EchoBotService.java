@@ -1,5 +1,6 @@
 package botto.xmpp.examples;
 
+import botto.xmpp.annotations.ConnectionInfo;
 import botto.xmpp.annotations.Context;
 import botto.xmpp.annotations.PacketOutput;
 import botto.xmpp.annotations.Receive;
@@ -57,6 +58,9 @@ public class EchoBotService extends AbstractBotService {
      * to multiple addresses
      */
     public static class RelayBot {
+
+        @Context
+        ConnectionInfo connectionInfo;
 
         @Context
         private PacketOutput output;
