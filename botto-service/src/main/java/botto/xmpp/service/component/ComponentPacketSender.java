@@ -19,7 +19,6 @@ public class ComponentPacketSender extends SingleThreadQueueExecutor<ComponentPa
     private final ExternalComponentManager manager;
 
     public ComponentPacketSender(ExternalComponentManager manager) {
-        super("component-packet-sender");
         this.manager = manager;
     }
 

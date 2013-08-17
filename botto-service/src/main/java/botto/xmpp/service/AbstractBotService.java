@@ -13,23 +13,31 @@ import org.xmpp.component.Component;
 import org.xmpp.component.ComponentException;
 import org.xmpp.packet.Packet;
 
+import java.net.ConnectException;
 import java.util.concurrent.Executors;
 
 public abstract class AbstractBotService {
 
     private final Logger Log = LoggerFactory.getLogger(AbstractBotService.class);
 
+    private ServiceEnvironment environment;
+    private ComponentPacketSender sender;
+    private ExternalComponentManager manager;
+    private ComponentBotExecutor botExecutor;
+    private BotSessionManager botSessionManager;
+
     public final void run(BotServiceConfiguration configuration) {
-        final ServiceEnvironment environment = new ServiceEnvironment(configuration);
+        environment = new ServiceEnvironment(configuration);
         run(environment);
 
-        final ExternalComponentManager manager = new ExternalComponentManager(configuration.getHost(), configuration.getComponentPort());
-        final ComponentPacketSender sender = new ComponentPacketSender(manager);
+        manager = new ExternalComponentManager(configuration.getHost(), configuration.getComponentPort());
+        sender = new ComponentPacketSender(manager);
 
-        final ComponentBotExecutor botExecutor = new ComponentBotExecutor(Executors.newFixedThreadPool(10));
+
+        botExecutor = new ComponentBotExecutor(Executors.newCachedThreadPool());
+        botSessionManager = new BotSessionManager(configuration.getHost(), configuration.getClientPort());
+
         ComponentBotRouter router = new ComponentBotRouter(botExecutor);
-
-        final BotSessionManager botSessionManager = new BotSessionManager(configuration.getHost(), configuration.getClientPort());
 
         // setup sub-domains
         for(SubdomainEnvironment subdomain : environment.getSubdomains()) {
@@ -59,6 +67,12 @@ public abstract class AbstractBotService {
                 connectionInfo.setConnectionStatus(true);
                 Log.info("Components Connected");
             } catch (ComponentException e) {
+                if (e.getCause() instanceof ConnectException) {
+                    Log.error("Could not connect to {}:{} while configuring component for subdomain {}",
+                            configuration.getHost(), configuration.getClientPort(), subdomain.getName());
+
+                }
+                stop();
                 throw new RuntimeException(e);
             }
         }
@@ -75,20 +89,37 @@ public abstract class AbstractBotService {
             @Override
             public void run() {
                 Log.info("Running shutdown hook");
-                sender.stop();
-                botExecutor.stop();
-                botSessionManager.stop();
-
-                for(SubdomainEnvironment subdomain : environment.getSubdomains()) {
-                    try {
-                        subdomain.shutdown();
-                        manager.removeComponent(subdomain.getName());
-                    } catch (ComponentException e) {
-                        Log.warn("Component exception during shutdown: {}", e);
-                    }
-                }
+                stop();
             }
         }));
+    }
+
+    public void stop() {
+
+        Log.info("Shutting Down");
+
+        if (sender != null)
+            sender.stop();
+
+        if (botExecutor != null)
+            botExecutor.stop();
+
+        if (botSessionManager != null)
+            botSessionManager.stop();
+
+        if (environment != null) {
+            for(SubdomainEnvironment subdomain : environment.getSubdomains()) {
+                try {
+                    subdomain.shutdown();
+                    if (manager != null)
+                        manager.removeComponent(subdomain.getName());
+                } catch (ComponentException e) {
+                    Log.warn("Component exception during shutdown: {}", e);
+                }
+            }
+        }
+
+        Log.info("Shutdown complete");
     }
 
     protected abstract void run(ServiceEnvironment environment);

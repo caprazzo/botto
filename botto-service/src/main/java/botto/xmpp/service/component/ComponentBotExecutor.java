@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xmpp.packet.Packet;
 
+import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 
@@ -30,10 +31,11 @@ public class ComponentBotExecutor {
             return;
         }
 
-        final ListenableFuture<?> response = executorService.submit(new BotReceiveTask(processor, packet));
-        Futures.addCallback(response, new FutureCallback<Object>() {
+        final ListenableFuture<Packet> response = executorService.submit(new BotReceiveTask(processor, packet));
+        Futures.addCallback(response, new FutureCallback<Packet>() {
             @Override
-            public void onSuccess(Object response) {
+            public void onSuccess(Packet response) {
+                // TODO: send response to output
             }
 
             @Override
@@ -47,7 +49,7 @@ public class ComponentBotExecutor {
         ExecutorUtils.shutdown(Log, executorService, 5, TimeUnit.SECONDS);
     }
 
-    private static class BotReceiveTask implements Runnable {
+    private static class BotReceiveTask implements Callable<Packet> {
 
         private final Bot bot;
         private final Packet packet;
@@ -58,8 +60,8 @@ public class ComponentBotExecutor {
         }
 
         @Override
-        public void run() {
-            bot.receive(packet);
+        public Packet call() {
+            return bot.receive(packet);
         }
     }
 

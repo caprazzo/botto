@@ -12,22 +12,22 @@ public abstract class AbstractBot implements Bot {
         doSetPacketOutput(output);
     }
 
-    protected abstract void doSetPacketOutput(PacketOutput output);
+    public final void setConnectionInfo(ConnectionInfo connectionInfo) {
+        doSetConnectionInfo(connectionInfo);
+    }
 
     @Override
     public final Packet receive(Packet packet) {
         Packet response = doReceive(packet);
-         if (response != null) {
+        if (response != null) {
             output.send(response);
         }
         return response;
     }
 
-    protected abstract Packet doReceive(Packet packet);
+    protected abstract void doSetPacketOutput(PacketOutput output);
 
-    public void setConnectionInfo(ConnectionInfo connectionInfo) {
-        doSetConnectionInfo(connectionInfo);
-    }
+    protected abstract Packet doReceive(Packet packet);
 
     protected abstract void doSetConnectionInfo(ConnectionInfo connectionInfo);
 }

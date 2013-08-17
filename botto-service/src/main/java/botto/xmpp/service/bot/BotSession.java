@@ -1,16 +1,15 @@
 package botto.xmpp.service.bot;
 
-import botto.xmpp.annotations.PacketOutput;
+
 import botto.xmpp.service.AbstractBot;
 import botto.xmpp.service.BotConnectionInfo;
 import botto.xmpp.utils.PacketTypeConverter;
-import com.google.common.base.Preconditions;
+
 import net.caprazzi.reusables.common.Managed;
 import net.caprazzi.reusables.threading.ExecutorUtils;
 import org.jivesoftware.smack.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xmpp.packet.Packet;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
@@ -26,8 +25,9 @@ class BotSession implements Managed {
     private final String resource;
     private final XMPPConnection connection;
 
-    private final ExecutorService executor = Executors.newSingleThreadExecutor();
+    private final ExecutorService connectionExecutor = Executors.newSingleThreadExecutor();
 
+    //TODO: wrap configuration in a Configuration object
     public BotSession(String host, int port, String node, String secret, String resource, final AbstractBot bot, final BotSessionPacketSender sender) {
         log = LoggerFactory.getLogger(BotSession.class.getName() + "." + node);
 
@@ -44,7 +44,7 @@ class BotSession implements Managed {
 
         connection = new XMPPConnection(configuration);
 
-        final BotSession session = this;
+        BotSessionPacketOutput packetOutput = new BotSessionPacketOutput(sender, connection, this);
 
         // deliver incoming packets to the bot and send out the response
         connection.addPacketListener(new PacketListener() {
@@ -52,6 +52,8 @@ class BotSession implements Managed {
             public void processPacket(org.jivesoftware.smack.packet.Packet packet) {
                 try {
                     log.debug("Received packet {}", packet.toXML());
+
+                    //TODO: give any response to packetOutput
                     bot.receive(PacketTypeConverter.converttoTinder(packet));
                 }
                 catch (Exception ex) {
@@ -61,18 +63,7 @@ class BotSession implements Managed {
         }, null);
 
         // set the packet output to the bot
-        bot.setPacketOutput(new PacketOutput() {
-            @Override
-            public void send(Packet packet) {
-                Preconditions.checkNotNull(packet, "Packet can't be null");
-                try {
-                    sender.send(session, PacketTypeConverter.convertFromTinder(packet, connection));
-                }
-                catch (Exception ex) {
-                    log.error("Error while sending packet {}: {}", packet, ex);
-                }
-            }
-        });
+        bot.setPacketOutput(packetOutput);
 
         final BotConnectionInfo info = new BotConnectionInfo();
         bot.setConnectionInfo(info);
@@ -112,7 +103,7 @@ class BotSession implements Managed {
 
     public synchronized void start() {
         final CountDownLatch latch = new CountDownLatch(1);
-        executor.submit(new Runnable() {
+        connectionExecutor.submit(new Runnable() {
             @Override
             public void run() {
                 log.info("Connecting...");
@@ -137,7 +128,7 @@ class BotSession implements Managed {
 
     public synchronized void stop() {
         connection.disconnect();
-        ExecutorUtils.shutdown(log, executor, 5, TimeUnit.SECONDS);
+        ExecutorUtils.shutdown(log, connectionExecutor, 5, TimeUnit.SECONDS);
     }
 
     public synchronized boolean sendPacket(org.jivesoftware.smack.packet.Packet packet) {

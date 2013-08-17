@@ -20,6 +20,7 @@ import java.util.Collection;
 public class AnnotatedBotObject extends AbstractBot {
 
     private final Logger Log = LoggerFactory.getLogger(AnnotatedBotObject.class);
+
     private final Class<?> clazz;
     private final Object obj;
     private final Collection<Field> injecatbleFields;
@@ -84,6 +85,9 @@ public class AnnotatedBotObject extends AbstractBot {
         }
     }
 
+    // delivers an incoming packet to the first
+    // method annotated @Receive that can receive
+    // the specific type of this packet
     protected Packet doReceive(Packet packet) {
         for (ReceiverMethod method : receiverMethods) {
             if (method.canReceive(packet)) {
@@ -116,11 +120,13 @@ public class AnnotatedBotObject extends AbstractBot {
 
     @Override
     protected void doSetPacketOutput(PacketOutput output) {
+        Preconditions.checkNotNull(output, "packetOutput can't be null");
         inject(output);
     }
 
     @Override
     protected void doSetConnectionInfo(ConnectionInfo connectionInfo) {
+        Preconditions.checkNotNull(connectionInfo, "connectionInfo can't be null");
         inject(connectionInfo);
     }
 

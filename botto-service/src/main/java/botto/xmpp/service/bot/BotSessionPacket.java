@@ -12,7 +12,6 @@ public final class BotSessionPacket {
         this.packet = packet;
     }
 
-
     public BotSession getSession() {
         return session;
     }
