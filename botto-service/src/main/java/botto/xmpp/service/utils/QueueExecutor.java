@@ -9,11 +9,11 @@ import java.util.concurrent.*;
 /**
  * Abstract single-threaded async queue executor.
  */
-public abstract class QueueExecutor<T> {
+public abstract class QueueExecutor<TElement> {
 
     private final Logger Log;
 
-    private final BlockingQueue<T> outbox = new LinkedBlockingQueue<T>();
+    private final BlockingQueue<ElementHolder<TElement>> outbox = new LinkedBlockingQueue<ElementHolder<TElement>>();
 
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
 
@@ -21,7 +21,7 @@ public abstract class QueueExecutor<T> {
         Log = LoggerFactory.getLogger(this.getClass());
     }
 
-    public abstract void doProcess(T element);
+    public abstract void doProcess(TElement element);
 
     public final void start() {
         executor.submit(new Runnable() {
@@ -29,8 +29,7 @@ public abstract class QueueExecutor<T> {
             public void run() {
                 while(!Thread.currentThread().isInterrupted()) {
                     try {
-                        // get the first element, but don't remove it
-                        T element = outbox.take();
+                        ElementHolder<TElement> element = outbox.take();
                         if (element == null) {
 
                             if (Log.isTraceEnabled())
@@ -43,7 +42,7 @@ public abstract class QueueExecutor<T> {
                             Log.trace("Processing element {}", element);
 
                         try {
-                            doProcess(element);
+                            doProcess(element.getElement());
                         }
                         catch (Exception ex) {
                             Log.error("Error while processing element {}: {}", element, ex);
@@ -57,14 +56,14 @@ public abstract class QueueExecutor<T> {
         });
     }
 
-    public final void enqueue(T element) {
+    public final void enqueue(TElement element) {
         Preconditions.checkNotNull(element, "Can't enqueue null elements");
 
         if (Log.isDebugEnabled())
             Log.debug("Adding element to queue: {}", element);
 
         try {
-            outbox.put(element);
+            outbox.put(new ElementHolder(element));
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }
@@ -75,5 +74,17 @@ public abstract class QueueExecutor<T> {
         // TODO: run until the queue is empty or a timeout has elapsed
         executor.shutdownNow();
         Log.info("Shut down complete");
+    }
+
+    private static class ElementHolder<TElement> {
+        private final TElement element;
+
+        public ElementHolder(TElement element) {
+            this.element = element;
+        }
+
+        public TElement getElement() {
+            return element;
+        }
     }
 }
