@@ -4,10 +4,13 @@ botService:
     host: localhost
 
     # xmpp server Component port
-    port: 5275
+    componentPort: 5275
 
     # xmpp server Component password
-    secret: secret
+    componentSecret: secret
+
+    # xmpp server standard client port
+    clientPort: 5223
 
 logging:
     level: INFO
