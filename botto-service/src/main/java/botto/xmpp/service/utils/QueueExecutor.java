@@ -1,6 +1,7 @@
 package botto.xmpp.service.utils;
 
 import com.google.common.base.Preconditions;
+import com.google.common.util.concurrent.AbstractFuture;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -13,7 +14,7 @@ public abstract class QueueExecutor<TElement> {
 
     private final Logger Log;
 
-    private final BlockingQueue<ElementHolder<TElement>> outbox = new LinkedBlockingQueue<ElementHolder<TElement>>();
+    private final BlockingQueue<ElementListenableFuture<TElement>> queue = new LinkedBlockingQueue<ElementListenableFuture<TElement>>();
 
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
 
@@ -27,9 +28,9 @@ public abstract class QueueExecutor<TElement> {
         executor.submit(new Runnable() {
             @Override
             public void run() {
-                while(!Thread.currentThread().isInterrupted()) {
+                while(!Thread.currentThread().isInterrupted() && !executor.isShutdown()) {
                     try {
-                        ElementHolder<TElement> element = outbox.take();
+                        ElementListenableFuture<TElement> element = queue.take();
                         if (element == null) {
 
                             if (Log.isTraceEnabled())
@@ -43,9 +44,11 @@ public abstract class QueueExecutor<TElement> {
 
                         try {
                             doProcess(element.getElement());
+                            element.setSuccess();
                         }
                         catch (Exception ex) {
                             Log.error("Error while processing element {}: {}", element, ex);
+                            element.setException(ex);
                         }
                     } catch (InterruptedException e) {
                         // it's ok, we are shutting down now
@@ -56,35 +59,67 @@ public abstract class QueueExecutor<TElement> {
         });
     }
 
-    public final void enqueue(TElement element) {
+    public final ElementListenableFuture enqueue(TElement element) {
         Preconditions.checkNotNull(element, "Can't enqueue null elements");
 
         if (Log.isDebugEnabled())
             Log.debug("Adding element to queue: {}", element);
 
+        ElementListenableFuture future = new ElementListenableFuture(element);
+
         try {
-            outbox.put(new ElementHolder(element));
+            queue.put(future);
         } catch (InterruptedException e) {
+            Log.warn("Interrupted Exception while adding an element to internal queue.");
             Thread.currentThread().interrupt();
         }
+
+        return future;
     }
 
     public final void shutdown() {
-        // TODO: stop accepting new items
-        // TODO: run until the queue is empty or a timeout has elapsed
-        executor.shutdownNow();
+        // Disable new tasks from being submitted
+        executor.shutdown();
+        try {
+            // Wait a while for existing tasks to terminate
+            if (!executor.awaitTermination(2, TimeUnit.SECONDS)) {
+                executor.shutdownNow(); // Cancel currently executing tasks
+
+                // Wait a while for tasks to respond to being cancelled
+                if (!executor.awaitTermination(2, TimeUnit.SECONDS))
+                    Log.warn("Executor did not terminate cleanly");
+            }
+        } catch (InterruptedException ie) {
+            // (Re-)Cancel if current thread also interrupted
+            executor.shutdownNow();
+            // Preserve interrupt status
+            Thread.currentThread().interrupt();
+        }
+
         Log.info("Shut down complete");
     }
 
-    private static class ElementHolder<TElement> {
+    public static class ElementListenableFuture<TElement> extends AbstractFuture<Boolean> {
         private final TElement element;
 
-        public ElementHolder(TElement element) {
+        public static <TElement> ElementListenableFuture<TElement> create(TElement element) {
+            return new ElementListenableFuture(element);
+        }
+
+        private ElementListenableFuture(TElement element) {
             this.element = element;
         }
 
         public TElement getElement() {
             return element;
+        }
+
+        public void setSuccess() {
+            this.set(true);
+        }
+
+        public void setException(Exception ex) {
+            this.setException(ex);
         }
     }
 }
