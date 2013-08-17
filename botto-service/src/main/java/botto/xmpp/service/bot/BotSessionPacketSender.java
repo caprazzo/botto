@@ -15,6 +15,7 @@ public class BotSessionPacketSender extends QueueExecutor<BotSessionPacket> {
     }
 
     public void send(BotSession connection, Packet packet) {
+        // TODO: could this return a Future with the result of the send operation?
         enqueue(new BotSessionPacket(connection, packet));
     }
 

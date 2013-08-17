@@ -1,3 +1,4 @@
+import botto.xmpp.annotations.ConnectionStatus;
 import botto.xmpp.annotations.Context;
 import botto.xmpp.annotations.PacketOutput;
 import org.xmpp.packet.JID;
@@ -10,6 +11,13 @@ public class SayHelloBot {
 
     @Context
     private PacketOutput output;
+
+    @Context
+    private ConnectionStatus connectionStatus;
+
+    public boolean isConnected() {
+        return connectionStatus == ConnectionStatus.connected;
+    }
 
     /**
      * Sends an XMPP message that says 'hello'

@@ -1,9 +1,11 @@
 package botto.xmpp.service.bot;
 
+import botto.xmpp.annotations.ConnectionStatus;
 import botto.xmpp.annotations.PacketOutput;
 import botto.xmpp.service.AbstractBot;
 import botto.xmpp.utils.PacketTypeConverter;
 import com.google.common.base.Preconditions;
+import com.sun.javafx.tools.packager.Log;
 import org.jivesoftware.smack.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -56,19 +58,53 @@ class BotSession {
             }
         }, null);
 
-        // set an the packet output to the bot
+        // set the packet output to the bot
         bot.setPacketOutput(new PacketOutput() {
             @Override
             public void send(Packet packet) {
                 Preconditions.checkNotNull(packet, "Packet can't be null");
                 try {
-                sender.send(session, PacketTypeConverter.convertFromTinder(packet, connection));
+                    sender.send(session, PacketTypeConverter.convertFromTinder(packet, connection));
                 }
                 catch (Exception ex) {
                     log.error("Error while sending packet {}: {}", packet, ex);
                 }
             }
         });
+
+        connection.addConnectionListener(new ConnectionListener() {
+            @Override
+            public void connectionClosed() {
+                log.info("Connection {}: closed", connection);
+                bot.setConnectionStatus(ConnectionStatus.disconnected);
+            }
+
+            @Override
+            public void connectionClosedOnError(Exception e) {
+                log.warn("Connection {}: closed with exception {}", connection, e);
+                bot.setConnectionStatus(ConnectionStatus.disconnected);
+            }
+
+            @Override
+            public void reconnectingIn(int i) {
+                log.info("Connection {}: reconnecting in ", i);
+                bot.setConnectionStatus(ConnectionStatus.disconnected);
+            }
+
+            @Override
+            public void reconnectionSuccessful() {
+                log.info("Connection {}: reconnected");
+                bot.setConnectionStatus(ConnectionStatus.connected);
+            }
+
+            @Override
+            public void reconnectionFailed(Exception e) {
+                log.error("Connection {}: reconnection failed with exception {}", e);
+                bot.setConnectionStatus(ConnectionStatus.disconnected);
+            }
+        });
+
+        bot.setConnectionStatus(ConnectionStatus.disconnected);
     }
 
     public synchronized void start() {
@@ -94,6 +130,7 @@ class BotSession {
         }
 
         log.info("Connected...");
+
 
     }
 
