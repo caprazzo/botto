@@ -1,12 +1,12 @@
 package botto.xmpp.service;
 
-import botto.xmpp.annotations.ConnectionStatus;
+import botto.xmpp.annotations.ConnectionInfo;
 import botto.xmpp.annotations.PacketOutput;
 import org.xmpp.packet.Packet;
 
 public abstract class AbstractBot implements Bot {
     private PacketOutput output;
-    private ConnectionStatus connectionStatus;
+    private ConnectionInfo connectionInfo;
 
     public final void setPacketOutput(PacketOutput output) {
         this.output = output;
@@ -26,10 +26,10 @@ public abstract class AbstractBot implements Bot {
 
     protected abstract Packet doReceive(Packet packet);
 
-    public void setConnectionStatus(ConnectionStatus connectionStatus) {
-        this.connectionStatus = connectionStatus;
-        doSetConnectionStatus(connectionStatus);
+    public void setConnectionInfo(ConnectionInfo connectionInfo) {
+        this.connectionInfo = connectionInfo;
+        doSetConnectionStatus(connectionInfo);
     }
 
-    protected abstract void doSetConnectionStatus(ConnectionStatus connectionStatus);
+    protected abstract void doSetConnectionStatus(ConnectionInfo connectionInfo);
 }

@@ -1,11 +1,10 @@
 package botto.xmpp.service.bot;
 
-import botto.xmpp.annotations.ConnectionStatus;
+import botto.xmpp.annotations.ConnectionInfo;
 import botto.xmpp.annotations.PacketOutput;
 import botto.xmpp.service.AbstractBot;
 import botto.xmpp.utils.PacketTypeConverter;
 import com.google.common.base.Preconditions;
-import com.sun.javafx.tools.packager.Log;
 import org.jivesoftware.smack.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -72,39 +71,42 @@ class BotSession {
             }
         });
 
+        final BotConnectionInfo info = new BotConnectionInfo();
+        bot.setConnectionInfo(info);
+
         connection.addConnectionListener(new ConnectionListener() {
             @Override
             public void connectionClosed() {
                 log.info("Connection {}: closed", connection);
-                bot.setConnectionStatus(ConnectionStatus.disconnected);
+                info.setConnectionStatus(false);
             }
 
             @Override
             public void connectionClosedOnError(Exception e) {
                 log.warn("Connection {}: closed with exception {}", connection, e);
-                bot.setConnectionStatus(ConnectionStatus.disconnected);
+                info.setConnectionStatus(false);
             }
 
             @Override
             public void reconnectingIn(int i) {
                 log.info("Connection {}: reconnecting in ", i);
-                bot.setConnectionStatus(ConnectionStatus.disconnected);
+                info.setConnectionStatus(false);
             }
 
             @Override
             public void reconnectionSuccessful() {
                 log.info("Connection {}: reconnected");
-                bot.setConnectionStatus(ConnectionStatus.connected);
+                info.setConnectionStatus(true);
             }
 
             @Override
             public void reconnectionFailed(Exception e) {
                 log.error("Connection {}: reconnection failed with exception {}", e);
-                bot.setConnectionStatus(ConnectionStatus.disconnected);
+                info.setConnectionStatus(false);
             }
         });
 
-        bot.setConnectionStatus(ConnectionStatus.disconnected);
+
     }
 
     public synchronized void start() {

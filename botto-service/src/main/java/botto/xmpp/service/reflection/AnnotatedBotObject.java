@@ -1,6 +1,6 @@
 package botto.xmpp.service.reflection;
 
-import botto.xmpp.annotations.ConnectionStatus;
+import botto.xmpp.annotations.ConnectionInfo;
 import botto.xmpp.service.AbstractBot;
 import botto.xmpp.service.utils.ReflectionUtils;
 import com.google.common.base.Optional;
@@ -75,7 +75,7 @@ public class AnnotatedBotObject extends AbstractBot {
         else if (PacketOutput.class.isAssignableFrom(field.getType())) {
             return true;
         }
-        else if (ConnectionStatus.class.isAssignableFrom(field.getType())) {
+        else if (ConnectionInfo.class.isAssignableFrom(field.getType())) {
             return true;
         }
         else {
@@ -122,8 +122,8 @@ public class AnnotatedBotObject extends AbstractBot {
     }
 
     @Override
-    protected void doSetConnectionStatus(ConnectionStatus connectionStatus) {
-        inject(connectionStatus);
+    protected void doSetConnectionStatus(ConnectionInfo connectionInfo) {
+        inject(connectionInfo);
     }
 
     public Object getObject() {
