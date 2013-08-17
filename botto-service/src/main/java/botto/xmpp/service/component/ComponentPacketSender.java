@@ -1,7 +1,7 @@
 package botto.xmpp.service.component;
 
-import botto.xmpp.service.utils.QueueExecutor;
 import com.google.common.base.Preconditions;
+import net.caprazzi.reusables.threading.SingleThreadQueueExecutor;
 import org.jivesoftware.whack.ExternalComponentManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,13 +12,14 @@ import org.xmpp.packet.Packet;
  * Sends packets from xmpp components.
  * Incoming messages are queued up and sent asynchronously.
  */
-public class ComponentPacketSender extends QueueExecutor<ComponentPacketSender.ComponentPacket> {
+public class ComponentPacketSender extends SingleThreadQueueExecutor<ComponentPacketSender.ComponentPacket> {
 
     private final Logger Log = LoggerFactory.getLogger(ComponentPacketSender.class);
 
     private final ExternalComponentManager manager;
 
     public ComponentPacketSender(ExternalComponentManager manager) {
+        super("component-packet-sender");
         this.manager = manager;
     }
 

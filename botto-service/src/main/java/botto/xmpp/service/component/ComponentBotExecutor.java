@@ -2,7 +2,7 @@ package botto.xmpp.service.component;
 
 import com.google.common.util.concurrent.*;
 import botto.xmpp.service.Bot;
-import botto.xmpp.service.utils.ExecutionUtils;
+import net.caprazzi.reusables.threading.ExecutorUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xmpp.packet.Packet;
@@ -43,9 +43,8 @@ public class ComponentBotExecutor {
         });
     }
 
-    public void shutdown() {
-        ExecutionUtils.shutdown(executorService, 5, TimeUnit.SECONDS);
-        Log.info("Shut down complete.");
+    public void stop() {
+        ExecutorUtils.shutdown(Log, executorService, 5, TimeUnit.SECONDS);
     }
 
     private static class BotReceiveTask implements Runnable {

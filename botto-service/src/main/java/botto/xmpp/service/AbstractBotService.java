@@ -1,6 +1,5 @@
 package botto.xmpp.service;
 
-import botto.xmpp.service.bot.BotConnectionInfo;
 import botto.xmpp.service.bot.BotSessionManager;
 import botto.xmpp.service.component.ComponentBotExecutor;
 import botto.xmpp.service.component.ComponentBotRouter;
@@ -76,9 +75,9 @@ public abstract class AbstractBotService {
             @Override
             public void run() {
                 Log.info("Running shutdown hook");
-                sender.shutdown();
-                botExecutor.shutdown();
-                botSessionManager.shutdown();
+                sender.stop();
+                botExecutor.stop();
+                botSessionManager.stop();
 
                 for(SubdomainEnvironment subdomain : environment.getSubdomains()) {
                     try {

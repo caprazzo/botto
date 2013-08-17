@@ -1,10 +1,12 @@
 package botto.xmpp.service.bot;
 
-import botto.xmpp.annotations.ConnectionInfo;
 import botto.xmpp.annotations.PacketOutput;
 import botto.xmpp.service.AbstractBot;
+import botto.xmpp.service.BotConnectionInfo;
 import botto.xmpp.utils.PacketTypeConverter;
 import com.google.common.base.Preconditions;
+import net.caprazzi.reusables.common.Managed;
+import net.caprazzi.reusables.threading.ExecutorUtils;
 import org.jivesoftware.smack.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,8 +15,9 @@ import org.xmpp.packet.Packet;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
-class BotSession {
+class BotSession implements Managed {
 
     private final Logger log;
 
@@ -105,8 +108,6 @@ class BotSession {
                 info.setConnectionStatus(false);
             }
         });
-
-
     }
 
     public synchronized void start() {
@@ -132,13 +133,11 @@ class BotSession {
         }
 
         log.info("Connected...");
-
-
     }
 
-    public synchronized void shutdown() {
+    public synchronized void stop() {
         connection.disconnect();
-        executor.shutdown();
+        ExecutorUtils.shutdown(log, executor, 5, TimeUnit.SECONDS);
     }
 
     public synchronized boolean sendPacket(org.jivesoftware.smack.packet.Packet packet) {

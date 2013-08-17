@@ -1,13 +1,18 @@
 package botto.xmpp.service.bot;
 
-import botto.xmpp.service.utils.QueueExecutor;
+import net.caprazzi.reusables.threading.SingleThreadQueueExecutor;
 import org.jivesoftware.smack.packet.Packet;
 
 /**
  * Async packet sender.
  * TODO: don't dequeue if the bot is not available
  */
-public class BotSessionPacketSender extends QueueExecutor<BotSessionPacket> {
+public class BotSessionPacketSender extends SingleThreadQueueExecutor<BotSessionPacket> {
+
+    protected BotSessionPacketSender() {
+        super("bot-session-packet-sender");
+    }
+
     @Override
     public void doProcess(BotSessionPacket packet) {
        //TODO: handle the return value of sendPacket

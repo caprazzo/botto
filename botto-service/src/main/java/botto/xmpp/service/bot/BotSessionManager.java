@@ -1,10 +1,11 @@
 package botto.xmpp.service.bot;
 
 import botto.xmpp.service.AbstractBot;
+import net.caprazzi.reusables.common.Managed;
 
 import java.util.HashMap;
 
-public class BotSessionManager {
+public class BotSessionManager implements Managed {
 
     private final String host;
     private final int port;
@@ -32,10 +33,10 @@ public class BotSessionManager {
         sender.start();
     }
 
-    public void shutdown() {
-        sender.shutdown();
+    public void stop() {
+        sender.stop();
         for(BotSession session : sessions.values()) {
-            session.shutdown();
+            session.stop();
         }
     }
 

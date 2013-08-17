@@ -6,7 +6,6 @@ import org.xmpp.packet.Packet;
 
 public abstract class AbstractBot implements Bot {
     private PacketOutput output;
-    private ConnectionInfo connectionInfo;
 
     public final void setPacketOutput(PacketOutput output) {
         this.output = output;
@@ -27,7 +26,6 @@ public abstract class AbstractBot implements Bot {
     protected abstract Packet doReceive(Packet packet);
 
     public void setConnectionInfo(ConnectionInfo connectionInfo) {
-        this.connectionInfo = connectionInfo;
         doSetConnectionInfo(connectionInfo);
     }
 
