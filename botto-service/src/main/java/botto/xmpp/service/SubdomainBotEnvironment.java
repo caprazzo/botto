@@ -19,4 +19,8 @@ class SubdomainBotEnvironment {
     public NodeFilter getNodeFilter() {
         return nodeFilter;
     }
+
+    public void shutdown() {
+        bot.shutdown();
+    }
 }

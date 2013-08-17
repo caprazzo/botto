@@ -72,4 +72,10 @@ public class SubdomainEnvironment {
         }
         return false;
     }
+
+    public void shutdown() {
+        for (SubdomainBotEnvironment botEnv : bots) {
+            botEnv.shutdown();
+        }
+    }
 }

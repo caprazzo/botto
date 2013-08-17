@@ -93,8 +93,6 @@ public class AnnotatedBotObject extends AbstractBot {
         return null;
     }
 
-
-
     private void inject(Object value) {
         for(Field field : injecatbleFields) {
             if (!Modifier.isPublic(field.getModifiers())) {
@@ -122,11 +120,15 @@ public class AnnotatedBotObject extends AbstractBot {
     }
 
     @Override
-    protected void doSetConnectionStatus(ConnectionInfo connectionInfo) {
+    protected void doSetConnectionInfo(ConnectionInfo connectionInfo) {
         inject(connectionInfo);
     }
 
     public Object getObject() {
         return obj;
+    }
+
+    public void shutdown() {
+        // TODO: shutdown bot (set disconnected and refuse any other action)
     }
 }

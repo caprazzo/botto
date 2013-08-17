@@ -28,8 +28,8 @@ public abstract class AbstractBot implements Bot {
 
     public void setConnectionInfo(ConnectionInfo connectionInfo) {
         this.connectionInfo = connectionInfo;
-        doSetConnectionStatus(connectionInfo);
+        doSetConnectionInfo(connectionInfo);
     }
 
-    protected abstract void doSetConnectionStatus(ConnectionInfo connectionInfo);
+    protected abstract void doSetConnectionInfo(ConnectionInfo connectionInfo);
 }

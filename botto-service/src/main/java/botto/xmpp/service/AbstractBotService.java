@@ -1,5 +1,6 @@
 package botto.xmpp.service;
 
+import botto.xmpp.service.bot.BotConnectionInfo;
 import botto.xmpp.service.bot.BotSessionManager;
 import botto.xmpp.service.component.ComponentBotExecutor;
 import botto.xmpp.service.component.ComponentBotRouter;
@@ -36,6 +37,7 @@ public abstract class AbstractBotService {
 
             // create a component for each subdomain
             final Component component = new PacketRoutingComponent(router, subdomain.getName());
+            final BotConnectionInfo connectionInfo = new BotConnectionInfo();
 
             PacketOutput output = new PacketOutput() {
                 @Override
@@ -46,6 +48,7 @@ public abstract class AbstractBotService {
 
             for(SubdomainBotEnvironment holder : subdomain.getBots()) {
                 holder.getBot().setPacketOutput(output);
+                holder.getBot().setConnectionInfo(connectionInfo);
                 router.addBot(holder.getBot(), subdomain.getName(), holder.getNodeFilter());
             }
 
@@ -54,6 +57,7 @@ public abstract class AbstractBotService {
                 manager.setMultipleAllowed(subdomain.getName(), true);
                 manager.removeComponent(subdomain.getName());
                 manager.addComponent(subdomain.getName(), component);
+                connectionInfo.setConnectionStatus(true);
                 Log.info("Components Connected");
             } catch (ComponentException e) {
                 throw new RuntimeException(e);
@@ -78,6 +82,7 @@ public abstract class AbstractBotService {
 
                 for(SubdomainEnvironment subdomain : environment.getSubdomains()) {
                     try {
+                        subdomain.shutdown();
                         manager.removeComponent(subdomain.getName());
                     } catch (ComponentException e) {
                         Log.warn("Component exception during shutdown: {}", e);
