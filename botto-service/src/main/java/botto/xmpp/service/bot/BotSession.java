@@ -24,6 +24,7 @@ class BotSession implements Managed {
     private final String secret;
     private final String resource;
     private final XMPPConnection connection;
+    private final BotConnectionInfo info;
 
     private final ExecutorService connectionExecutor = Executors.newSingleThreadExecutor();
 
@@ -65,8 +66,45 @@ class BotSession implements Managed {
         // set the packet output to the bot
         bot.setPacketOutput(packetOutput);
 
-        final BotConnectionInfo info = new BotConnectionInfo();
+        info = new BotConnectionInfo();
         bot.setConnectionInfo(info);
+    }
+
+    public synchronized void start() {
+        final CountDownLatch latch = new CountDownLatch(1);
+        connectionExecutor.submit(new Runnable() {
+            @Override
+            public void run() {
+                log.info("Connecting...");
+
+                try {
+                    connection.connect();
+                    try {
+                        connection.login(node, secret, resource);
+                    }
+                    catch (XMPPException ex) {
+                        //stop();
+                        log.error("Could not login as '{}'. Error: {}", node, ex.getMessage());
+                    }
+                } catch (XMPPException ex) {
+                    //stop();
+                    log.error("Could not connect to {}:{}. Error: {}", connection.getHost(), connection.getPort(), ex.getMessage());
+                }
+                latch.countDown();
+            }
+        });
+
+        try {
+            latch.await();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        if (!connection.isConnected() || !connection.isAuthenticated()) {
+            log.error("Connection Failed");
+            stop();
+            return;
+        }
 
         connection.addConnectionListener(new ConnectionListener() {
             @Override
@@ -99,29 +137,6 @@ class BotSession implements Managed {
                 info.setConnectionStatus(false);
             }
         });
-    }
-
-    public synchronized void start() {
-        final CountDownLatch latch = new CountDownLatch(1);
-        connectionExecutor.submit(new Runnable() {
-            @Override
-            public void run() {
-                log.info("Connecting...");
-                try {
-                    connection.connect();
-                    connection.login(node, secret, resource);
-                } catch (XMPPException e) {
-                    e.printStackTrace();
-                }
-                latch.countDown();
-            }
-        });
-
-        try {
-            latch.await();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
 
         log.info("Connected...");
     }

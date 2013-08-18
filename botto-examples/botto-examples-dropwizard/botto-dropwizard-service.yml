@@ -10,7 +10,7 @@ botService:
     componentSecret: secret
 
     # xmpp server standard client port
-    clientPort: 5223
+    clientPort: 5222
 
 logging:
     level: INFO

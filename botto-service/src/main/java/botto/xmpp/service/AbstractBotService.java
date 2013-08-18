@@ -69,7 +69,7 @@ public abstract class AbstractBotService {
             } catch (ComponentException e) {
                 if (e.getCause() instanceof ConnectException) {
                     Log.error("Could not connect to {}:{} while configuring component for subdomain {}",
-                            configuration.getHost(), configuration.getClientPort(), subdomain.getName());
+                            configuration.getHost(), configuration.getComponentPort(), subdomain.getName());
 
                 }
                 stop();
