@@ -1,4 +1,4 @@
-package botto.xmpp.service;
+package botto.xmpp.engine;
 
 import botto.xmpp.annotations.ConnectionInfo;
 

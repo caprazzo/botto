@@ -1,5 +1,6 @@
 package botto.xmpp.service;
 
+import botto.xmpp.engine.BotConnectionInfo;
 import botto.xmpp.service.bot.BotSessionManager;
 import botto.xmpp.service.component.ComponentBotExecutor;
 import botto.xmpp.service.component.ComponentBotRouter;
@@ -69,7 +70,6 @@ public abstract class AbstractBotService {
                 if (e.getCause() instanceof ConnectException) {
                     Log.error("Could not connect to {}:{} while configuring component for subdomain {}",
                             configuration.getHost(), configuration.getComponentPort(), subdomain.getName());
-
                 }
                 stop();
                 throw new RuntimeException(e);

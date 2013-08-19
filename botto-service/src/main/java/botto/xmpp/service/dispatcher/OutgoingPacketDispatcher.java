@@ -1,6 +1,7 @@
 package botto.xmpp.service.dispatcher;
 
 import botto.xmpp.annotations.PacketOutput;
+import botto.xmpp.engine.BotConnection;
 import botto.xmpp.service.Bot;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
@@ -9,7 +10,7 @@ import net.caprazzi.reusables.common.Managed;
 import net.caprazzi.reusables.threading.SingleThreadQueueExecutor;
 import org.xmpp.packet.Packet;
 
-public class OutgoingPacketDispatcher extends EnvelopeDispatcher<Bot, PacketOutput> implements Managed {
+public class OutgoingPacketDispatcher extends EnvelopeDispatcher<Bot, BotConnection> implements Managed {
 
     private final SingleThreadQueueExecutor<PacketEnvelope<PacketOutput>> outputQueue;
 

@@ -8,15 +8,15 @@ import com.sun.tools.jdi.ObsoleteMethodImpl;
 import net.caprazzi.reusables.common.Managed;
 
 import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class BotSessionManager implements Managed {
 
     private final String host;
     private final int port;
 
-    private final HashMap<String, BotSession> sessions = new HashMap<String, BotSession>();
-
-    private final BotSessionPacketSender sender = new BotSessionPacketSender();
+    private final Map<String, SmackBotSession> sessions = new ConcurrentHashMap<String, SmackBotSession>();
 
     public BotSessionManager(String host, int port) {
         this.host = host;
@@ -25,11 +25,11 @@ public class BotSessionManager implements Managed {
 
     @Deprecated
     public void createSession(final AbstractBot bot, final String node, String secret, String resource) {
-        sessions.put(node, new BotSession(host, port, node, secret, resource, bot, sender));
+        sessions.put(node, new SmackBotSession(host, port, node, secret, resource, bot));
     }
 
     public PacketInputOutput createSession(BotEnvironment env) {
-        final BotSession session = new BotSession(host, port, env.getNode(), env.getSecret(), env.getResource(), env.getBot(), sender);
+        final SmackBotSession session = new SmackBotSession(host, port, env.getNode(), env.getSecret(), env.getResource(), env.getBot());
         sessions.put(env.getNode(), session);
         return session;
     }
@@ -39,20 +39,16 @@ public class BotSessionManager implements Managed {
     }
 
     public void start() {
-        for(BotSession session : sessions.values()) {
+        for(SmackBotSession session : sessions.values()) {
             session.start();
         }
-
-        sender.start();
     }
 
     public void stop() {
-        sender.stop();
-        for(BotSession session : sessions.values()) {
+        for(SmackBotSession session : sessions.values()) {
             session.stop();
         }
         sessions.clear();
     }
-
 
 }

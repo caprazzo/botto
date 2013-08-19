@@ -1,5 +1,6 @@
 package botto.xmpp.service.dispatcher;
 
+import botto.xmpp.engine.BotConnection;
 import botto.xmpp.service.Bot;
 import com.google.common.base.Optional;
 
@@ -8,7 +9,7 @@ import net.caprazzi.reusables.common.Managed;
 import net.caprazzi.reusables.threading.SingleThreadQueueResultExecutor;
 import org.xmpp.packet.Packet;
 
-public class IncomingPacketDispatcher extends EnvelopeDispatcher<PacketSource, Bot> implements Managed {
+public class IncomingPacketDispatcher extends EnvelopeDispatcher<BotConnection, Bot> implements Managed {
 
     private final OutgoingPacketDispatcher output;
 

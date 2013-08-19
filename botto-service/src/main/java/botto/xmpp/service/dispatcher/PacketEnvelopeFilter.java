@@ -1,5 +1,5 @@
 package botto.xmpp.service.dispatcher;
 
 public interface PacketEnvelopeFilter<TSource> {
-   public boolean accept(PacketEnvelope<TSource> packet);
+   public boolean accept(PacketEnvelope<TSource> envelope);
 }

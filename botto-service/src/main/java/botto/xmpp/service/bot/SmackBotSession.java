@@ -3,26 +3,23 @@ package botto.xmpp.service.bot;
 
 import botto.xmpp.annotations.PacketOutput;
 import botto.xmpp.service.AbstractBot;
-import botto.xmpp.service.BotConnectionInfo;
+import botto.xmpp.engine.BotConnectionInfo;
 import botto.xmpp.service.dispatcher.PacketSource;
 import botto.xmpp.utils.PacketTypeConverter;
-
 import com.sun.javafx.tools.packager.Log;
 import net.caprazzi.reusables.common.Managed;
 import net.caprazzi.reusables.threading.ExecutorUtils;
 import org.jivesoftware.smack.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.slf4j.Marker;
 import org.xmpp.packet.Packet;
 
-import java.util.Iterator;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-class BotSession implements Managed, PacketInputOutput {
+class SmackBotSession implements Managed, PacketInputOutput {
 
     private final Logger log;
 
@@ -37,8 +34,8 @@ class BotSession implements Managed, PacketInputOutput {
     private final PacketSource packetSource;
 
     //TODO: wrap configuration in a Configuration object
-    public BotSession(String host, int port, String node, String secret, String resource, final AbstractBot bot, final BotSessionPacketSender sender) {
-        log = LoggerFactory.getLogger(BotSession.class.getName() + "." + node);
+    public SmackBotSession(String host, int port, String node, String secret, String resource, final AbstractBot bot) {
+        log = LoggerFactory.getLogger(SmackBotSession.class.getName() + "." + node);
 
         this.node = node;
         this.secret = secret;
