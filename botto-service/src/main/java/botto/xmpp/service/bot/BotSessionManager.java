@@ -1,6 +1,9 @@
 package botto.xmpp.service.bot;
 
+
 import botto.xmpp.service.AbstractBot;
+import botto.xmpp.service.BotEnvironment;
+
 import net.caprazzi.reusables.common.Managed;
 
 import java.util.HashMap;
@@ -40,4 +43,13 @@ public class BotSessionManager implements Managed {
         }
     }
 
+    public PacketInputOutput createSession(BotEnvironment env) {
+        final BotSession session = new BotSession(host, port, env.getNode(), env.getSecret(), env.getResource(), env.getBot(), sender);
+        sessions.put(env.getNode(), session);
+        return session;
+    }
+
+    public void destroySession(BotEnvironment env) {
+        sessions.remove(env.getNode()).stop();
+    }
 }

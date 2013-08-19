@@ -33,7 +33,6 @@ public abstract class AbstractBotService {
         manager = new ExternalComponentManager(configuration.getHost(), configuration.getComponentPort());
         sender = new ComponentPacketSender(manager);
 
-
         botExecutor = new ComponentBotExecutor(Executors.newCachedThreadPool());
         botSessionManager = new BotSessionManager(configuration.getHost(), configuration.getClientPort());
 

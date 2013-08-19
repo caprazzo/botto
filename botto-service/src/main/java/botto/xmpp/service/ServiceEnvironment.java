@@ -15,7 +15,7 @@ public class ServiceEnvironment {
     private final HashMap<String, BotEnvironment> bots = new HashMap<String, BotEnvironment>();
     private final BotServiceConfiguration configuration;
 
-    ServiceEnvironment(BotServiceConfiguration configuration) {
+    public ServiceEnvironment(BotServiceConfiguration configuration) {
         Preconditions.checkNotNull(configuration, "Configuration can't be null.");
         this.configuration = configuration;
     }
@@ -39,7 +39,7 @@ public class ServiceEnvironment {
         return env;
     }
 
-    Collection<SubdomainEnvironment> getSubdomains() {
+    public Collection<SubdomainEnvironment> getSubdomains() {
         return subdomains.values();
     }
 

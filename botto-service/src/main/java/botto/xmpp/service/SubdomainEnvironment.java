@@ -8,6 +8,7 @@ import botto.xmpp.service.component.NodeFilters;
 import botto.xmpp.service.reflection.AnnotatedBotObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xmpp.packet.JID;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,10 +41,10 @@ public class SubdomainEnvironment {
         Preconditions.checkNotNull(bot, "Bot object must not be null.");
         Preconditions.checkNotNull(node, "node must not be null.");
 
-        addBot(bot, NodeFilters.singleNode(node));
+        addBot(bot, node, NodeFilters.singleNode(node));
     }
 
-    private void addBot(Object bot, NodeFilter nodeFilter) {
+    private void addBot(Object bot, String node, NodeFilter nodeFilter) {
         Preconditions.checkNotNull(bot, "Bot object must not be null.");
         Preconditions.checkArgument(!service.isBotInOtherSubdomains(this, bot), "This bot instance has already been added to another subdomain. A bot instance can only be added to one subdomain.");
         Preconditions.checkNotNull(nodeFilter, "NodeFilter must not be null.");
@@ -53,7 +54,7 @@ public class SubdomainEnvironment {
             log.error("Provided annotated bot is not a valid bot implementation: {}", bot);
             return;
         }
-        bots.add(new SubdomainBotEnvironment(annotatedBot.get(), nodeFilter));
+        bots.add(new SubdomainBotEnvironment(annotatedBot.get(), nodeFilter, node));
     }
 
     public String getName() {

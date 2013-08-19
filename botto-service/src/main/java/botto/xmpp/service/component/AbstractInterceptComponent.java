@@ -1,5 +1,6 @@
 package botto.xmpp.service.component;
 
+import botto.xmpp.service.dispatcher.PacketSource;
 import org.xmpp.component.Component;
 import org.xmpp.component.ComponentException;
 import org.xmpp.component.ComponentManager;
@@ -9,7 +10,7 @@ import org.xmpp.packet.Packet;
 /**
  *  An XMPP component that only captures packets
  */
-public abstract class AbstractInterceptComponent implements Component {
+public abstract class AbstractInterceptComponent implements Component, PacketSource {
 
     protected final String subdomain;
 

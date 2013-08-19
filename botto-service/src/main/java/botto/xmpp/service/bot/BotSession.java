@@ -1,13 +1,16 @@
 package botto.xmpp.service.bot;
 
 
+import botto.xmpp.annotations.PacketOutput;
 import botto.xmpp.service.AbstractBot;
 import botto.xmpp.service.BotConnectionInfo;
+import botto.xmpp.service.dispatcher.PacketSource;
 import botto.xmpp.utils.PacketTypeConverter;
 
 import net.caprazzi.reusables.common.Managed;
 import net.caprazzi.reusables.threading.ExecutorUtils;
 import org.jivesoftware.smack.*;
+import org.jivesoftware.smack.packet.Packet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,7 +19,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-class BotSession implements Managed {
+class BotSession implements Managed, PacketInputOutput {
 
     private final Logger log;
 
@@ -27,6 +30,8 @@ class BotSession implements Managed {
     private final BotConnectionInfo info;
 
     private final ExecutorService connectionExecutor = Executors.newSingleThreadExecutor();
+    private final BotSessionPacketOutput packetOutput;
+    private final PacketSource packetSource;
 
     //TODO: wrap configuration in a Configuration object
     public BotSession(String host, int port, String node, String secret, String resource, final AbstractBot bot, final BotSessionPacketSender sender) {
@@ -44,26 +49,28 @@ class BotSession implements Managed {
         Roster.setDefaultSubscriptionMode(Roster.SubscriptionMode.accept_all);
 
         connection = new XMPPConnection(configuration);
+        packetOutput = new BotSessionPacketOutput(sender, connection, this);
+        packetSource = new PacketSource() {
 
-        BotSessionPacketOutput packetOutput = new BotSessionPacketOutput(sender, connection, this);
-
-        // deliver incoming packets to the bot and send out the response
-        connection.addPacketListener(new PacketListener() {
             @Override
-            public void processPacket(org.jivesoftware.smack.packet.Packet packet) {
-                try {
-                    log.debug("Received packet {}", packet.toXML());
-
-                    //TODO: give any response to packetOutput
-                    bot.receive(PacketTypeConverter.converttoTinder(packet));
-                }
-                catch (Exception ex) {
-                    log.error("Error while processing packet {}: {}", packet.getPacketID(), ex);
-                }
+            public void setPacketSourceListener(final PacketSourceListener listener) {
+                connection.addPacketListener(new PacketListener() {
+                    @Override
+                    public void processPacket(org.jivesoftware.smack.packet.Packet packet) {
+                        log.debug("Received packet {}", packet.toXML());
+                        try {
+                            listener.receive(PacketTypeConverter.converttoTinder(packet));
+                        }
+                        catch(Exception ex) {
+                            log.error("Error while processing packet {}: {}", packet.getPacketID(), ex);
+                        }
+                    }
+                }, null);
             }
-        }, null);
+        };
 
         // set the packet output to the bot
+        // TODO: the bot packet output should go to an OutgoingPacketDispatcher
         bot.setPacketOutput(packetOutput);
 
         info = new BotConnectionInfo();
@@ -173,5 +180,15 @@ class BotSession implements Managed {
     @Override
     public String toString() {
         return "BotSession(" + node + ")";
+    }
+
+    @Override
+    public PacketOutput getOutput() {
+        return packetOutput;
+    }
+
+    @Override
+    public PacketSource getSource() {
+        return packetSource;
     }
 }
