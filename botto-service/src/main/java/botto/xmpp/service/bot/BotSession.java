@@ -7,13 +7,16 @@ import botto.xmpp.service.BotConnectionInfo;
 import botto.xmpp.service.dispatcher.PacketSource;
 import botto.xmpp.utils.PacketTypeConverter;
 
+import com.sun.javafx.tools.packager.Log;
 import net.caprazzi.reusables.common.Managed;
 import net.caprazzi.reusables.threading.ExecutorUtils;
 import org.jivesoftware.smack.*;
-import org.jivesoftware.smack.packet.Packet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.Marker;
+import org.xmpp.packet.Packet;
 
+import java.util.Iterator;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -30,7 +33,7 @@ class BotSession implements Managed, PacketInputOutput {
     private final BotConnectionInfo info;
 
     private final ExecutorService connectionExecutor = Executors.newSingleThreadExecutor();
-    private final BotSessionPacketOutput packetOutput;
+    private final PacketOutput packetOutput;
     private final PacketSource packetSource;
 
     //TODO: wrap configuration in a Configuration object
@@ -49,9 +52,19 @@ class BotSession implements Managed, PacketInputOutput {
         Roster.setDefaultSubscriptionMode(Roster.SubscriptionMode.accept_all);
 
         connection = new XMPPConnection(configuration);
-        packetOutput = new BotSessionPacketOutput(sender, connection, this);
-        packetSource = new PacketSource() {
 
+        // TODO: here we could do some per-bot output buffering, to be more resilient against disconnections
+        packetOutput = new PacketOutput() {
+            @Override
+            public void send(Packet packet) {
+                if (!connection.isConnected() || !connection.isAuthenticated()) {
+                    throw new RuntimeException("Connection is not available");
+                }
+                sendPacket(PacketTypeConverter.convertFromTinder(packet, connection));
+            }
+        };
+
+        packetSource = new PacketSource() {
             @Override
             public void setPacketSourceListener(final PacketSourceListener listener) {
                 connection.addPacketListener(new PacketListener() {
@@ -68,10 +81,6 @@ class BotSession implements Managed, PacketInputOutput {
                 }, null);
             }
         };
-
-        // set the packet output to the bot
-        // TODO: the bot packet output should go to an OutgoingPacketDispatcher
-        bot.setPacketOutput(packetOutput);
 
         info = new BotConnectionInfo();
         bot.setConnectionInfo(info);
@@ -90,11 +99,9 @@ class BotSession implements Managed, PacketInputOutput {
                         connection.login(node, secret, resource);
                     }
                     catch (XMPPException ex) {
-                        //stop();
                         log.error("Could not login as '{}'. Error: {}", node, ex.getMessage());
                     }
                 } catch (XMPPException ex) {
-                    //stop();
                     log.error("Could not connect to {}:{}. Error: {}", connection.getHost(), connection.getPort(), ex.getMessage());
                 }
                 latch.countDown();
@@ -145,36 +152,44 @@ class BotSession implements Managed, PacketInputOutput {
             }
         });
 
-        log.info("Connected...");
+        info.setConnectionStatus(true);
+
+        log.info("Connected.");
     }
 
     public synchronized void stop() {
-        connection.disconnect();
+        Log.info("Shut down start");
+        try {
+            connection.disconnect();
+        }
+        catch (Exception ex) {
+            log.error("Error while closing connecion");
+        }
         ExecutorUtils.shutdown(log, connectionExecutor, 5, TimeUnit.SECONDS);
+        Log.info("Shutdown complete");
     }
 
-    public synchronized boolean sendPacket(org.jivesoftware.smack.packet.Packet packet) {
+    public synchronized void sendPacket(org.jivesoftware.smack.packet.Packet packet) {
 
         if (!connection.isConnected()) {
             if (log.isDebugEnabled())
-                log.debug("Not sending packet because connection is not connected. Packet: {}", packet.toXML());
+                log.warn("Not sending packet because connection is not connected. Packet: {}", packet.toXML());
 
-            return false;
+            throw new RuntimeException("Not sending packet because connection is not connected. Packet: {}" + packet.toXML());
         }
 
         if (!connection.isAuthenticated()) {
             if (log.isDebugEnabled())
-                log.debug("Not sending packet because connection is not authenticated. Packet: {}", packet.toXML());
+                log.warn("Not sending packet because connection is not authenticated. Packet: {}", packet.toXML());
 
-            return false;
+            throw new RuntimeException("Not sending packet because connection is not authenticated. Packet: {} " + packet.toXML());
         }
 
         if (log.isDebugEnabled()) {
             log.debug("Sending packet {}", packet);
         }
-        connection.sendPacket(packet);
 
-        return true;
+        connection.sendPacket(packet);
     }
 
     @Override
