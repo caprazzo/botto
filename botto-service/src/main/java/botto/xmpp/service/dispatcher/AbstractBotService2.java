@@ -51,7 +51,7 @@ public abstract class AbstractBotService2 {
                         manager.sendPacket(component, packet);
                     }
                 };
-                dispatcher.addComponentBot(botEnv.getBot(), botEnv.getNodeFilter(), component, output);
+                //dispatcher.addComponentBot(botEnv.getBot(), botEnv.getNodeFilter(), component, output);
             }
         }
 
@@ -59,7 +59,7 @@ public abstract class AbstractBotService2 {
 
         for (BotEnvironment env: environment.getBots()) {
             PacketInputOutput session = botSessionManager.createSession(env);
-            dispatcher.addNodeBot(env.getBot(), session.getSource(), session.getOutput());
+            //dispatcher.addNodeBot(env.getBot(), session.getSource(), session.getOutput());
         }
 
         dispatcher.start();

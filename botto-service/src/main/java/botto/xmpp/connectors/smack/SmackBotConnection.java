@@ -1,4 +1,4 @@
-package botto.xmpp.connectors;
+package botto.xmpp.connectors.smack;
 
 import botto.xmpp.engine.BotConnection;
 import botto.xmpp.engine.ConnectionInfoListener;

@@ -12,12 +12,12 @@ import org.xmpp.packet.Packet;
 
 public class OutgoingPacketDispatcher extends EnvelopeDispatcher<Bot, BotConnection> implements Managed {
 
-    private final SingleThreadQueueExecutor<PacketEnvelope<PacketOutput>> outputQueue;
+    private final SingleThreadQueueExecutor<PacketEnvelope<BotConnection>> outputQueue;
 
     public OutgoingPacketDispatcher() {
-        outputQueue = new SingleThreadQueueExecutor<PacketEnvelope<PacketOutput>>() {
+        outputQueue = new SingleThreadQueueExecutor<PacketEnvelope<BotConnection>>() {
             @Override
-            protected void doProcess(PacketEnvelope<PacketOutput> envelope) {
+            protected void doProcess(PacketEnvelope<BotConnection> envelope) {
                 try {
                     envelope.getLabel().send(envelope.getPacket());
                 }
@@ -28,9 +28,10 @@ public class OutgoingPacketDispatcher extends EnvelopeDispatcher<Bot, BotConnect
         };
     }
 
+    @Override
     // enqueues incoming packets, to be sent in a separate thread
-    protected ListenableConfirmation doDispatch(PacketOutput output, Packet packet) {
-        return confirmFutureSuccess(outputQueue.enqueue(new PacketEnvelope<PacketOutput>(output, packet)));
+    protected ListenableConfirmation doDispatch(BotConnection destination, Packet packet) {
+        return confirmFutureSuccess(outputQueue.enqueue(new PacketEnvelope<BotConnection>(destination, packet)));
     }
 
     private ListenableConfirmation confirmFutureSuccess(ListenableFuture future) {
@@ -59,5 +60,4 @@ public class OutgoingPacketDispatcher extends EnvelopeDispatcher<Bot, BotConnect
     public void stop() {
         outputQueue.stop();
     }
-
 }

@@ -1,11 +1,9 @@
-package botto.xmpp.connectors;
+package botto.xmpp.connectors.whack;
 
-import botto.xmpp.engine.BotConnection;
 import botto.xmpp.engine.Connector;
+import botto.xmpp.engine.BotConnection;
 import botto.xmpp.engine.ConnectorException;
 import botto.xmpp.service.AbstractBot;
-import botto.xmpp.service.component.AbstractInterceptComponent;
-import com.google.common.base.Preconditions;
 import org.jivesoftware.whack.ExternalComponentManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,7 +15,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-public class WhackConnector implements Connector {
+public class WhackConnector extends Connector<WhackConnectorConfiguration> {
 
     private static final Logger Log = LoggerFactory.getLogger(WhackConnector.class);
 
@@ -30,6 +28,11 @@ public class WhackConnector implements Connector {
         this.configuration = configuration;
         // TODO the connector should be configured with host, port, domain, secret and a map subdomain -> password
         manager = new ExternalComponentManager(configuration.getHost(), configuration.getPort());
+    }
+
+    @Override
+    public void configure(WhackConnectorConfiguration configuration) {
+        //To change body of implemented methods use File | Settings | File Templates.
     }
 
     @Override
@@ -92,6 +95,16 @@ public class WhackConnector implements Connector {
         }
     }
 
+    @Override
+    public void doStart() {
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public void doStop() {
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
+
     private void removeComponent(WhackBotComponent component) throws ConnectorException {
         try {
             manager.removeComponent(component.getSubdomain());
@@ -100,37 +113,4 @@ public class WhackConnector implements Connector {
         }
     }
 
-    public static class WhackConnectorConfiguration {
-        private int port;
-        private String host;
-        private String domain;
-
-        public int getPort() {
-            return port;
-        }
-
-        public void setPort(int port) {
-            this.port = port;
-        }
-
-        public String getHost() {
-            return host;
-        }
-
-        public void setHost(String host) {
-            this.host = host;
-        }
-
-        public String getDomain() {
-            return domain;
-        }
-
-        public void setDomain(String domain) {
-            this.domain = domain;
-        }
-
-        public String getSecret(String subdomain) {
-            return null;  //To change body of created methods use File | Settings | File Templates.
-        }
-    }
 }

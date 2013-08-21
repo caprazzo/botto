@@ -1,4 +1,4 @@
-package botto.xmpp.connectors;
+package botto.xmpp.connectors.whack;
 
 import botto.xmpp.engine.BotConnectionInfo;
 import org.slf4j.Logger;
