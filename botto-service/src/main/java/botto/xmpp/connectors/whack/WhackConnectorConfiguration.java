@@ -8,6 +8,7 @@ public class WhackConnectorConfiguration implements ConnectorConfiguration {
     private String host;
     private String domain;
     private String name;
+    private String secret;
 
     public void setName(String name) {
         this.name = name;
@@ -42,6 +43,10 @@ public class WhackConnectorConfiguration implements ConnectorConfiguration {
     }
 
     public String getSecret(String subdomain) {
-        return null;  //To change body of created methods use File | Settings | File Templates.
+        return secret;
+    }
+
+    public void setSecret(String secret) {
+        this.secret = secret;
     }
 }

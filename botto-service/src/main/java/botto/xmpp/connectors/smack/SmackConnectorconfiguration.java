@@ -3,7 +3,7 @@ package botto.xmpp.connectors.smack;
 import botto.xmpp.engine.ConnectorConfiguration;
 import org.xmpp.packet.JID;
 
-public class SmackConnectorconfiguration implements ConnectorConfiguration {
+public class SmackConnectorConfiguration implements ConnectorConfiguration {
     private String resource;
     private String host;
     private int port;
