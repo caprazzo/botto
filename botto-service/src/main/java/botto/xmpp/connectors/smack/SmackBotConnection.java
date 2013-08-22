@@ -12,6 +12,7 @@ import org.jivesoftware.smack.*;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xmpp.packet.JID;
 import org.xmpp.packet.Packet;
 
 import java.util.concurrent.ExecutorService;
@@ -26,7 +27,7 @@ public class SmackBotConnection implements BotConnection {
 
     private final static Logger Log = LoggerFactory.getLogger(SmackBotConnection.class);
 
-    private final String node;
+    private final JID address;
     private final String secret;
     private final String resource;
 
@@ -37,8 +38,9 @@ public class SmackBotConnection implements BotConnection {
     private ConnectionPacketListener packetListener;
     private ConnectionInfoListener connectionInfoListener;
 
-    public SmackBotConnection(String node, String host, int port, String secret, String resource) {
-        this.node = node;
+    public SmackBotConnection(JID address, String host, int port, String secret, String resource) {
+        this.address = address;
+
         this.secret = secret;
         this.resource = resource;
 
@@ -156,11 +158,11 @@ public class SmackBotConnection implements BotConnection {
                 try {
                     connection.connect();
                     try {
-                        connection.login(node, secret, resource);
+                        connection.login(address.getNode(), secret, resource);
                         future.set(true);
                     }
                     catch (XMPPException ex) {
-                        Log.error("Could not login as '{}'. Error: {}", node, ex.getMessage());
+                        Log.error("Could not login as '{}'. Error: {}", address.getNode(), ex.getMessage());
                         future.setException(ex);
                     }
                 } catch (XMPPException ex) {

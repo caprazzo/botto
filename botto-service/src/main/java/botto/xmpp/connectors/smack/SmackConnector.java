@@ -7,20 +7,21 @@ import botto.xmpp.engine.ConnectorException;
 import botto.xmpp.service.AbstractBot;
 import org.xmpp.packet.JID;
 
+import java.util.Map;
+
 /**
  * A connector that uses the Smack library for single-node bots.
  */
 public class SmackConnector extends Connector<SmackConnectorconfiguration> {
 
-    // TODO: connector should be configured with host, port, domain, a map node/secret/resource
-    @Override
-    public void configure(SmackConnectorconfiguration configuration) {
-        //To change body of implemented methods use File | Settings | File Templates.
+    private final SmackConnectorconfiguration configuration;
+
+    public SmackConnector(SmackConnectorconfiguration configuration) {
+        this.configuration = configuration;
     }
 
-    public BotConnection createConnection(AbstractBot bot, JID address) {
-        //return new SmackBotConnection();
-        return null;
+    public BotConnection createConnection(JID address) {
+        return new SmackBotConnection(address, this.configuration.getHost(), this.configuration.getPort(), this.configuration.getSecret(address), this.configuration.getResource() );
     }
 
     @Override
@@ -31,13 +32,13 @@ public class SmackConnector extends Connector<SmackConnectorconfiguration> {
     }
 
     @Override
-    public void doStart() {
-        //To change body of implemented methods use File | Settings | File Templates.
+    public void start() {
+        // TODO: all connections should only be started here
     }
 
     @Override
-    public void doStop() {
-        //To change body of implemented methods use File | Settings | File Templates.
+    public void stop() {
+        // TODO: should stop all connections here
     }
 
 }

@@ -14,7 +14,7 @@ public class ConnectionManager {
     private Map<ConnectionKey, BotConnection> connections = new HashMap<ConnectionKey, BotConnection>();
 
     public synchronized void addBot(AbstractBot bot, JID address, Connector connector) throws ConnectorException {
-        BotConnection connection = connector.createConnection(bot, address);
+        BotConnection connection = connector.createConnection(address);
         connections.put(new ConnectionKey(bot, address, connector), connection);
         bot.setConnectionInfo(connection.getConnectionInfo());
         dispatcher.addConnection(bot, connection);

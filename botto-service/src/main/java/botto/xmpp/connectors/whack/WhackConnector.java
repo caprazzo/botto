@@ -31,22 +31,14 @@ public class WhackConnector extends Connector<WhackConnectorConfiguration> {
     }
 
     @Override
-    public void configure(WhackConnectorConfiguration configuration) {
-        //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    @Override
-    public BotConnection createConnection(AbstractBot bot, JID address) throws ConnectorException {
-        checkNotNull(bot, "A bot must not be null");
+    public BotConnection createConnection(JID address) throws ConnectorException {
         checkNotNull(address, "The address must not be null");
         verifyAddress(address);
-        // TODO: enforce address has subdomain and matches domain for this connector
 
         // get subdomain of bot
         String subdomain = getSubdomain(address);
         WhackBotComponent component = components.get(subdomain);
         if (component == null) {
-            String secret;
             try {
                 component = createComponent(subdomain, configuration.getSecret(subdomain));
             } catch (ComponentException e) {
@@ -60,7 +52,26 @@ public class WhackConnector extends Connector<WhackConnectorConfiguration> {
         return connection;
     }
 
+    @Override
+    public void removeConnection(BotConnection connection) throws ConnectorException {
+        checkNotNull(connection);
+        if (!(connection instanceof WhackBotConnection)) {
+            throw new ConnectorException(new IllegalArgumentException("Can only remove connections of type WhackBotConection"));
+        }
+
+        for(WhackBotComponent component : components.values()) {
+            component.removeConnection((WhackBotConnection)connection);
+            if (component.isEmpty()) {
+                removeComponent(component);
+            }
+            return;
+        }
+    }
+
     private WhackBotComponent createComponent(String subdomain, String secret) throws ComponentException {
+        checkNotNull(subdomain);
+        checkNotNull(secret);
+
         WhackBotComponent component = new WhackBotComponent(subdomain);
         manager.setSecretKey(subdomain, secret);
         manager.setMultipleAllowed(subdomain, true);
@@ -77,32 +88,7 @@ public class WhackConnector extends Connector<WhackConnectorConfiguration> {
     }
 
     private void verifyAddress(JID address) {
-        // TODO: must have a domain in the form subdomain.<domain>
-    }
-
-    @Override
-    public void removeConnection(BotConnection connection) throws ConnectorException {
-        if (!(connection instanceof WhackBotConnection)) {
-            throw new ConnectorException(new IllegalArgumentException("Can only remove connections of type WhackBotConection"));
-        }
-
-        for(WhackBotComponent component : components.values()) {
-            component.removeConnection((WhackBotConnection)connection);
-            if (component.isEmpty()) {
-                removeComponent(component);
-            }
-            return;
-        }
-    }
-
-    @Override
-    public void doStart() {
-        //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    @Override
-    public void doStop() {
-        //To change body of implemented methods use File | Settings | File Templates.
+        // TODO: enforce address has subdomain and matches domain for this connector
     }
 
     private void removeComponent(WhackBotComponent component) throws ConnectorException {
@@ -111,6 +97,16 @@ public class WhackConnector extends Connector<WhackConnectorConfiguration> {
         } catch (ComponentException e) {
             throw new ConnectorException("Exception while trying to remove component " + component, e);
         }
+    }
+
+    @Override
+    public void start() {
+
+    }
+
+    @Override
+    public void stop() {
+
     }
 
 }
