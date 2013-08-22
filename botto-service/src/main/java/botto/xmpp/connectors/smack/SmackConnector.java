@@ -3,8 +3,10 @@ package botto.xmpp.connectors.smack;
 import botto.xmpp.engine.BotConnection;
 import botto.xmpp.engine.Connector;
 import botto.xmpp.engine.ConnectorException;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import org.xmpp.packet.JID;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -15,7 +17,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class SmackConnector extends Connector<SmackConnectorConfiguration> {
 
     private final Logger Log = LoggerFactory.getLogger(SmackConnector.class);
-
     private final SmackConnectorConfiguration configuration;
 
     public SmackConnector(SmackConnectorConfiguration configuration) {
@@ -25,6 +26,7 @@ public class SmackConnector extends Connector<SmackConnectorConfiguration> {
 
     public BotConnection createConnection(JID address) {
         checkNotNull(address, "addresss must not be null");
+
         SmackBotConnection connection = new SmackBotConnection(address, this.configuration.getHost(), this.configuration.getPort(), this.configuration.getSecret(address), this.configuration.getResource());
         // TODO: connection should start only if connector.start() has been invoked
         connection.start();
