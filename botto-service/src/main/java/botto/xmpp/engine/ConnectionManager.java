@@ -3,12 +3,17 @@ package botto.xmpp.engine;
 import botto.xmpp.service.AbstractBot;
 import botto.xmpp.service.dispatcher.DispatcherService;
 import com.google.common.base.Objects;
+import net.caprazzi.reusables.common.Managed;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xmpp.packet.JID;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class ConnectionManager {
+public class ConnectionManager implements Managed {
+
+    private final Logger Log = LoggerFactory.getLogger(ConnectionManager.class);
 
     private DispatcherService dispatcher = new DispatcherService();
     private Map<ConnectionKey, BotConnection> connections = new HashMap<ConnectionKey, BotConnection>();
@@ -26,6 +31,16 @@ public class ConnectionManager {
             dispatcher.removeConnection(bot, connection);
             connector.removeConnection(connection);
         }
+    }
+
+    @Override
+    public void start() {
+        dispatcher.start();
+    }
+
+    @Override
+    public void stop() {
+        dispatcher.stop();
     }
 
     private static class ConnectionKey {

@@ -49,7 +49,8 @@ public class WhackBotComponent implements Component {
     public void processPacket(Packet packet) {
         WhackBotConnection connection = connections.get(packet.getFrom().toBareJID());
         if (connection == null) {
-            // TODO: log
+            Log.warn("Could not find a connection to route packet: {}", packet);
+            return;
         }
         connection.receive(packet);
     }

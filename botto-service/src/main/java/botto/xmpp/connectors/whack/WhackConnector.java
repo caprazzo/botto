@@ -25,6 +25,7 @@ public class WhackConnector extends Connector<WhackConnectorConfiguration> {
     private Map<String, WhackBotComponent> components = new ConcurrentHashMap<String, WhackBotComponent>();
 
     public WhackConnector(WhackConnectorConfiguration configuration) {
+        checkNotNull(configuration);
         this.configuration = configuration;
         // TODO the connector should be configured with host, port, domain, secret and a map subdomain -> password
         manager = new ExternalComponentManager(configuration.getHost(), configuration.getPort());

@@ -147,6 +147,21 @@ public class SmackBotConnection implements BotConnection {
         });
     }
 
+    public void stop() {
+        setConnectionStatus(false);
+
+        // TODO: remove conn listener
+        // connection.removeConnectionListener();
+
+        // TODO: remove packet listener
+        // connection.removePacketListener();
+
+        // disconnect
+        if (connection.isConnected()) {
+            connection.disconnect();
+        }
+    }
+
     private ListenableFuture<Boolean> connect() {
         final SettableFuture<Boolean> future = SettableFuture.create();
         connectionExecutor.submit(new Runnable() {
@@ -176,7 +191,8 @@ public class SmackBotConnection implements BotConnection {
 
     private void setConnectionStatus(boolean connected) {
         connectionInfo.setConnectionStatus(false);
-        connectionInfoListener.onConnectionInfo(connectionInfo);
+        if (connectionInfoListener != null)
+            connectionInfoListener.onConnectionInfo(connectionInfo);
     }
 
     private class SmackConnectionListener implements ConnectionListener {
