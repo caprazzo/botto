@@ -1,5 +1,7 @@
 package botto.xmpp.service.dispatcher;
 
+import botto.xmpp.utils.Helpers;
+import com.google.common.base.Objects;
 import org.xmpp.packet.Packet;
 
 /**
@@ -24,5 +26,13 @@ class PacketEnvelope<TLabel> {
 
     public Packet getPacket() {
         return packet;
+    }
+
+    @Override
+    public String toString() {
+        return Objects.toStringHelper(this)
+            .add("label", label)
+            .add("packet", Helpers.toString(packet))
+            .toString();
     }
 }

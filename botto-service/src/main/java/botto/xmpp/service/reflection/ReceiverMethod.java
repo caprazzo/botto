@@ -1,5 +1,6 @@
 package botto.xmpp.service.reflection;
 
+import com.google.common.base.Objects;
 import com.google.common.base.Optional;
 import botto.xmpp.annotations.Receive;
 import org.slf4j.Logger;
@@ -79,5 +80,12 @@ public class ReceiverMethod {
         }
 
         return Optional.of(new ReceiverMethod(method, arguments, packetArgument));
+    }
+
+    @Override
+    public String toString() {
+        return Objects.toStringHelper(this)
+            .addValue(method)
+            .toString();
     }
 }

@@ -3,6 +3,8 @@ package botto.xmpp.service.reflection;
 import botto.xmpp.annotations.ConnectionInfo;
 import botto.xmpp.service.AbstractBot;
 import botto.xmpp.service.utils.ReflectionUtils;
+import botto.xmpp.utils.Helpers;
+import com.google.common.base.Objects;
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import botto.xmpp.annotations.Context;
@@ -91,6 +93,7 @@ public class AnnotatedBotObject extends AbstractBot {
     protected Packet doReceive(Packet packet) {
         for (ReceiverMethod method : receiverMethods) {
             if (method.canReceive(packet)) {
+                Log.debug("Delivering {} to method {}", Helpers.toString(packet), method);
                 return method.receive(obj, packet).orNull();
             }
         }
@@ -102,6 +105,7 @@ public class AnnotatedBotObject extends AbstractBot {
             if (!Modifier.isPublic(field.getModifiers())) {
                 field.setAccessible(true);
             }
+
             Log.debug("Injecting {} to field {}", value, field);
 
             if (!field.getType().isAssignableFrom(value.getClass())) {
@@ -136,5 +140,12 @@ public class AnnotatedBotObject extends AbstractBot {
 
     public void shutdown() {
         // TODO: shutdown bot (set disconnected and refuse any other action)
+    }
+
+    @Override
+    public String toString() {
+        return Objects.toStringHelper(this)
+            .add("bot", obj)
+            .toString();
     }
 }

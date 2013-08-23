@@ -1,5 +1,6 @@
 package botto.xmpp.engine;
 
+import botto.xmpp.annotations.Context;
 import botto.xmpp.annotations.Receive;
 import botto.xmpp.connectors.smack.SmackConnector;
 import botto.xmpp.connectors.smack.SmackConnectorConfiguration;
@@ -7,6 +8,7 @@ import botto.xmpp.connectors.whack.WhackConnector;
 import botto.xmpp.connectors.whack.WhackConnectorConfiguration;
 import botto.xmpp.service.AbstractBot;
 import botto.xmpp.service.reflection.AnnotatedBotObject;
+import ch.qos.logback.core.net.SyslogOutputStream;
 import org.xmpp.packet.JID;
 import org.xmpp.packet.Message;
 
@@ -33,21 +35,21 @@ public class ExampleEngineMain {
         SmackConnector smackConnector = new SmackConnector(smackConfiguration);
 
         try {
-            AbstractBot bot = makeBot(new ABot());
+            AbstractBot bot = makeBot(new ExampleBot());
             connectionManager.addBot(bot, new JID("bot@caprazzi.net"), smackConnector);
         } catch (ConnectorException e) {
             throw new RuntimeException(e);
         }
 
         try {
-            AbstractBot bot = makeBot(new ABot());
+            AbstractBot bot = makeBot(new ExampleBot());
             connectionManager.addBot(bot, new JID("bot1@caprazzi.net"), smackConnector);
         } catch (ConnectorException e) {
             throw new RuntimeException(e);
         }
 
         try {
-            AbstractBot bot = makeBot(new ABot());
+            AbstractBot bot = makeBot(new ExampleBot());
             connectionManager.addBot(bot, new JID("something@bots.caprazzi.net"), whackConnector);
         } catch (ConnectorException e) {
             throw new RuntimeException(e);
@@ -63,10 +65,26 @@ public class ExampleEngineMain {
         return AnnotatedBotObject.from(o).get();
     }
 
-    public static class ABot {
+    public static class ExampleBot {
+
+        @Context
+        botto.xmpp.annotations.PacketOutput out;
+
         @Receive
-        public void receive(Message message) {
-            System.out.println(message);
+        public Message receive(Message message) {
+            System.out.println("Received message " + message.getID());
+            Message response = new Message();
+            response.setBody("you fool just said: " + message.getBody());
+
+
+            response.setTo(message.getFrom());
+            //out.send(response);
+            return response;
+        }
+
+        @Override
+        public String toString() {
+            return "ExampleBot";
         }
     }
 }
