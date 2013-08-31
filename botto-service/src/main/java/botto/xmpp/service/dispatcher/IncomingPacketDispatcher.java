@@ -15,13 +15,19 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xmpp.packet.Packet;
 
+import com.codahale.metrics.Timer;
+
 public class IncomingPacketDispatcher extends EnvelopeDispatcher<BotConnection, Bot> implements Managed {
+
+    private final static Timer timer = BottoService.Metrics.timer(MetricRegistry.name(IncomingPacketDispatcher.class, "bot", "receive"));
 
     private final static Logger Log = LoggerFactory.getLogger(SmackBotConnection.class);
 
     private final OutgoingPacketDispatcher output;
 
     private SingleThreadQueueResultExecutor<PacketEnvelope<Bot>, Optional<Packet>> dispatcherExecutor;
+
+
 
     public IncomingPacketDispatcher(OutgoingPacketDispatcher output) {
         this.output = output;
@@ -30,7 +36,14 @@ public class IncomingPacketDispatcher extends EnvelopeDispatcher<BotConnection, 
             public Optional<Packet> doProcess(PacketEnvelope<Bot> envelope) {
                 Log.debug("Processing {}", envelope);
                 Bot bot = envelope.getLabel();
-                return Optional.fromNullable(bot.receive(envelope.getPacket()));
+                Packet packet = envelope.getPacket();
+                Timer.Context time = timer.time();
+                try {
+                    return Optional.fromNullable(bot.receive(packet));
+                }
+                finally {
+                    time.stop();
+                }
             }
         };
     }
