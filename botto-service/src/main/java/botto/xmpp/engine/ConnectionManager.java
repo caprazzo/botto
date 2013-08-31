@@ -17,7 +17,6 @@ public class ConnectionManager implements Managed {
 
     private final Logger Log = LoggerFactory.getLogger(ConnectionManager.class);
 
-
     private DispatcherService dispatcher = new DispatcherService();
     private Map<ConnectionKey, BotConnection> connections = new HashMap<ConnectionKey, BotConnection>();
 
