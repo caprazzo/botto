@@ -33,6 +33,7 @@ public class WhackConnector extends Connector<WhackConnectorConfiguration> {
 
     @Override
     public BotConnection createConnection(JID address) throws ConnectorException {
+        Log.debug("Creating Whack connection for {}", address);
         checkNotNull(address, "The address must not be null");
         verifyAddress(address);
 
@@ -85,7 +86,7 @@ public class WhackConnector extends Connector<WhackConnectorConfiguration> {
     }
 
     private String getSubdomain(JID address) {
-        return address.getDomain().substring(0, address.getDomain().lastIndexOf("."));
+        return address.getDomain().substring(0, address.getDomain().indexOf("."));
     }
 
     private void verifyAddress(JID address) {

@@ -18,6 +18,7 @@ public class ExampleEngineMain {
 
         ConnectionManager connectionManager = new ConnectionManager();
 
+        // setup whack connector
         WhackConnectorConfiguration whackConfiguration = new WhackConnectorConfiguration();
         whackConfiguration.setDomain("caprazzi.net");
         whackConfiguration.setHost("localhost");
@@ -26,6 +27,7 @@ public class ExampleEngineMain {
 
         WhackConnector whackConnector = new WhackConnector(whackConfiguration);
 
+        // setup smack connector
         SmackConnectorConfiguration smackConfiguration = new SmackConnectorConfiguration();
         smackConfiguration.setHost("localhost");
         smackConfiguration.setPort(5222);

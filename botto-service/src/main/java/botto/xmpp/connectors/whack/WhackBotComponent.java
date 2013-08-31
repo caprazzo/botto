@@ -1,6 +1,7 @@
 package botto.xmpp.connectors.whack;
 
 import botto.xmpp.engine.BotConnectionInfo;
+import com.google.common.base.Objects;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xmpp.component.Component;
@@ -10,6 +11,7 @@ import org.xmpp.packet.JID;
 import org.xmpp.packet.Packet;
 
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class WhackBotComponent implements Component {
@@ -28,11 +30,11 @@ public class WhackBotComponent implements Component {
 
     public void addConnection(WhackBotConnection connection) {
         connection.setConnectionInfo(connectionInfo);
-        connections.put(connection.getAddress().toBareJID(), connection);
+        connections.put(connection.getSendAddress().toBareJID(), connection);
     }
 
     public void removeConnection(WhackBotConnection connection) {
-        connections.remove(connection.getAddress().toBareJID());
+        connections.remove(connection.getSendAddress().toBareJID());
     }
 
     @Override
@@ -47,7 +49,8 @@ public class WhackBotComponent implements Component {
 
     @Override
     public void processPacket(Packet packet) {
-        WhackBotConnection connection = connections.get(packet.getFrom().toBareJID());
+        Log.debug("Received packet {}", packet);
+        WhackBotConnection connection = connections.get(packet.getTo().toBareJID());
         if (connection == null) {
             Log.warn("Could not find a connection to route packet: {}", packet);
             return;
@@ -73,6 +76,16 @@ public class WhackBotComponent implements Component {
     }
 
     public synchronized void send(Packet packet) throws ComponentException {
+
+        if (packet.getFrom() == null) {
+            packet.setFrom(jid);
+        }
+
+        if (packet.getID() == null) {
+            packet.setID(UUID.randomUUID().toString());
+        }
+
+        Log.debug("[{}] sending packet {}", packet);
         componentManager.sendPacket(this, packet);
     }
 
@@ -86,5 +99,12 @@ public class WhackBotComponent implements Component {
 
     public void setConnected(boolean connected) {
         connectionInfo.setConnectionStatus(connected);
+    }
+
+    @Override
+    public String toString() {
+        return Objects.toStringHelper(this)
+            .add("jid", jid)
+            .toString();
     }
 }

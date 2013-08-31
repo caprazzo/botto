@@ -70,6 +70,11 @@ public class SmackBotConnection implements BotConnection {
     }
 
     @Override
+    public JID getSendAddress() {
+        return address;
+    }
+
+    @Override
     public synchronized void send(Packet packet) {
         if (!connection.isConnected()) {
             if (Log.isDebugEnabled())

@@ -43,12 +43,12 @@ public class WhackBotConnection implements BotConnection {
         try {
             component.send(packet);
         } catch (ComponentException e) {
-            // TODO: log
+            Log.error("Error while sending packet {} to component {}", packet, component);
             throw new RuntimeException("Exception while sending packet " + packet, e);
         }
     }
 
-    public JID getAddress() {
+    public JID getSendAddress() {
         return address;
     }
 
