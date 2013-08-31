@@ -4,6 +4,11 @@ import botto.xmpp.annotations.PacketOutput;
 import botto.xmpp.engine.BotConnection;
 import botto.xmpp.service.AbstractBot;
 import botto.xmpp.service.Bot;
+import botto.xmpp.service.BottoService;
+import com.codahale.metrics.MetricRegistry;
+import com.codahale.metrics.Timer;
+import com.google.common.util.concurrent.FutureCallback;
+import com.google.common.util.concurrent.Futures;
 import net.caprazzi.reusables.common.Managed;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,6 +17,8 @@ import org.xmpp.packet.Packet;
 public class DispatcherService implements Managed {
 
     private final static Logger Log = LoggerFactory.getLogger(DispatcherService.class);
+
+
 
     private final IncomingPacketDispatcher incomingDispatcher;
     private final OutgoingPacketDispatcher outgoingDispatcher;
@@ -31,7 +38,7 @@ public class DispatcherService implements Managed {
         // capture messages coming from this connection and put them to the incoming dispatcher
         connection.setConnectionPacketListener(new BotConnection.ConnectionPacketListener() {
             @Override
-            public void onPacket(Packet packet) {
+            public void onPacket(final Packet packet) {
                 incomingDispatcher.dispatch(new PacketEnvelope<BotConnection>(connection, packet));
             }
         });
