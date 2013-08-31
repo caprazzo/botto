@@ -1,6 +1,9 @@
 package botto.xmpp.service.dispatcher;
 
 import botto.xmpp.service.Bot;
+import botto.xmpp.service.BottoService;
+import com.codahale.metrics.Meter;
+import com.codahale.metrics.MetricRegistry;
 import com.google.common.base.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,9 +13,11 @@ public abstract class EnvelopeDispatcher<TLabel, TTarget> {
 
     private final EnvelopeRouter<TLabel, TTarget> router = new EnvelopeRouter<TLabel, TTarget>();
     private final Logger Log;
+    private final Meter mDispatch;
 
     public EnvelopeDispatcher() {
         Log = LoggerFactory.getLogger(this.getClass());
+        mDispatch = BottoService.Metrics.meter(MetricRegistry.name(this.getClass(), "packets", "dispatch"));
     }
 
     protected abstract ListenableConfirmation doDispatch(TTarget destination, Packet packet);
@@ -23,6 +28,7 @@ public abstract class EnvelopeDispatcher<TLabel, TTarget> {
             Log.warn("No destination found for {}", envelope);
             return ListenableConfirmation.failed(new RuntimeException("Could not route packet to any destination"));
         }
+        mDispatch.mark();
         return doDispatch(route.get(), envelope.getPacket());
     }
 

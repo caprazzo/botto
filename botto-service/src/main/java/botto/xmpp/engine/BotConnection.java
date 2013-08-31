@@ -9,8 +9,6 @@ import org.xmpp.packet.Packet;
  */
 public interface BotConnection  {
 
-
-
     public interface ConnectionPacketListener {
         public void onPacket(Packet packet);
     }

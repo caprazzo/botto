@@ -3,6 +3,9 @@ package botto.xmpp.service.dispatcher;
 import botto.xmpp.connectors.smack.SmackBotConnection;
 import botto.xmpp.engine.BotConnection;
 import botto.xmpp.service.Bot;
+import botto.xmpp.service.BottoService;
+import com.codahale.metrics.Meter;
+import com.codahale.metrics.MetricRegistry;
 import com.google.common.base.Optional;
 
 import com.google.common.util.concurrent.*;
