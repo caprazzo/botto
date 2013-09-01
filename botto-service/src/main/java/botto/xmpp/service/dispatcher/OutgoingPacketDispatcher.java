@@ -1,6 +1,7 @@
 package botto.xmpp.service.dispatcher;
 
 import botto.xmpp.botto.xmpp.connector.BotConnection;
+import botto.xmpp.botto.xmpp.connector.Connector;
 import botto.xmpp.service.Bot;
 import botto.xmpp.service.Meters;
 import com.codahale.metrics.Gauge;
@@ -29,8 +30,16 @@ public class OutgoingPacketDispatcher extends EnvelopeDispatcher<Bot, BotConnect
             @Override
             protected void doProcess(PacketEnvelope<BotConnection> envelope) {
                 try {
-                    Log.debug("Sending {} to {}", envelope.getPacket(), envelope.getLabel());
-                    envelope.getLabel().send(envelope.getPacket());
+                    Packet packet = envelope.getPacket();
+                    BotConnection connection = envelope.getLabel();
+                    Log.debug("Sending {} to {}", packet, connection);
+                    // TODO: this would be better expressed by connector.send(connection, packet)
+                    // TODO: obtain connector here
+
+                    // TODO: this is a loopy way of obtaining a connector
+                    // maybe the envelope is a better place?
+                    Connector connector = connection.getConnector();
+                    connector.send(connection, packet);
                 }
                 catch(Exception ex) {
                     throw new RuntimeException("Error while sending " + envelope, ex);
@@ -75,7 +84,7 @@ public class OutgoingPacketDispatcher extends EnvelopeDispatcher<Bot, BotConnect
         return confirmation;
     }
 
-    // TODO: should the logic be implemented in BotConnection ?
+    // TODO: should the logic be implemented in BotConnection, or maybe in Connector?
     // TODO: each connection should have a unique ID and an incrementor for packets
 
     private Packet preparePacketForSending(Packet packet, BotConnection destination) {

@@ -30,6 +30,10 @@ public abstract class Connector<TConfig extends ConnectorConfiguration> implemen
         listener.onPacket(connection, packet);
     }
 
+    public final void send(BotConnection connection, Packet packet) {
+        doSend(connection, packet);
+    }
+
     public final String getName() {
         return name;
     }
@@ -40,4 +44,5 @@ public abstract class Connector<TConfig extends ConnectorConfiguration> implemen
 
     public abstract void start();
     public abstract void stop();
+    public abstract void doSend(BotConnection connection, Packet packet);
 }

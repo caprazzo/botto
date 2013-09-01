@@ -30,13 +30,9 @@ public class ConnectionManager implements Managed {
 
     private final AtomicInteger connectorCount = new AtomicInteger();
 
-
-
-    // TODO: return connectorId
     public synchronized ConnectorId registerConnector(Connector connector) throws Exception {
 
         if(connectors.containsValue(connector)) {
-            // TODO: throw. connectors can only be registered once
             Log.error("Could not register connector {} beacause it has already been registered");
             // TODO: use a project-specific exception
             throw new Exception("Could not register connector " + connector);
@@ -47,7 +43,6 @@ public class ConnectionManager implements Managed {
 
         final Meters.ConnectorMetrics meter = Meters.connectors.forConnector(connectorId);
 
-        // TODO: prevent adding a connector twice
         // TODO: maybe should have Connector Registry?
         connector.setPacketListener(new ConnectorPacketLstener() {
             @Override

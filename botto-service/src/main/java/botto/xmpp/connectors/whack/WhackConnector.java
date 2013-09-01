@@ -49,7 +49,7 @@ public class WhackConnector extends Connector<WhackConnectorConfiguration> {
 
         }
 
-        WhackBotConnection connection = new WhackBotConnection(component, address);
+        WhackBotConnection connection = new WhackBotConnection(this, component, address);
         component.addConnection(connection);
         return connection;
     }
@@ -109,6 +109,13 @@ public class WhackConnector extends Connector<WhackConnectorConfiguration> {
     @Override
     public void stop() {
 
+    }
+
+    @Override
+    public void doSend(BotConnection connection, Packet packet) {
+        // TODO: cast? really?
+        WhackBotConnection conn = (WhackBotConnection)connection;
+        conn.send(packet);
     }
 
     public void receiveFromComponent(WhackBotConnection connection, Packet packet) {

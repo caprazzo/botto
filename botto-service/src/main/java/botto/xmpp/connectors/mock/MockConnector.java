@@ -41,6 +41,11 @@ public class MockConnector extends Connector<MockConnectorConfiguration> {
         //To change body of implemented methods use File | Settings | File Templates.
     }
 
+    @Override
+    public void doSend(BotConnection connection, Packet packet) {
+        send(packet);
+    }
+
     public void send(Packet packet) {
         // delay by 1s
         // delay(1000);

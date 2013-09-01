@@ -3,8 +3,8 @@ package botto.xmpp.connectors.mock;
 import botto.xmpp.botto.xmpp.connector.BotConnection;
 import botto.xmpp.botto.xmpp.connector.BotConnectionInfo;
 import botto.xmpp.botto.xmpp.connector.ConnectionInfoListener;
+import botto.xmpp.botto.xmpp.connector.Connector;
 import org.xmpp.packet.JID;
-import org.xmpp.packet.Packet;
 
 public class MockBotConnection implements BotConnection {
 
@@ -34,8 +34,8 @@ public class MockBotConnection implements BotConnection {
     }
 
     @Override
-    public void send(Packet packet) {
-        connector.send(packet);
+    public Connector getConnector() {
+        return connector;
     }
 
 }

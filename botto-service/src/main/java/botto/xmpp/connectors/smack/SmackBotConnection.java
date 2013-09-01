@@ -3,6 +3,7 @@ package botto.xmpp.connectors.smack;
 import botto.xmpp.botto.xmpp.connector.BotConnection;
 import botto.xmpp.botto.xmpp.connector.ConnectionInfoListener;
 import botto.xmpp.botto.xmpp.connector.BotConnectionInfo;
+import botto.xmpp.botto.xmpp.connector.Connector;
 import botto.xmpp.utils.PacketTypeConverter;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
@@ -71,8 +72,7 @@ class SmackBotConnection implements BotConnection {
         return address;
     }
 
-    @Override
-    public synchronized void send(Packet packet) {
+    synchronized void send(Packet packet) {
         if (!connection.isConnected()) {
             if (Log.isDebugEnabled())
                 Log.warn("Not sending packet because connection is not connected. Packet: {}", packet.toXML());
@@ -107,6 +107,11 @@ class SmackBotConnection implements BotConnection {
             Log.error("Error while sending packet {}", packet, ex);
             throw new RuntimeException("Error while sending packet " + packet, ex);
         }
+    }
+
+    @Override
+    public Connector getConnector() {
+        return connector;
     }
 
     public synchronized void start() {

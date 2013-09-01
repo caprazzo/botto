@@ -56,6 +56,13 @@ public class SmackConnector extends Connector<SmackConnectorConfiguration> {
         // TODO: should stop all connections here
     }
 
+    @Override
+    public void doSend(BotConnection connection, org.xmpp.packet.Packet packet) {
+        // TODO: cast? really?
+        SmackBotConnection conn = (SmackBotConnection)connection;
+        conn.send(packet);
+    }
+
     public void receiveFromConnection(SmackBotConnection connection, org.xmpp.packet.Packet packet) {
         receive(connection, packet);
     }
