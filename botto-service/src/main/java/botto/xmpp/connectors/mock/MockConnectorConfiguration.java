@@ -1,6 +1,6 @@
 package botto.xmpp.connectors.mock;
 
-import botto.xmpp.engine.ConnectorConfiguration;
+import botto.xmpp.botto.xmpp.connector.ConnectorConfiguration;
 
 public class MockConnectorConfiguration implements ConnectorConfiguration {
     private String domain;

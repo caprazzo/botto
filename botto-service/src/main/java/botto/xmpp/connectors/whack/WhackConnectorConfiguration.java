@@ -1,6 +1,6 @@
 package botto.xmpp.connectors.whack;
 
-import botto.xmpp.engine.ConnectorConfiguration;
+import botto.xmpp.botto.xmpp.connector.ConnectorConfiguration;
 
 public class WhackConnectorConfiguration implements ConnectorConfiguration {
 

@@ -1,6 +1,6 @@
 package botto.xmpp.service;
 
-import botto.xmpp.engine.BotConnectionInfo;
+import botto.xmpp.botto.xmpp.connector.BotConnectionInfo;
 import botto.xmpp.service.bot.BotSessionManager;
 import botto.xmpp.service.component.ComponentBotExecutor;
 import botto.xmpp.service.component.ComponentBotRouter;

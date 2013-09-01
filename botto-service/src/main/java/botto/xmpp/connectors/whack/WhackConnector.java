@@ -1,14 +1,14 @@
 package botto.xmpp.connectors.whack;
 
-import botto.xmpp.engine.Connector;
-import botto.xmpp.engine.BotConnection;
-import botto.xmpp.engine.ConnectorException;
-import botto.xmpp.service.AbstractBot;
+import botto.xmpp.botto.xmpp.connector.Connector;
+import botto.xmpp.botto.xmpp.connector.BotConnection;
+import botto.xmpp.botto.xmpp.connector.ConnectorException;
 import org.jivesoftware.whack.ExternalComponentManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xmpp.component.ComponentException;
 import org.xmpp.packet.JID;
+import org.xmpp.packet.Packet;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -20,13 +20,13 @@ public class WhackConnector extends Connector<WhackConnectorConfiguration> {
     private static final Logger Log = LoggerFactory.getLogger(WhackConnector.class);
 
     private final ExternalComponentManager manager;
-    private final WhackConnectorConfiguration configuration;
 
-    private Map<String, WhackBotComponent> components = new ConcurrentHashMap<String, WhackBotComponent>();
+    private final Map<String, WhackBotComponent> components = new ConcurrentHashMap<String, WhackBotComponent>();
 
     public WhackConnector(WhackConnectorConfiguration configuration) {
+        super(configuration);
         checkNotNull(configuration);
-        this.configuration = configuration;
+
         // TODO the connector should be configured with host, port, domain, secret and a map subdomain -> password
         manager = new ExternalComponentManager(configuration.getHost(), configuration.getPort());
     }
@@ -42,7 +42,7 @@ public class WhackConnector extends Connector<WhackConnectorConfiguration> {
         WhackBotComponent component = components.get(subdomain);
         if (component == null) {
             try {
-                component = createComponent(subdomain, configuration.getSecret(subdomain));
+                component = createComponent(subdomain, getConfiguration().getSecret(subdomain));
             } catch (ComponentException e) {
                 throw new ConnectorException("Error while creating component for subdomain " + subdomain, e);
             }
@@ -74,7 +74,7 @@ public class WhackConnector extends Connector<WhackConnectorConfiguration> {
         checkNotNull(subdomain);
         checkNotNull(secret);
 
-        WhackBotComponent component = new WhackBotComponent(subdomain);
+        WhackBotComponent component = new WhackBotComponent(this, subdomain);
         manager.setSecretKey(subdomain, secret);
         manager.setMultipleAllowed(subdomain, true);
         manager.removeComponent(subdomain);
@@ -111,4 +111,7 @@ public class WhackConnector extends Connector<WhackConnectorConfiguration> {
 
     }
 
+    public void receiveFromComponent(WhackBotConnection connection, Packet packet) {
+        receive(connection, packet);
+    }
 }

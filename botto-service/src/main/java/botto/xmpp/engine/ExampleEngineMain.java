@@ -2,6 +2,8 @@ package botto.xmpp.engine;
 
 import botto.xmpp.annotations.Context;
 import botto.xmpp.annotations.Receive;
+import botto.xmpp.botto.xmpp.connector.ConnectorException;
+import botto.xmpp.botto.xmpp.connector.ConnectorId;
 import botto.xmpp.connectors.smack.SmackConnector;
 import botto.xmpp.connectors.smack.SmackConnectorConfiguration;
 import botto.xmpp.connectors.whack.WhackConnector;
@@ -9,14 +11,13 @@ import botto.xmpp.connectors.whack.WhackConnectorConfiguration;
 import botto.xmpp.service.AbstractBot;
 import botto.xmpp.service.BottoService;
 import botto.xmpp.service.reflection.AnnotatedBotObject;
-import ch.qos.logback.core.net.SyslogOutputStream;
 import com.codahale.metrics.JmxReporter;
 import org.xmpp.packet.JID;
 import org.xmpp.packet.Message;
 
 public class ExampleEngineMain {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
 
         ConnectionManager connectionManager = new ConnectionManager();
 
@@ -28,6 +29,7 @@ public class ExampleEngineMain {
         whackConfiguration.setSecret("secret");
 
         WhackConnector whackConnector = new WhackConnector(whackConfiguration);
+        ConnectorId whackConnectorId = connectionManager.registerConnector(whackConnector);
 
         // setup smack connector
         SmackConnectorConfiguration smackConfiguration = new SmackConnectorConfiguration();
@@ -37,24 +39,25 @@ public class ExampleEngineMain {
         smackConfiguration.setResource("any");
 
         SmackConnector smackConnector = new SmackConnector(smackConfiguration);
+        ConnectorId smackConnectorId = connectionManager.registerConnector(smackConnector);
 
         try {
             AbstractBot bot = makeBot(new ExampleBot());
-            connectionManager.addBot(bot, new JID("bot@caprazzi.net"), smackConnector);
+            connectionManager.addBot(bot, new JID("bot@caprazzi.net"), smackConnectorId);
         } catch (ConnectorException e) {
             throw new RuntimeException(e);
         }
 
         try {
             AbstractBot bot = makeBot(new ExampleBot());
-            connectionManager.addBot(bot, new JID("bot1@caprazzi.net"), smackConnector);
+            connectionManager.addBot(bot, new JID("bot1@caprazzi.net"), smackConnectorId);
         } catch (ConnectorException e) {
             throw new RuntimeException(e);
         }
 
         try {
             AbstractBot bot = makeBot(new ExampleBot());
-            connectionManager.addBot(bot, new JID("something@bots.caprazzi.net"), whackConnector);
+            connectionManager.addBot(bot, new JID("something@bots.caprazzi.net"), whackConnectorId);
         } catch (ConnectorException e) {
             throw new RuntimeException(e);
         }

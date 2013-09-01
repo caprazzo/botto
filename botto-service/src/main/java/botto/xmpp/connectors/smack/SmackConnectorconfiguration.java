@@ -1,6 +1,6 @@
 package botto.xmpp.connectors.smack;
 
-import botto.xmpp.engine.ConnectorConfiguration;
+import botto.xmpp.botto.xmpp.connector.ConnectorConfiguration;
 import org.xmpp.packet.JID;
 
 public class SmackConnectorConfiguration implements ConnectorConfiguration {

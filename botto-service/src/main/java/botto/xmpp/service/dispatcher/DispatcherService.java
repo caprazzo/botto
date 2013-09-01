@@ -1,14 +1,9 @@
 package botto.xmpp.service.dispatcher;
 
 import botto.xmpp.annotations.PacketOutput;
-import botto.xmpp.engine.BotConnection;
+import botto.xmpp.botto.xmpp.connector.BotConnection;
 import botto.xmpp.service.AbstractBot;
 import botto.xmpp.service.Bot;
-import botto.xmpp.service.BottoService;
-import com.codahale.metrics.MetricRegistry;
-import com.codahale.metrics.Timer;
-import com.google.common.util.concurrent.FutureCallback;
-import com.google.common.util.concurrent.Futures;
 import net.caprazzi.reusables.common.Managed;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,8 +13,6 @@ public class DispatcherService implements Managed {
 
     private final static Logger Log = LoggerFactory.getLogger(DispatcherService.class);
 
-
-
     private final IncomingPacketDispatcher incomingDispatcher;
     private final OutgoingPacketDispatcher outgoingDispatcher;
 
@@ -28,24 +21,18 @@ public class DispatcherService implements Managed {
         incomingDispatcher = new IncomingPacketDispatcher(outgoingDispatcher);
     }
 
+    public void receive(BotConnection connection, Packet packet) {
+        incomingDispatcher.dispatch(new PacketEnvelope<BotConnection>(connection, packet));
+    }
+
     public synchronized void removeConnection(AbstractBot bot, BotConnection connection) {
        // TODO: also use connection when removing
        incomingDispatcher.removeRoute(bot);
        outgoingDispatcher.removeRoute(bot);
     }
 
+    // TODO: return a ConnectionId
     public synchronized void addConnection(final AbstractBot bot, final BotConnection connection) {
-
-        // TODO: this listener should probably be set on the connector, to
-        // further simplify Connection
-
-        // capture messages coming from this connection and put them to the incoming dispatcher
-        connection.setConnectionPacketListener(new BotConnection.ConnectionPacketListener() {
-            @Override
-            public void onPacket(final Packet packet) {
-                incomingDispatcher.dispatch(new PacketEnvelope<BotConnection>(connection, packet));
-            }
-        });
 
         // route incoming packets to this bot.
         // TODO: can this be done with a table instead of scanning all filters?
@@ -89,5 +76,6 @@ public class DispatcherService implements Managed {
         outgoingDispatcher.stop();
         Log.info("Shutdown complete");
     }
+
 
 }

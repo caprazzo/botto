@@ -1,9 +1,8 @@
 package botto.xmpp.connectors.mock;
 
-import botto.xmpp.engine.BotConnection;
-import botto.xmpp.engine.BotConnectionInfo;
-import botto.xmpp.engine.ConnectionInfoListener;
-import botto.xmpp.service.Bot;
+import botto.xmpp.botto.xmpp.connector.BotConnection;
+import botto.xmpp.botto.xmpp.connector.BotConnectionInfo;
+import botto.xmpp.botto.xmpp.connector.ConnectionInfoListener;
 import org.xmpp.packet.JID;
 import org.xmpp.packet.Packet;
 
@@ -11,13 +10,12 @@ public class MockBotConnection implements BotConnection {
 
     private final JID address;
     private final MockConnector connector;
-    private ConnectionPacketListener packetListener;
 
     private final BotConnectionInfo connectionInfo = new BotConnectionInfo();
 
-    public MockBotConnection(JID address, MockConnector connector) {
-        this.address = address;
+    public MockBotConnection(MockConnector connector, JID address) {
         this.connector = connector;
+        this.address = address;
     }
 
     @Override
@@ -31,11 +29,6 @@ public class MockBotConnection implements BotConnection {
     }
 
     @Override
-    public void setConnectionPacketListener(ConnectionPacketListener packetListener) {
-        this.packetListener = packetListener;
-    }
-
-    @Override
     public JID getSendAddress() {
         return address;
     }
@@ -45,7 +38,4 @@ public class MockBotConnection implements BotConnection {
         connector.send(packet);
     }
 
-    public void receive(Packet packet) {
-        packetListener.onPacket(packet);
-    }
 }

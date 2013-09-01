@@ -3,7 +3,7 @@ package botto.xmpp.service.bot;
 
 import botto.xmpp.annotations.PacketOutput;
 import botto.xmpp.service.AbstractBot;
-import botto.xmpp.engine.BotConnectionInfo;
+import botto.xmpp.botto.xmpp.connector.BotConnectionInfo;
 import botto.xmpp.service.dispatcher.PacketSource;
 import botto.xmpp.utils.PacketTypeConverter;
 import com.sun.javafx.tools.packager.Log;

@@ -1,8 +1,8 @@
 package botto.xmpp.connectors.smack;
 
-import botto.xmpp.engine.BotConnection;
-import botto.xmpp.engine.ConnectionInfoListener;
-import botto.xmpp.engine.BotConnectionInfo;
+import botto.xmpp.botto.xmpp.connector.BotConnection;
+import botto.xmpp.botto.xmpp.connector.ConnectionInfoListener;
+import botto.xmpp.botto.xmpp.connector.BotConnectionInfo;
 import botto.xmpp.utils.PacketTypeConverter;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
@@ -27,6 +27,7 @@ class SmackBotConnection implements BotConnection {
 
     private final static Logger Log = LoggerFactory.getLogger(SmackBotConnection.class);
 
+    private final SmackConnector connector;
     private final JID address;
     private final String secret;
     private final String resource;
@@ -35,10 +36,11 @@ class SmackBotConnection implements BotConnection {
 
     private final ExecutorService connectionExecutor = Executors.newSingleThreadExecutor();
     private final BotConnectionInfo connectionInfo = new BotConnectionInfo();
-    private ConnectionPacketListener packetListener;
     private ConnectionInfoListener connectionInfoListener;
 
-    public SmackBotConnection(JID address, String host, int port, String secret, String resource) {
+    // TODO: add a SmackBotConfiguration object, or create the XMPPConnection outside
+    public SmackBotConnection(SmackConnector connector, JID address, String host, int port, String secret, String resource) {
+        this.connector = connector;
         this.address = address;
 
         this.secret = secret;
@@ -62,11 +64,6 @@ class SmackBotConnection implements BotConnection {
     @Override
     public void setConnectionInfoListener(ConnectionInfoListener infoListener) {
         this.connectionInfoListener = infoListener;
-    }
-
-    @Override
-    public void setConnectionPacketListener(ConnectionPacketListener listener) {
-        this.packetListener = listener;
     }
 
     @Override
@@ -113,6 +110,7 @@ class SmackBotConnection implements BotConnection {
     }
 
     public synchronized void start() {
+        final SmackBotConnection botConnection = this;
         Futures.addCallback(connect(), new FutureCallback<Boolean>() {
             @Override
             public void onSuccess(Boolean result) {
@@ -134,9 +132,7 @@ class SmackBotConnection implements BotConnection {
                         }
 
                         try {
-                            // TODO: instead of packetListener, this should call
-                            // connector.receive(connection, packet)
-                            packetListener.onPacket(converted);
+                            connector.receiveFromConnection(botConnection, converted);
                         }
                         catch(Exception ex) {
                            Log.error("Error while processing packet {}: {}", packet.getPacketID(), ex);

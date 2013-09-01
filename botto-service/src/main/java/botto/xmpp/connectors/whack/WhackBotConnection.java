@@ -1,8 +1,8 @@
 package botto.xmpp.connectors.whack;
 
-import botto.xmpp.engine.BotConnection;
-import botto.xmpp.engine.ConnectionInfoListener;
-import botto.xmpp.engine.BotConnectionInfo;
+import botto.xmpp.botto.xmpp.connector.BotConnection;
+import botto.xmpp.botto.xmpp.connector.ConnectionInfoListener;
+import botto.xmpp.botto.xmpp.connector.BotConnectionInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xmpp.component.ComponentException;
@@ -34,11 +34,6 @@ class WhackBotConnection implements BotConnection {
     }
 
     @Override
-    public void setConnectionPacketListener(ConnectionPacketListener packetListener) {
-        this.packetListener = packetListener;
-    }
-
-    @Override
     public void send(Packet packet) {
         try {
             component.send(packet);
@@ -52,9 +47,9 @@ class WhackBotConnection implements BotConnection {
         return address;
     }
 
-    public void receive(Packet packet) {
-        packetListener.onPacket(packet);
-    }
+    //public void receive(Packet packet) {
+    //    packetListener.onPacket(packet);
+    //}
 
     public void setConnectionInfo(BotConnectionInfo connectionInfo) {
         this.connectionInfo = connectionInfo;

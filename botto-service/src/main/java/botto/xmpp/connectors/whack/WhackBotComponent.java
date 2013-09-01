@@ -1,6 +1,6 @@
 package botto.xmpp.connectors.whack;
 
-import botto.xmpp.engine.BotConnectionInfo;
+import botto.xmpp.botto.xmpp.connector.BotConnectionInfo;
 import com.google.common.base.Objects;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,13 +18,15 @@ public class WhackBotComponent implements Component {
 
     private static final Logger Log = LoggerFactory.getLogger(WhackBotComponent.class);
 
+    private final WhackConnector connector;
     private final String subdomain;
     private JID jid;
     private ComponentManager componentManager;
     private Map<String, WhackBotConnection> connections = new ConcurrentHashMap<String, WhackBotConnection>();
     private final BotConnectionInfo connectionInfo = new BotConnectionInfo();
 
-    public WhackBotComponent(String subdomain) {
+    public WhackBotComponent(WhackConnector connector, String subdomain) {
+        this.connector = connector;
         this.subdomain = subdomain;
     }
 
@@ -55,7 +57,7 @@ public class WhackBotComponent implements Component {
             Log.warn("Could not find a connection to route packet: {}", packet);
             return;
         }
-        connection.receive(packet);
+        connector.receiveFromComponent(connection, packet);
     }
 
     @Override

@@ -2,10 +2,11 @@ package botto.xmpp.engine;
 
 import botto.xmpp.annotations.Context;
 import botto.xmpp.annotations.Receive;
+
+import botto.xmpp.botto.xmpp.connector.ConnectorId;
 import botto.xmpp.connectors.mock.MockConnector;
 import botto.xmpp.connectors.mock.MockConnectorConfiguration;
 import botto.xmpp.service.AbstractBot;
-import botto.xmpp.service.Bot;
 import botto.xmpp.service.BottoService;
 import botto.xmpp.service.reflection.AnnotatedBotObject;
 import com.codahale.metrics.JmxReporter;
@@ -18,7 +19,7 @@ import java.util.concurrent.TimeUnit;
 
 public class MockEngineMain {
 
-    public static void main(String[] args) throws ConnectorException {
+    public static void main(String[] args) throws Exception {
 
         ConnectionManager connectionManager = new ConnectionManager();
 
@@ -26,28 +27,30 @@ public class MockEngineMain {
         configuration.setDomain("example.com");
         MockConnector connector = new MockConnector(configuration);
 
+        ConnectorId mock = connectionManager.registerConnector(connector);
+
         // echo bot
         ExampleEngineMain.ExampleBot echoBot = new ExampleEngineMain.ExampleBot();
         AbstractBot echo = AnnotatedBotObject.from(echoBot).get();
-        connectionManager.addBot(echo, new JID("echo@example.com"), connector);
+        connectionManager.addBot(echo, new JID("echo@example.com"), mock);
 
         // add a generator bot
         {
             GenBot genBot = new GenBot(1, TimeUnit.MILLISECONDS, new JID("echo@example.com"));
             AbstractBot gen = AnnotatedBotObject.from(genBot).get();
-            connectionManager.addBot(gen, new JID("gen@example.com"), connector);
+            connectionManager.addBot(gen, new JID("gen@example.com"), mock);
         }
 
         {
             GenBot genBot = new GenBot(1, TimeUnit.MILLISECONDS, new JID("echo@example.com"));
             AbstractBot gen = AnnotatedBotObject.from(genBot).get();
-            connectionManager.addBot(gen, new JID("gen2@example.com"), connector);
+            connectionManager.addBot(gen, new JID("gen2@example.com"), mock);
         }
 
         {
             GenBot genBot = new GenBot(1, TimeUnit.MILLISECONDS, new JID("echo@example.com"));
             AbstractBot gen = AnnotatedBotObject.from(genBot).get();
-            connectionManager.addBot(gen, new JID("gen3@example.com"), connector);
+            connectionManager.addBot(gen, new JID("gen3@example.com"), mock);
         }
         // add an echo bot
 

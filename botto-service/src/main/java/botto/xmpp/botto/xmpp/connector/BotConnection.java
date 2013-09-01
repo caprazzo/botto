@@ -1,4 +1,4 @@
-package botto.xmpp.engine;
+package botto.xmpp.botto.xmpp.connector;
 
 import org.xmpp.packet.JID;
 import org.xmpp.packet.Packet;
@@ -15,7 +15,6 @@ public interface BotConnection  {
 
     public BotConnectionInfo getConnectionInfo();
     public void setConnectionInfoListener(ConnectionInfoListener infoListener);
-    public void setConnectionPacketListener(ConnectionPacketListener packetListener);
 
     public JID getSendAddress();
     public void send(Packet packet);

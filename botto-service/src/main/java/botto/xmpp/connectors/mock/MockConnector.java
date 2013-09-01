@@ -1,8 +1,8 @@
 package botto.xmpp.connectors.mock;
 
-import botto.xmpp.engine.BotConnection;
-import botto.xmpp.engine.Connector;
-import botto.xmpp.engine.ConnectorException;
+import botto.xmpp.botto.xmpp.connector.BotConnection;
+import botto.xmpp.botto.xmpp.connector.Connector;
+import botto.xmpp.botto.xmpp.connector.ConnectorException;
 import org.xmpp.packet.JID;
 import org.xmpp.packet.Packet;
 
@@ -11,17 +11,15 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class MockConnector extends Connector<MockConnectorConfiguration> {
 
-    private final MockConnectorConfiguration configuration;
-
     public MockConnector(MockConnectorConfiguration configuration) {
-        this.configuration = configuration;
+        super(configuration);
     }
 
     Map<String, MockBotConnection> bots = new ConcurrentHashMap<String, MockBotConnection>();
 
     @Override
     public BotConnection createConnection(JID address) throws ConnectorException {
-        MockBotConnection connection = new MockBotConnection(address, this);
+        MockBotConnection connection = new MockBotConnection(this, address);
         bots.put(address.toBareJID(), connection);
         return connection;
     }
@@ -42,14 +40,18 @@ public class MockConnector extends Connector<MockConnectorConfiguration> {
     }
 
     public void send(Packet packet) {
-        MockBotConnection connection = bots.get(packet.getTo().toBareJID());
+        // delay by 1s
         try {
             Thread.sleep(1000);
         } catch (InterruptedException e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         }
+
+        // if found a connection for this destination, deliver directly to it
+        // (a normal connector would send to a server instead)
+        MockBotConnection connection = bots.get(packet.getTo().toBareJID());
         if (connection != null) {
-            connection.receive(packet);
+            receive(connection, packet);
         }
     }
 }

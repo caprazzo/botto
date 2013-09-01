@@ -1,9 +1,11 @@
 package botto.xmpp.connectors.smack;
 
-import botto.xmpp.engine.BotConnection;
-import botto.xmpp.engine.Connector;
-import botto.xmpp.engine.ConnectorException;
+import botto.xmpp.botto.xmpp.connector.BotConnection;
+import botto.xmpp.botto.xmpp.connector.Connector;
+import botto.xmpp.botto.xmpp.connector.ConnectorException;
 
+import org.jivesoftware.smack.PacketListener;
+import org.jivesoftware.smack.packet.Packet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,17 +19,17 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class SmackConnector extends Connector<SmackConnectorConfiguration> {
 
     private final Logger Log = LoggerFactory.getLogger(SmackConnector.class);
-    private final SmackConnectorConfiguration configuration;
 
     public SmackConnector(SmackConnectorConfiguration configuration) {
+        super(configuration);
         checkNotNull(configuration, "Configuration must not be null");
-        this.configuration = configuration;
+
     }
 
     public BotConnection createConnection(JID address) {
         checkNotNull(address, "addresss must not be null");
 
-        SmackBotConnection connection = new SmackBotConnection(address, this.configuration.getHost(), this.configuration.getPort(), this.configuration.getSecret(address), this.configuration.getResource());
+        SmackBotConnection connection = new SmackBotConnection(this, address, getConfiguration().getHost(), getConfiguration().getPort(), getConfiguration().getSecret(address), getConfiguration().getResource());
         // TODO: connection should start only if connector.start() has been invoked
         connection.start();
         return connection;
@@ -54,4 +56,7 @@ public class SmackConnector extends Connector<SmackConnectorConfiguration> {
         // TODO: should stop all connections here
     }
 
+    public void receiveFromConnection(SmackBotConnection connection, org.xmpp.packet.Packet packet) {
+        receive(connection, packet);
+    }
 }
