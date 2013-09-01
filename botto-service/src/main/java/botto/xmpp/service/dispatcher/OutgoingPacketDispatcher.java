@@ -2,7 +2,7 @@ package botto.xmpp.service.dispatcher;
 
 import botto.xmpp.botto.xmpp.connector.BotConnection;
 import botto.xmpp.service.Bot;
-import botto.xmpp.service.MetricsServices;
+import botto.xmpp.service.Meters;
 import com.codahale.metrics.Gauge;
 import com.codahale.metrics.MetricRegistry;
 import com.google.common.base.Strings;
@@ -40,7 +40,7 @@ public class OutgoingPacketDispatcher extends EnvelopeDispatcher<Bot, BotConnect
 
 
         // TODO: can we put this inside the executor directly?
-        MetricsServices.Metrics.register(MetricRegistry.name(OutgoingPacketDispatcher.class, "depth"),
+        Meters.Metrics.register(MetricRegistry.name(OutgoingPacketDispatcher.class, "depth"),
                 new Gauge<Integer>() {
                     @Override
                     public Integer getValue() {

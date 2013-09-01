@@ -1,7 +1,7 @@
 package botto.xmpp.service.dispatcher;
 
 import botto.xmpp.service.Bot;
-import botto.xmpp.service.MetricsServices;
+import botto.xmpp.service.Meters;
 
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
@@ -20,7 +20,7 @@ public abstract class EnvelopeDispatcher<TLabel, TTarget> {
 
     public EnvelopeDispatcher() {
         Log = LoggerFactory.getLogger(this.getClass());
-        mDispatch = MetricsServices.Metrics.timer(MetricRegistry.name(this.getClass(), "packets", "processing"));
+        mDispatch = Meters.Metrics.timer(MetricRegistry.name(this.getClass(), "packets", "processing"));
     }
 
     protected abstract ListenableConfirmation doDispatch(TTarget destination, Packet packet);

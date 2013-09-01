@@ -9,7 +9,7 @@ import botto.xmpp.connectors.smack.SmackConnectorConfiguration;
 import botto.xmpp.connectors.whack.WhackConnector;
 import botto.xmpp.connectors.whack.WhackConnectorConfiguration;
 import botto.xmpp.service.AbstractBot;
-import botto.xmpp.service.MetricsServices;
+import botto.xmpp.service.Meters;
 import botto.xmpp.service.reflection.AnnotatedBotObject;
 import com.codahale.metrics.JmxReporter;
 import org.xmpp.packet.JID;
@@ -68,7 +68,7 @@ public class ExampleEngineMain {
         connectionManager.start();
 
         // start metrics reporting to JMX
-        final JmxReporter reporter = JmxReporter.forRegistry(MetricsServices.Metrics).build();
+        final JmxReporter reporter = JmxReporter.forRegistry(Meters.Metrics).build();
         reporter.start();
     }
 

@@ -2,10 +2,11 @@ package botto.xmpp.engine;
 
 import botto.xmpp.botto.xmpp.connector.*;
 import botto.xmpp.service.AbstractBot;
-import botto.xmpp.service.MetricsServices;
+import botto.xmpp.service.Meters;
 import botto.xmpp.service.dispatcher.DispatcherService;
 import com.codahale.metrics.Meter;
 import com.google.common.base.Objects;
+import com.sun.javafx.font.FontStrike;
 import net.caprazzi.reusables.common.Managed;
 
 import org.slf4j.Logger;
@@ -29,6 +30,8 @@ public class ConnectionManager implements Managed {
 
     private final AtomicInteger connectorCount = new AtomicInteger();
 
+
+
     // TODO: return connectorId
     public synchronized ConnectorId registerConnector(Connector connector) throws Exception {
 
@@ -39,28 +42,29 @@ public class ConnectionManager implements Managed {
             throw new Exception("Could not register connector " + connector);
         }
 
-        ConnectorId id = new ConnectorId(connectorCount.getAndIncrement(), connector.getClass(), connector.getName());
-        connectors.put(id, connector);
+        final ConnectorId connectorId = new ConnectorId(connectorCount.getAndIncrement(), connector.getClass(), connector.getName());
+        connectors.put(connectorId, connector);
 
-        final Meter receiveMeter = MetricsServices.Metrics.meter(MetricsServices.connectorPacketsAllIncoming(id));
+        final Meters.ConnectorMetrics meter = Meters.connectors.forConnector(connectorId);
 
         // TODO: prevent adding a connector twice
         // TODO: maybe should have Connector Registry?
         connector.setPacketListener(new ConnectorPacketLstener() {
             @Override
             public void onPacket(BotConnection connection, Packet packet) {
-                receiveMeter.mark();
+                meter.countIncoming(packet);
                 dispatcher.receive(connection, packet);
             }
         });
 
-        Log.info("Registered connector {} with id {}", connector, id);
+        Log.info("Registered connector {} with id {}", connector, connectorId);
 
-        return id;
+        return connectorId;
     }
 
     public synchronized void removeConnector(ConnectorId connectorId) {
         // TODO: implement removal code
+        // TODO: should also un-register meters for removed connectors?
     }
 
     public synchronized void addBot(AbstractBot bot, JID address, ConnectorId connectorId) throws Exception {

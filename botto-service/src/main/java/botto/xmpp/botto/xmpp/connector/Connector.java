@@ -40,6 +40,4 @@ public abstract class Connector<TConfig extends ConnectorConfiguration> implemen
 
     public abstract void start();
     public abstract void stop();
-
-
 }

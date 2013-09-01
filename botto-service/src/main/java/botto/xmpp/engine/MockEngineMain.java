@@ -7,7 +7,7 @@ import botto.xmpp.botto.xmpp.connector.ConnectorId;
 import botto.xmpp.connectors.mock.MockConnector;
 import botto.xmpp.connectors.mock.MockConnectorConfiguration;
 import botto.xmpp.service.AbstractBot;
-import botto.xmpp.service.MetricsServices;
+import botto.xmpp.service.Meters;
 import botto.xmpp.service.reflection.AnnotatedBotObject;
 import com.codahale.metrics.JmxReporter;
 import org.xmpp.packet.JID;
@@ -61,7 +61,7 @@ public class MockEngineMain {
 
 
         // start metrics reporting to JMX
-        final JmxReporter reporter = JmxReporter.forRegistry(MetricsServices.Metrics).build();
+        final JmxReporter reporter = JmxReporter.forRegistry(Meters.Metrics).build();
         reporter.start();
 
     }
