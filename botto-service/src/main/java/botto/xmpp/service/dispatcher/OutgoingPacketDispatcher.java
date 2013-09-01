@@ -33,8 +33,6 @@ public class OutgoingPacketDispatcher extends EnvelopeDispatcher<Bot, BotConnect
                     Packet packet = envelope.getPacket();
                     BotConnection connection = envelope.getLabel();
                     Log.debug("Sending {} to {}", packet, connection);
-                    // TODO: this would be better expressed by connector.send(connection, packet)
-                    // TODO: obtain connector here
 
                     // TODO: this is a loopy way of obtaining a connector
                     // maybe the envelope is a better place?
