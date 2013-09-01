@@ -35,6 +35,10 @@ public class DispatcherService implements Managed {
     }
 
     public synchronized void addConnection(final AbstractBot bot, final BotConnection connection) {
+
+        // TODO: this listener should probably be set on the connector, to
+        // further simplify Connection
+
         // capture messages coming from this connection and put them to the incoming dispatcher
         connection.setConnectionPacketListener(new BotConnection.ConnectionPacketListener() {
             @Override
@@ -85,7 +89,5 @@ public class DispatcherService implements Managed {
         outgoingDispatcher.stop();
         Log.info("Shutdown complete");
     }
-
-
 
 }

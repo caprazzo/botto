@@ -9,7 +9,7 @@ import org.xmpp.component.ComponentException;
 import org.xmpp.packet.JID;
 import org.xmpp.packet.Packet;
 
-public class WhackBotConnection implements BotConnection {
+class WhackBotConnection implements BotConnection {
 
     private static final Logger Log = LoggerFactory.getLogger(WhackBotConnection.class);
 

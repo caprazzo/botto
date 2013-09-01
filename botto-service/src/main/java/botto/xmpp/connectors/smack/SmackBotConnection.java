@@ -23,7 +23,7 @@ import java.util.concurrent.Executors;
  *
  * Each connection wraps an XMPPConnection, which is allocated in its own thread.
  */
-public class SmackBotConnection implements BotConnection {
+class SmackBotConnection implements BotConnection {
 
     private final static Logger Log = LoggerFactory.getLogger(SmackBotConnection.class);
 
@@ -134,6 +134,8 @@ public class SmackBotConnection implements BotConnection {
                         }
 
                         try {
+                            // TODO: instead of packetListener, this should call
+                            // connector.receive(connection, packet)
                             packetListener.onPacket(converted);
                         }
                         catch(Exception ex) {

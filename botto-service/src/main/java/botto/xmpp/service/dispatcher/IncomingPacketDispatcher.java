@@ -1,10 +1,9 @@
 package botto.xmpp.service.dispatcher;
 
-import botto.xmpp.connectors.smack.SmackBotConnection;
 import botto.xmpp.engine.BotConnection;
 import botto.xmpp.service.Bot;
 import botto.xmpp.service.BottoService;
-import com.codahale.metrics.Meter;
+import com.codahale.metrics.Gauge;
 import com.codahale.metrics.MetricRegistry;
 import com.google.common.base.Optional;
 
@@ -21,13 +20,11 @@ public class IncomingPacketDispatcher extends EnvelopeDispatcher<BotConnection, 
 
     private final static Timer timer = BottoService.Metrics.timer(MetricRegistry.name(IncomingPacketDispatcher.class, "bot", "receive"));
 
-    private final static Logger Log = LoggerFactory.getLogger(SmackBotConnection.class);
+    private final static Logger Log = LoggerFactory.getLogger(IncomingPacketDispatcher.class);
 
     private final OutgoingPacketDispatcher output;
 
     private SingleThreadQueueResultExecutor<PacketEnvelope<Bot>, Optional<Packet>> dispatcherExecutor;
-
-
 
     public IncomingPacketDispatcher(OutgoingPacketDispatcher output) {
         this.output = output;
@@ -46,6 +43,15 @@ public class IncomingPacketDispatcher extends EnvelopeDispatcher<BotConnection, 
                 }
             }
         };
+
+        // TODO: can we put this inside the executor directly?
+        BottoService.Metrics.register(MetricRegistry.name(IncomingPacketDispatcher.class, "depth"),
+            new Gauge<Integer>() {
+                @Override
+                public Integer getValue() {
+                    return dispatcherExecutor.size();
+                }
+            });
     }
 
     // TODO: should dispatch also return a future, so full tracing can be enabled?

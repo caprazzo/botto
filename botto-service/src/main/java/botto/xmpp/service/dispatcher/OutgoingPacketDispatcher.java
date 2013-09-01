@@ -3,6 +3,7 @@ package botto.xmpp.service.dispatcher;
 import botto.xmpp.engine.BotConnection;
 import botto.xmpp.service.Bot;
 import botto.xmpp.service.BottoService;
+import com.codahale.metrics.Gauge;
 import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricRegistry;
 import com.google.common.base.Strings;
@@ -25,7 +26,7 @@ public class OutgoingPacketDispatcher extends EnvelopeDispatcher<Bot, BotConnect
     private final SingleThreadQueueExecutor<PacketEnvelope<BotConnection>> outputQueue;
 
     public OutgoingPacketDispatcher() {
-        outputQueue = new SingleThreadQueueExecutor<PacketEnvelope<BotConnection>>() {
+        outputQueue = new SingleThreadQueueExecutor<PacketEnvelope<BotConnection>>(0) {
             @Override
             protected void doProcess(PacketEnvelope<BotConnection> envelope) {
                 try {
@@ -37,6 +38,16 @@ public class OutgoingPacketDispatcher extends EnvelopeDispatcher<Bot, BotConnect
                 }
             }
         };
+
+
+        // TODO: can we put this inside the executor directly?
+        BottoService.Metrics.register(MetricRegistry.name(OutgoingPacketDispatcher.class, "depth"),
+                new Gauge<Integer>() {
+                    @Override
+                    public Integer getValue() {
+                        return outputQueue.size();
+                    }
+                });
     }
 
     @Override

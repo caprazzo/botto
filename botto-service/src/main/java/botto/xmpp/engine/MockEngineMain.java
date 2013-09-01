@@ -32,9 +32,23 @@ public class MockEngineMain {
         connectionManager.addBot(echo, new JID("echo@example.com"), connector);
 
         // add a generator bot
-        GenBot genBot = new GenBot(1, TimeUnit.MILLISECONDS, new JID("echo@example.com"));
-        AbstractBot gen = AnnotatedBotObject.from(genBot).get();
-        connectionManager.addBot(gen, new JID("gen@example.com"), connector);
+        {
+            GenBot genBot = new GenBot(1, TimeUnit.MILLISECONDS, new JID("echo@example.com"));
+            AbstractBot gen = AnnotatedBotObject.from(genBot).get();
+            connectionManager.addBot(gen, new JID("gen@example.com"), connector);
+        }
+
+        {
+            GenBot genBot = new GenBot(1, TimeUnit.MILLISECONDS, new JID("echo@example.com"));
+            AbstractBot gen = AnnotatedBotObject.from(genBot).get();
+            connectionManager.addBot(gen, new JID("gen2@example.com"), connector);
+        }
+
+        {
+            GenBot genBot = new GenBot(1, TimeUnit.MILLISECONDS, new JID("echo@example.com"));
+            AbstractBot gen = AnnotatedBotObject.from(genBot).get();
+            connectionManager.addBot(gen, new JID("gen3@example.com"), connector);
+        }
         // add an echo bot
 
         connector.start();
