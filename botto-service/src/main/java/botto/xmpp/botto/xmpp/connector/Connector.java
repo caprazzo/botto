@@ -26,11 +26,16 @@ public abstract class Connector<TConfig extends ConnectorConfiguration> implemen
         this.listener = listener;
     }
 
+    public void setOutgoingPacketListener(ConnectorPacketLstener connectorPacketLstener) {
+        //To change body of created methods use File | Settings | File Templates.
+    }
+
     protected final void receive(BotConnection connection, Packet packet) {
-        listener.onPacket(connection, packet);
+        listener.onIncoming(connection, packet);
     }
 
     public final void send(BotConnection connection, Packet packet) {
+        listener.onOutgoing(connection, packet);
         doSend(connection, packet);
     }
 
@@ -45,4 +50,6 @@ public abstract class Connector<TConfig extends ConnectorConfiguration> implemen
     public abstract void start();
     public abstract void stop();
     public abstract void doSend(BotConnection connection, Packet packet);
+
+
 }

@@ -4,9 +4,7 @@ import botto.xmpp.botto.xmpp.connector.*;
 import botto.xmpp.service.AbstractBot;
 import botto.xmpp.service.Meters;
 import botto.xmpp.service.dispatcher.DispatcherService;
-import com.codahale.metrics.Meter;
 import com.google.common.base.Objects;
-import com.sun.javafx.font.FontStrike;
 import net.caprazzi.reusables.common.Managed;
 
 import org.slf4j.Logger;
@@ -46,9 +44,14 @@ public class ConnectionManager implements Managed {
         // TODO: maybe should have Connector Registry?
         connector.setPacketListener(new ConnectorPacketLstener() {
             @Override
-            public void onPacket(BotConnection connection, Packet packet) {
+            public void onIncoming(BotConnection connection, Packet packet) {
                 meter.countIncoming(packet);
                 dispatcher.receive(connection, packet);
+            }
+
+            @Override
+            public void onOutgoing(BotConnection connection, Packet packet) {
+                meter.countOutgoing(packet);
             }
         });
 

@@ -61,6 +61,58 @@ public class Meters {
             }
         }
 
+        public void countOutgoing(Packet packet) {
+            countOutgoing();
+
+            if (packet instanceof Message) {
+                countOutgoingMessage();
+            }
+            else if (packet instanceof Presence) {
+                countOutgoingPresence();
+            }
+            else if (packet instanceof IQ) {
+                countOutgoingIQ();
+            }
+            else {
+                countOutgoingOther();
+            }
+        }
+
+        private void countOutgoing() {
+            all.sent.mark();
+            if (allConnectors != null) {
+                allConnectors.all.sent.mark();
+            }
+        }
+
+        private void countOutgoingMessage() {
+            message.sent.mark();
+            if (allConnectors != null) {
+                allConnectors.message.sent.mark();
+            }
+        }
+
+        private void countOutgoingPresence() {
+            presence.sent.mark();
+            if (allConnectors != null) {
+                allConnectors.presence.sent.mark();
+            }
+        }
+
+        private void countOutgoingIQ() {
+            iq.sent.mark();
+            if (allConnectors != null) {
+                allConnectors.iq.sent.mark();
+            }
+        }
+
+        private void countOutgoingOther() {
+            other.sent.mark();
+            if (allConnectors != null) {
+                allConnectors.other.sent.mark();
+            }
+        }
+
         private void countIncoming() {
             all.received.mark();
             if (allConnectors != null) {
@@ -95,6 +147,8 @@ public class Meters {
                 allConnectors.other.received.mark();
             }
         }
+
+
     }
 
     private static final class PacketMetrics {

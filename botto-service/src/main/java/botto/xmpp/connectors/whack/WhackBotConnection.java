@@ -55,7 +55,7 @@ class WhackBotConnection implements BotConnection {
     }
 
     //public void receive(Packet packet) {
-    //    packetListener.onPacket(packet);
+    //    packetListener.onIncoming(packet);
     //}
 
     public void setConnectionInfo(BotConnectionInfo connectionInfo) {
