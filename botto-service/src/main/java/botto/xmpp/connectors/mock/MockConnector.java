@@ -41,17 +41,22 @@ public class MockConnector extends Connector<MockConnectorConfiguration> {
 
     public void send(Packet packet) {
         // delay by 1s
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-        }
+        // delay(1000);
+
 
         // if found a connection for this destination, deliver directly to it
         // (a normal connector would send to a server instead)
         MockBotConnection connection = bots.get(packet.getTo().toBareJID());
         if (connection != null) {
             receive(connection, packet);
+        }
+    }
+
+    private void delay(int millis) {
+        try {
+            Thread.sleep(millis);
+        } catch (InterruptedException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         }
     }
 }

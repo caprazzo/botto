@@ -2,7 +2,7 @@ package botto.xmpp.service.dispatcher;
 
 import botto.xmpp.botto.xmpp.connector.BotConnection;
 import botto.xmpp.service.Bot;
-import botto.xmpp.service.BottoService;
+import botto.xmpp.service.MetricsServices;
 import com.codahale.metrics.Gauge;
 import com.codahale.metrics.MetricRegistry;
 import com.google.common.base.Optional;
@@ -18,7 +18,7 @@ import com.codahale.metrics.Timer;
 
 public class IncomingPacketDispatcher extends EnvelopeDispatcher<BotConnection, Bot> implements Managed {
 
-    private final static Timer timer = BottoService.Metrics.timer(MetricRegistry.name(IncomingPacketDispatcher.class, "bot", "receive"));
+    private final static Timer timer = MetricsServices.Metrics.timer(MetricRegistry.name(IncomingPacketDispatcher.class, "bot", "receive"));
 
     private final static Logger Log = LoggerFactory.getLogger(IncomingPacketDispatcher.class);
 
@@ -45,7 +45,7 @@ public class IncomingPacketDispatcher extends EnvelopeDispatcher<BotConnection, 
         };
 
         // TODO: can we put this inside the executor directly?
-        BottoService.Metrics.register(MetricRegistry.name(IncomingPacketDispatcher.class, "depth"),
+        MetricsServices.Metrics.register(MetricRegistry.name(IncomingPacketDispatcher.class, "depth"),
             new Gauge<Integer>() {
                 @Override
                 public Integer getValue() {

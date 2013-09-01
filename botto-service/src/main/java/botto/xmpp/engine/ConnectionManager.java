@@ -2,7 +2,9 @@ package botto.xmpp.engine;
 
 import botto.xmpp.botto.xmpp.connector.*;
 import botto.xmpp.service.AbstractBot;
+import botto.xmpp.service.MetricsServices;
 import botto.xmpp.service.dispatcher.DispatcherService;
+import com.codahale.metrics.Meter;
 import com.google.common.base.Objects;
 import net.caprazzi.reusables.common.Managed;
 
@@ -40,11 +42,14 @@ public class ConnectionManager implements Managed {
         ConnectorId id = new ConnectorId(connectorCount.getAndIncrement(), connector.getClass(), connector.getName());
         connectors.put(id, connector);
 
+        final Meter receiveMeter = MetricsServices.Metrics.meter(MetricsServices.connectorPacketsAllIncoming(id));
+
         // TODO: prevent adding a connector twice
         // TODO: maybe should have Connector Registry?
         connector.setPacketListener(new ConnectorPacketLstener() {
             @Override
             public void onPacket(BotConnection connection, Packet packet) {
+                receiveMeter.mark();
                 dispatcher.receive(connection, packet);
             }
         });
@@ -61,7 +66,8 @@ public class ConnectionManager implements Managed {
     public synchronized void addBot(AbstractBot bot, JID address, ConnectorId connectorId) throws Exception {
         Connector connector = connectors.get(connectorId);
         if (connector == null) {
-            throw new Exception("Connector not found");
+            // TODO: use a project-specific exception
+            throw new Exception("Connector not found " + connectorId);
         }
         BotConnection connection = connector.createConnection(address);
         connections.put(new ConnectionKey(bot, address, connector), connection);
@@ -72,7 +78,8 @@ public class ConnectionManager implements Managed {
     public synchronized void removeBot(AbstractBot bot, JID address, ConnectorId connectorId) throws Exception {
         Connector connector = connectors.get(connectorId);
         if (connector == null) {
-            throw new Exception("Connector not found");
+            // TODO: use a project-specific exception
+            throw new Exception("Connector not found " + connectorId);
         }
         BotConnection connection = connections.get(new ConnectionKey(bot, address, connector));
         if (connection != null) {

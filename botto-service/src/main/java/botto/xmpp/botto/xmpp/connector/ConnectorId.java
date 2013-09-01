@@ -3,6 +3,7 @@ package botto.xmpp.botto.xmpp.connector;
 
 import com.google.common.base.Objects;
 
+// TODO: in an ideal world, only the ConnectionManager should be able to create ConnectorId
 public class ConnectorId {
     private final String toString;
     private final int hashCode;
