@@ -87,7 +87,7 @@ public class WhackBotComponent implements Component {
             packet.setID(UUID.randomUUID().toString());
         }
 
-        Log.debug("[{}] sending packet {}", packet);
+        Log.debug("[{}] sending packet {}", this, packet);
         componentManager.sendPacket(this, packet);
     }
 
