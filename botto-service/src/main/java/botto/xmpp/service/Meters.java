@@ -147,8 +147,6 @@ public class Meters {
                 allConnectors.other.received.mark();
             }
         }
-
-
     }
 
     private static final class PacketMetrics {
