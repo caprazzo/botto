@@ -1,5 +1,6 @@
 package botto.xmpp.connectors.mock;
 
+
 import botto.xmpp.botto.xmpp.connector.BotConnection;
 import botto.xmpp.botto.xmpp.connector.Connector;
 import botto.xmpp.botto.xmpp.connector.ConnectorException;
@@ -22,6 +23,7 @@ public class MockConnector extends Connector<MockConnectorConfiguration> {
         MockBotConnection connection = new MockBotConnection(this, address);
         bots.put(address.toBareJID(), connection);
         return connection;
+        //To change body of created methods use File | Settings | File Templates.
     }
 
     @Override
@@ -59,4 +61,5 @@ public class MockConnector extends Connector<MockConnectorConfiguration> {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         }
     }
+
 }

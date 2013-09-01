@@ -24,4 +24,5 @@ public class MockConnectorConfiguration implements ConnectorConfiguration {
     public String getDomain() {
         return domain;
     }
+
 }
