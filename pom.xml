@@ -27,6 +27,17 @@
         <tinder.version>1.2.4-SNAPSHOT</tinder.version>
     </properties>
 
+    <repositories>
+        <repository>
+            <id>mcaprari-releases</id>
+            <url>https://github.com/mcaprari/mcaprari-maven-repo/raw/master/releases</url>
+        </repository>
+        <repository>
+            <id>mcaprari-snapshots</id>
+            <url>https://github.com/mcaprari/mcaprari-maven-repo/raw/master/snapshots</url>
+        </repository>
+    </repositories>
+
     <distributionManagement>
         <repository>
             <id>repo</id>
