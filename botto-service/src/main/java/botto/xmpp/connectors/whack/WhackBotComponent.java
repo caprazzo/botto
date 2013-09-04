@@ -1,6 +1,7 @@
 package botto.xmpp.connectors.whack;
 
 import botto.xmpp.botto.xmpp.connector.BotConnectionInfo;
+import botto.xmpp.botto.xmpp.connector.ConnectorException;
 import com.google.common.base.Objects;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,7 +58,11 @@ public class WhackBotComponent implements Component {
             Log.warn("Could not find a connection to route packet: {}", packet);
             return;
         }
-        connector.receiveFromComponent(connection, packet);
+        try {
+            connector.receiveFromComponent(connection, packet);
+        } catch (ConnectorException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        }
     }
 
     @Override

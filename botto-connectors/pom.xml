@@ -8,6 +8,9 @@
         <version>0.7.0-SNAPSHOT</version>
     </parent>
     <packaging>pom</packaging>
+    <modules>
+        <module>botto-connector-smack</module>
+    </modules>
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>botto-connectors</artifactId>

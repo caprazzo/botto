@@ -26,7 +26,7 @@ public class PacketTypeConverter {
 
     // this method converts from smack (xmpp bot library) packet types
     // to tinder/whack packet types (xmpp component library)
-    static Packet converttoTinder(org.jivesoftware.smack.packet.Packet packet) {
+    public static Packet converttoTinder(org.jivesoftware.smack.packet.Packet packet) {
         SAXReader saxReader = new SAXReader();
         try {
             Document read = saxReader.read(new InputSource(new ByteArrayInputStream(packet.toXML().getBytes("utf-8"))));
@@ -52,7 +52,7 @@ public class PacketTypeConverter {
         }
     }
 
-    static org.jivesoftware.smack.packet.Packet convertFromTinder(Packet packet, Connection connection) {
+    public static org.jivesoftware.smack.packet.Packet convertFromTinder(Packet packet, Connection connection) {
         try {
             XmlPullParserFactory factory = XmlPullParserFactory.newInstance("org.xmlpull.mxp1.MXParserFactory", PacketTypeConverter.class); //XmlPullParserFactory.newInstance("org.xmlpull.v1.XmlPullParserFactory", PacketTypeConverter.class);
             factory.setNamespaceAware(true);

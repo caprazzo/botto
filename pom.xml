@@ -16,7 +16,6 @@
         <module>botto-examples</module>
         <module>botto-connector</module>
         <module>botto-connectors</module>
-        <module>botto-connector-smack</module>
     </modules>
 
     <properties>
