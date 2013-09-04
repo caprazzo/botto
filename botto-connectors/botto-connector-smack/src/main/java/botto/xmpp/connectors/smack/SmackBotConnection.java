@@ -4,7 +4,7 @@ import botto.xmpp.botto.xmpp.connector.BotConnection;
 import botto.xmpp.botto.xmpp.connector.ConnectionInfoListener;
 import botto.xmpp.botto.xmpp.connector.BotConnectionInfo;
 import botto.xmpp.botto.xmpp.connector.Connector;
-import botto.xmpp.utils.PacketTypeConverter;
+
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
@@ -189,7 +189,7 @@ class SmackBotConnection implements BotConnection {
                         future.setException(ex);
                     }
                 } catch (XMPPException ex) {
-                    Log.error("Could not connect to {}:{}. Error: {}", connection.getHost(), connection.getPort(), ex.getMessage());
+                    Log.error("Could not connect to {}:{}. Error: " + ex.getMessage(), connection.getHost(), connection.getPort());
                     future.setException(ex);
                 }
             }

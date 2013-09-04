@@ -102,12 +102,12 @@ public class WhackConnector extends Connector<WhackConnectorConfiguration> {
     }
 
     @Override
-    public void start() {
+    public void doStart() throws ConnectorException {
 
     }
 
     @Override
-    public void stop() {
+    public void doStop() throws ConnectorException {
 
     }
 
@@ -118,7 +118,7 @@ public class WhackConnector extends Connector<WhackConnectorConfiguration> {
         conn.send(packet);
     }
 
-    public void receiveFromComponent(WhackBotConnection connection, Packet packet) {
+    public void receiveFromComponent(WhackBotConnection connection, Packet packet) throws ConnectorException {
         receive(connection, packet);
     }
 }

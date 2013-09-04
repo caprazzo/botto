@@ -54,6 +54,12 @@
         </dependency>
 
         <dependency>
+            <groupId>botto.xmpp</groupId>
+            <artifactId>botto-connector-smack</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
             <groupId>java-reusables</groupId>
             <artifactId>java-reusables-threading</artifactId>
             <version>${java-reusables.version}</version>
@@ -90,11 +96,6 @@
         </dependency>
 
         <dependency>
-            <groupId>xpp3</groupId>
-            <artifactId>xpp3</artifactId>
-            <version>1.1.4c</version>
-        </dependency>
-        <dependency>
             <groupId>org.igniterealtime</groupId>
             <artifactId>whack</artifactId>
             <version>2.0.0-SNAPSHOT</version>
@@ -113,16 +114,7 @@
                 </exclusion>
             </exclusions>
         </dependency>
-        <dependency>
-            <groupId>jivesoftware</groupId>
-            <artifactId>smack</artifactId>
-            <version>3.3.0</version>
-        </dependency>
-        <dependency>
-            <groupId>jivesoftware</groupId>
-            <artifactId>smackx</artifactId>
-            <version>3.3.0</version>
-        </dependency>
+
 
 
         <dependency>

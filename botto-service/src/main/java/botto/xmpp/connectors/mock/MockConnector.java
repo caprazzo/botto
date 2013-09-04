@@ -32,21 +32,21 @@ public class MockConnector extends Connector<MockConnectorConfiguration> {
     }
 
     @Override
-    public void start() {
+    public void doStart() throws ConnectorException {
         //To change body of implemented methods use File | Settings | File Templates.
     }
 
     @Override
-    public void stop() {
+    public void doStop()  throws ConnectorException {
         //To change body of implemented methods use File | Settings | File Templates.
     }
 
     @Override
-    public void doSend(BotConnection connection, Packet packet) {
+    public void doSend(BotConnection connection, Packet packet) throws ConnectorException {
         send(packet);
     }
 
-    public void send(Packet packet) {
+    public void send(Packet packet) throws ConnectorException {
         // delay by 1s
         // delay(1000);
 

@@ -1,4 +1,4 @@
-package botto.xmpp.utils;
+package botto.xmpp.connectors.smack;
 
 
 import org.dom4j.Document;
@@ -18,7 +18,6 @@ import org.xmpp.packet.Packet;
 import org.xmpp.packet.Presence;
 
 import java.io.ByteArrayInputStream;
-import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
 
 public class PacketTypeConverter {
@@ -27,7 +26,7 @@ public class PacketTypeConverter {
 
     // this method converts from smack (xmpp bot library) packet types
     // to tinder/whack packet types (xmpp component library)
-    public static Packet converttoTinder(org.jivesoftware.smack.packet.Packet packet) {
+    static Packet converttoTinder(org.jivesoftware.smack.packet.Packet packet) {
         SAXReader saxReader = new SAXReader();
         try {
             Document read = saxReader.read(new InputSource(new ByteArrayInputStream(packet.toXML().getBytes("utf-8"))));
@@ -53,7 +52,7 @@ public class PacketTypeConverter {
         }
     }
 
-    public static org.jivesoftware.smack.packet.Packet convertFromTinder(Packet packet, Connection connection) {
+    static org.jivesoftware.smack.packet.Packet convertFromTinder(Packet packet, Connection connection) {
         try {
             XmlPullParserFactory factory = XmlPullParserFactory.newInstance("org.xmlpull.mxp1.MXParserFactory", PacketTypeConverter.class); //XmlPullParserFactory.newInstance("org.xmlpull.v1.XmlPullParserFactory", PacketTypeConverter.class);
             factory.setNamespaceAware(true);

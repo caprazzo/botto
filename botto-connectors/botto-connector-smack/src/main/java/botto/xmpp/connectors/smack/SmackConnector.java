@@ -4,8 +4,6 @@ import botto.xmpp.botto.xmpp.connector.BotConnection;
 import botto.xmpp.botto.xmpp.connector.Connector;
 import botto.xmpp.botto.xmpp.connector.ConnectorException;
 
-import org.jivesoftware.smack.PacketListener;
-import org.jivesoftware.smack.packet.Packet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,12 +45,12 @@ public class SmackConnector extends Connector<SmackConnectorConfiguration> {
     }
 
     @Override
-    public void start() {
+    public void doStart() throws ConnectorException {
         // TODO: all connections should only be started here
     }
 
     @Override
-    public void stop() {
+    public void doStop()  throws ConnectorException {
         // TODO: should stop all connections here
     }
 
@@ -63,7 +61,7 @@ public class SmackConnector extends Connector<SmackConnectorConfiguration> {
         conn.send(packet);
     }
 
-    public void receiveFromConnection(SmackBotConnection connection, org.xmpp.packet.Packet packet) {
+    public void receiveFromConnection(SmackBotConnection connection, org.xmpp.packet.Packet packet) throws ConnectorException {
         receive(connection, packet);
     }
 }

@@ -1,6 +1,7 @@
 package botto.xmpp.utils;
 
 
+import botto.xmpp.connectors.smack.PacketTypeConverter;
 import org.junit.Assert;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.packet.Packet;

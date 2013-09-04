@@ -5,7 +5,9 @@ import botto.xmpp.annotations.PacketOutput;
 import botto.xmpp.service.AbstractBot;
 import botto.xmpp.botto.xmpp.connector.BotConnectionInfo;
 import botto.xmpp.service.dispatcher.PacketSource;
-import botto.xmpp.utils.PacketTypeConverter;
+
+import botto.xmpp.connectors.smack.PacketTypeConverter;
+
 import com.sun.javafx.tools.packager.Log;
 import net.caprazzi.reusables.common.Managed;
 import net.caprazzi.reusables.threading.ExecutorUtils;
