@@ -31,9 +31,9 @@ public class ConnectionManager implements Managed {
     public synchronized ConnectorId registerConnector(Connector connector) throws Exception {
 
         if(connectors.containsValue(connector)) {
+            // TODO: any way to not duplicate the error message?
             Log.error("Could not register connector {} beacause it has already been registered");
-            // TODO: use a project-specific exception
-            throw new Exception("Could not register connector " + connector);
+            throw new ConnectorException("Could not register connector {} because it has already been registered", connector);
         }
 
         final ConnectorId connectorId = new ConnectorId(connectorCount.getAndIncrement(), connector.getClass(), connector.getName());
@@ -68,8 +68,7 @@ public class ConnectionManager implements Managed {
     public synchronized void addBot(AbstractBot bot, JID address, ConnectorId connectorId) throws Exception {
         Connector connector = connectors.get(connectorId);
         if (connector == null) {
-            // TODO: use a project-specific exception
-            throw new Exception("Connector not found " + connectorId);
+            throw new ConnectorException("Connector not found for {}", connectorId);
         }
         BotConnection connection = connector.createConnection(address);
         connections.put(new ConnectionKey(bot, address, connector), connection);
@@ -80,8 +79,7 @@ public class ConnectionManager implements Managed {
     public synchronized void removeBot(AbstractBot bot, JID address, ConnectorId connectorId) throws Exception {
         Connector connector = connectors.get(connectorId);
         if (connector == null) {
-            // TODO: use a project-specific exception
-            throw new Exception("Connector not found " + connectorId);
+            throw new ConnectorException("Connector not found for {}", connectorId);
         }
         BotConnection connection = connections.get(new ConnectionKey(bot, address, connector));
         if (connection != null) {

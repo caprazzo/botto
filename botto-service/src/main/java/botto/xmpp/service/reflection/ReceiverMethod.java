@@ -57,7 +57,7 @@ public class ReceiverMethod {
         }
 
         if (method.getReturnType() != void.class && !Packet.class.isAssignableFrom(method.getReturnType())) {
-            Log.debug("Method marked as @Receiver is not valid because it is not void and it does not return Packet or a subclass: {}", method);
+            Log.debug("Method marked as @Receiver is not valid because it does not return void, Packet or a subclass of Packet: {}", method);
             return Optional.absent();
         }
 
@@ -75,7 +75,7 @@ public class ReceiverMethod {
         }
 
         if (packetParams != 1) {
-            Log.debug("Method marked as @Receiver is not valid because it has {} parameters that accept Packet or a subclass: {}", packetParams, method);
+            Log.debug("Method marked as @Receiver is not valid because it has more than one parameter ({}) that accepts Packet or a subclass of Packet: {}", packetParams, method);
             return Optional.absent();
         }
 

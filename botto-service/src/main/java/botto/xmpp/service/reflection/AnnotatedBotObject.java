@@ -2,7 +2,6 @@ package botto.xmpp.service.reflection;
 
 import botto.xmpp.annotations.ConnectionInfo;
 import botto.xmpp.service.AbstractBot;
-import botto.xmpp.service.utils.ReflectionUtils;
 import botto.xmpp.utils.Helpers;
 import com.google.common.base.Objects;
 import com.google.common.base.Optional;
@@ -25,21 +24,21 @@ public class AnnotatedBotObject extends AbstractBot {
 
     private final Class<?> clazz;
     private final Object obj;
-    private final Collection<Field> injecatbleFields;
+    private final Collection<Field> injectableFields;
     private final Collection<ReceiverMethod> receiverMethods;
 
     private AnnotatedBotObject(Object obj) {
         Preconditions.checkNotNull(obj, "Bot object must not be null.");
         this.obj = obj;
         this.clazz = obj.getClass();
-        injecatbleFields = scanInjectableFields();
+        injectableFields = scanInjectableFields();
         receiverMethods = scanReceiverMethods();
     }
 
     public static Optional<AnnotatedBotObject> from(Object obj) {
         Preconditions.checkNotNull(obj, "Bot object must not be null.");
         AnnotatedBotObject annotated = new AnnotatedBotObject(obj);
-        if (annotated.injecatbleFields.size() > 0 || annotated.receiverMethods.size() > 0) {
+        if (annotated.injectableFields.size() > 0 || annotated.receiverMethods.size() > 0) {
             return Optional.of(annotated);
         }
         return Optional.absent();
@@ -101,7 +100,7 @@ public class AnnotatedBotObject extends AbstractBot {
     }
 
     private void inject(Object value) {
-        for(Field field : injecatbleFields) {
+        for(Field field : injectableFields) {
             if (!Modifier.isPublic(field.getModifiers())) {
                 field.setAccessible(true);
             }

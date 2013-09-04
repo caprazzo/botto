@@ -1,4 +1,4 @@
-package botto.xmpp.service.utils;
+package botto.xmpp.service.reflection;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
