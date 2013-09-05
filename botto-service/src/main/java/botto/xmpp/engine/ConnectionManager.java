@@ -17,6 +17,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
+// TODO: this is BottoEngine
 public class ConnectionManager implements Managed {
 
     private final Logger Log = LoggerFactory.getLogger(ConnectionManager.class);
@@ -28,6 +29,7 @@ public class ConnectionManager implements Managed {
 
     private final AtomicInteger connectorCount = new AtomicInteger();
 
+    // TODO: if the manager has already started, also start the connector
     public synchronized ConnectorId registerConnector(Connector connector) throws Exception {
 
         if(connectors.containsValue(connector)) {
@@ -63,6 +65,7 @@ public class ConnectionManager implements Managed {
     public synchronized void removeConnector(ConnectorId connectorId) {
         // TODO: implement removal code
         // TODO: should also un-register meters for removed connectors?
+        // TODO: stop it if started
     }
 
     public synchronized void addBot(AbstractBot bot, JID address, ConnectorId connectorId) throws Exception {
@@ -90,11 +93,13 @@ public class ConnectionManager implements Managed {
 
     @Override
     public void start() {
+        // TODO: start all non-started connectors
         dispatcher.start();
     }
 
     @Override
     public void stop() {
+        // TODO: stop all stopped connectors
         dispatcher.stop();
     }
 

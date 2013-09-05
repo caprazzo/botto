@@ -8,17 +8,16 @@ import botto.xmpp.service.*;
 import org.xmpp.packet.JID;
 import org.xmpp.packet.Message;
 
-public class EchoBotService extends AbstractBotService {
+public class EchoBotService {
 
     public static void main(String[] main) {
         BotServiceConfiguration configuration = new BotServiceConfiguration();
         configuration.setHost("localhost");
         configuration.setComponentPort(5275);
         configuration.setComponentSecret("secret");
-        new EchoBotService().run(configuration);
+        //new EchoBotService().run(configuration);
     }
 
-    @Override
     public void run(ServiceEnvironment environment) {
         EchoBot echoBot = new EchoBot();
 

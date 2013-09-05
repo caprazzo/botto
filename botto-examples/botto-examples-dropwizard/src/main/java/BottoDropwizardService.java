@@ -30,6 +30,7 @@ public class BottoDropwizardService extends Service<BottoDropwizardServiceConfig
         dropwizardEnvironment.addResource(resource);
 
         // create a botservice instance
+        /*
         AbstractBotService botService = new AbstractBotService() {
             @Override
             protected void run(ServiceEnvironment environment) {
@@ -46,12 +47,13 @@ public class BottoDropwizardService extends Service<BottoDropwizardServiceConfig
                 botEnv.setSecret("countup");
             }
         };
+        */
 
         // obtain bot service config from dropwizard config
         BotServiceConfiguration botServiceConfiguration = dropwizardConfig.getBotService();
 
         // run the service
-        botService.run(botServiceConfiguration);
+        //botService.run(botServiceConfiguration);
     }
 
 }

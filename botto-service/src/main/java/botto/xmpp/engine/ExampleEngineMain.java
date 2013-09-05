@@ -62,7 +62,6 @@ public class ExampleEngineMain {
             throw new RuntimeException(e);
         }
 
-
         whackConnector.start();
         smackConnector.start();
         connectionManager.start();
