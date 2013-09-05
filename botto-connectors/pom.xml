@@ -10,6 +10,8 @@
     <packaging>pom</packaging>
     <modules>
         <module>botto-connector-smack</module>
+        <module>botto-connector-whack</module>
+        <module>botto-connector-mock</module>
     </modules>
     <modelVersion>4.0.0</modelVersion>
 
