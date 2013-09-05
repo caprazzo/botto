@@ -4,10 +4,8 @@ package botto.xmpp.service.bot;
 import botto.xmpp.service.AbstractBot;
 import botto.xmpp.service.BotEnvironment;
 
-import com.sun.tools.jdi.ObsoleteMethodImpl;
 import net.caprazzi.reusables.common.Managed;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 

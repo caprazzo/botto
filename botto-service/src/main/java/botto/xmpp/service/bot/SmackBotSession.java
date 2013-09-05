@@ -8,7 +8,6 @@ import botto.xmpp.service.dispatcher.PacketSource;
 
 import botto.xmpp.connectors.smack.PacketTypeConverter;
 
-import com.sun.javafx.tools.packager.Log;
 import net.caprazzi.reusables.common.Managed;
 import net.caprazzi.reusables.threading.ExecutorUtils;
 import org.jivesoftware.smack.*;
@@ -157,7 +156,7 @@ class SmackBotSession implements Managed, PacketInputOutput {
     }
 
     public synchronized void stop() {
-        Log.info("Shut down start");
+        log.info("Shut down start");
         try {
             connection.disconnect();
         }
@@ -165,7 +164,7 @@ class SmackBotSession implements Managed, PacketInputOutput {
             log.error("Error while closing connecion");
         }
         ExecutorUtils.shutdown(log, connectionExecutor, 5, TimeUnit.SECONDS);
-        Log.info("Shutdown complete");
+        log.info("Shutdown complete");
     }
 
     public synchronized void sendPacket(org.jivesoftware.smack.packet.Packet packet) {
