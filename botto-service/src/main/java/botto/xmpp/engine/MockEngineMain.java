@@ -19,7 +19,6 @@ import java.util.concurrent.TimeUnit;
 
 public class MockEngineMain {
 
-
     public static void main(String[] args) throws Exception {
 
         ConnectionManager connectionManager = new ConnectionManager();
@@ -54,11 +53,8 @@ public class MockEngineMain {
             connectionManager.addBot(gen, new JID("gen3@example.com"), mock);
         }
 
-        // add an echo bot
-
         connector.start();
         connectionManager.start();
-
 
         // start metrics reporting to JMX
         final JmxReporter reporter = JmxReporter.forRegistry(Meters.Metrics).build();

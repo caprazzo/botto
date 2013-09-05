@@ -28,6 +28,7 @@ public class ConnectionManager implements Managed {
 
     private final AtomicInteger connectorCount = new AtomicInteger();
 
+    // TODO: if the manager has already started, also start the connector
     public synchronized ConnectorId registerConnector(Connector connector) throws Exception {
 
         if(connectors.containsValue(connector)) {
@@ -90,11 +91,13 @@ public class ConnectionManager implements Managed {
 
     @Override
     public void start() {
+        // TODO: start all non-started connectors
         dispatcher.start();
     }
 
     @Override
     public void stop() {
+        // TODO: stop all stopped connectors
         dispatcher.stop();
     }
 
