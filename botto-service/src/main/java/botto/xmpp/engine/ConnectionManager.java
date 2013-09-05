@@ -1,8 +1,8 @@
 package botto.xmpp.engine;
 
 import botto.xmpp.botto.xmpp.connector.*;
-import botto.xmpp.service.AbstractBot;
-import botto.xmpp.service.Meters;
+import botto.xmpp.service.dispatcher.AbstractBot;
+import botto.xmpp.service.dispatcher.Meters;
 import botto.xmpp.service.dispatcher.DispatcherService;
 import com.google.common.base.Objects;
 import net.caprazzi.reusables.common.Managed;

@@ -1,6 +1,5 @@
 package botto.xmpp.service.component;
 
-import botto.xmpp.service.dispatcher.PacketSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xmpp.packet.Packet;

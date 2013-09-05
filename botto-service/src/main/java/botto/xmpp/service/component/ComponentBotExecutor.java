@@ -1,7 +1,7 @@
 package botto.xmpp.service.component;
 
 import com.google.common.util.concurrent.*;
-import botto.xmpp.service.Bot;
+import botto.xmpp.service.dispatcher.Bot;
 import net.caprazzi.reusables.threading.ExecutorUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

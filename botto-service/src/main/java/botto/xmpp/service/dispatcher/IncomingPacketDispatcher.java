@@ -1,8 +1,6 @@
 package botto.xmpp.service.dispatcher;
 
 import botto.xmpp.botto.xmpp.connector.BotConnection;
-import botto.xmpp.service.Bot;
-import botto.xmpp.service.Meters;
 import com.codahale.metrics.Gauge;
 import com.codahale.metrics.MetricRegistry;
 import com.google.common.base.Optional;

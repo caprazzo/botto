@@ -1,7 +1,7 @@
 package botto.xmpp.service.bot;
 
 
-import botto.xmpp.service.AbstractBot;
+import botto.xmpp.service.dispatcher.AbstractBot;
 import botto.xmpp.service.BotEnvironment;
 
 import net.caprazzi.reusables.common.Managed;

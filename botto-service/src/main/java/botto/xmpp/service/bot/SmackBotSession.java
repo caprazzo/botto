@@ -2,7 +2,7 @@ package botto.xmpp.service.bot;
 
 
 import botto.xmpp.annotations.PacketOutput;
-import botto.xmpp.service.AbstractBot;
+import botto.xmpp.service.dispatcher.AbstractBot;
 import botto.xmpp.botto.xmpp.connector.BotConnectionInfo;
 import botto.xmpp.service.dispatcher.PacketSource;
 

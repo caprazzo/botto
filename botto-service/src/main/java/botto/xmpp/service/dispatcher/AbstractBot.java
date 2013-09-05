@@ -1,14 +1,13 @@
-package botto.xmpp.service;
+package botto.xmpp.service.dispatcher;
 
 import botto.xmpp.annotations.ConnectionInfo;
 import botto.xmpp.annotations.PacketOutput;
+import botto.xmpp.service.dispatcher.Bot;
 import org.xmpp.packet.Packet;
 
 public abstract class AbstractBot implements Bot {
-    private PacketOutput output;
 
     public final void setPacketOutput(PacketOutput output) {
-        this.output = output;
         doSetPacketOutput(output);
     }
 

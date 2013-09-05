@@ -2,8 +2,6 @@ package botto.xmpp.service.dispatcher;
 
 import botto.xmpp.annotations.PacketOutput;
 import botto.xmpp.botto.xmpp.connector.BotConnection;
-import botto.xmpp.service.AbstractBot;
-import botto.xmpp.service.Bot;
 import net.caprazzi.reusables.common.Managed;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

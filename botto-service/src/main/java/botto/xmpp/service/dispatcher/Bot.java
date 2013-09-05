@@ -1,4 +1,4 @@
-package botto.xmpp.service;
+package botto.xmpp.service.dispatcher;
 
 import org.xmpp.packet.Packet;
 

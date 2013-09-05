@@ -1,7 +1,7 @@
 package botto.xmpp.service.component;
 
 import com.google.common.collect.HashBasedTable;
-import botto.xmpp.service.Bot;
+import botto.xmpp.service.dispatcher.Bot;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xmpp.packet.Packet;
