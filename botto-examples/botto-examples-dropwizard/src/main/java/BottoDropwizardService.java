@@ -1,4 +1,4 @@
-import botto.xmpp.service.*;
+// import botto.xmpp.service.*;
 import com.yammer.dropwizard.Service;
 import com.yammer.dropwizard.config.Bootstrap;
 import com.yammer.dropwizard.config.Environment;
@@ -50,7 +50,7 @@ public class BottoDropwizardService extends Service<BottoDropwizardServiceConfig
         */
 
         // obtain bot service config from dropwizard config
-        BotServiceConfiguration botServiceConfiguration = dropwizardConfig.getBotService();
+        //BotServiceConfiguration botServiceConfiguration = dropwizardConfig.getBotService();
 
         // run the service
         //botService.run(botServiceConfiguration);
