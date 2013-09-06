@@ -1,5 +1,6 @@
 package botto.xmpp.service.dispatcher;
 
+import botto.xmpp.Bot;
 import com.google.common.base.Optional;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;

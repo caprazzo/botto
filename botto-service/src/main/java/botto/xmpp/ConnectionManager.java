@@ -1,7 +1,6 @@
-package botto.xmpp.engine;
+package botto.xmpp;
 
 import botto.xmpp.botto.xmpp.connector.*;
-import botto.xmpp.service.dispatcher.AbstractBot;
 import botto.xmpp.service.dispatcher.Meters;
 import botto.xmpp.service.dispatcher.DispatcherService;
 import com.google.common.base.Objects;
@@ -48,6 +47,9 @@ public class ConnectionManager implements Managed {
             @Override
             public void onIncoming(BotConnection connection, Packet packet) {
                 meter.countIncoming(packet);
+
+                // capture messages incoming from this connector
+                // and send them to the dispatcher
                 dispatcher.receive(connection, packet);
             }
 
@@ -99,7 +101,7 @@ public class ConnectionManager implements Managed {
 
     @Override
     public void stop() {
-        // TODO: stop all stopped connectors
+        // TODO: stop all started connectors
         dispatcher.stop();
     }
 

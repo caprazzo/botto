@@ -1,7 +1,7 @@
 package botto.xmpp.service.reflection;
 
 import botto.xmpp.annotations.ConnectionInfo;
-import botto.xmpp.service.dispatcher.AbstractBot;
+import botto.xmpp.AbstractBot;
 import botto.xmpp.utils.Helpers;
 import com.google.common.base.Objects;
 import com.google.common.base.Optional;

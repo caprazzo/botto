@@ -1,12 +1,13 @@
 package botto.xmpp.engine;
 
+import botto.xmpp.ConnectionManager;
 import botto.xmpp.annotations.Context;
 import botto.xmpp.annotations.Receive;
 
 import botto.xmpp.botto.xmpp.connector.ConnectorId;
 import botto.xmpp.connectors.mock.MockConnector;
 import botto.xmpp.connectors.mock.MockConnectorConfiguration;
-import botto.xmpp.service.dispatcher.AbstractBot;
+import botto.xmpp.AbstractBot;
 import botto.xmpp.service.dispatcher.Meters;
 import botto.xmpp.service.reflection.AnnotatedBotObject;
 import com.codahale.metrics.JmxReporter;

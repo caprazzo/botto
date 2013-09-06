@@ -1,5 +1,7 @@
 package botto.xmpp.service.dispatcher;
 
+import botto.xmpp.AbstractBot;
+import botto.xmpp.Bot;
 import botto.xmpp.annotations.PacketOutput;
 import botto.xmpp.botto.xmpp.connector.BotConnection;
 import net.caprazzi.reusables.common.Managed;

@@ -1,8 +1,8 @@
-package botto.xmpp.service.dispatcher;
+package botto.xmpp;
 
 import botto.xmpp.annotations.ConnectionInfo;
 import botto.xmpp.annotations.PacketOutput;
-import botto.xmpp.service.dispatcher.Bot;
+import botto.xmpp.Bot;
 import org.xmpp.packet.Packet;
 
 public abstract class AbstractBot implements Bot {

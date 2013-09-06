@@ -1,5 +1,6 @@
 package botto.xmpp.engine;
 
+import botto.xmpp.ConnectionManager;
 import botto.xmpp.annotations.Context;
 import botto.xmpp.annotations.Receive;
 import botto.xmpp.botto.xmpp.connector.ConnectorException;
@@ -8,7 +9,7 @@ import botto.xmpp.connectors.smack.SmackConnector;
 import botto.xmpp.connectors.smack.SmackConnectorConfiguration;
 import botto.xmpp.connectors.whack.WhackConnector;
 import botto.xmpp.connectors.whack.WhackConnectorConfiguration;
-import botto.xmpp.service.dispatcher.AbstractBot;
+import botto.xmpp.AbstractBot;
 import botto.xmpp.service.dispatcher.Meters;
 import botto.xmpp.service.reflection.AnnotatedBotObject;
 import com.codahale.metrics.JmxReporter;

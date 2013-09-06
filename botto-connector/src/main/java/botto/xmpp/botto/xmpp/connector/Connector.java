@@ -12,12 +12,19 @@ public abstract class Connector<TConfig extends ConnectorConfiguration> {
     private final String name;
     private ConnectorPacketLstener listener;
 
+    public abstract BotConnection createConnection(JID address) throws ConnectorException;
+    public abstract void removeConnection(BotConnection connection) throws ConnectorException;
+    public abstract void doStart() throws ConnectorException;
+    public abstract void doStop() throws ConnectorException;
+    public abstract void doSend(BotConnection connection, Packet packet) throws ConnectorException;
+
     public Connector(TConfig configuration) {
         // TODO: check configuration has a minimum validity
         this.configuration = configuration;
         this.name = configuration.getName();
     }
 
+    // TODO: allow setting multiple listeners
     public final void setPacketListener(ConnectorPacketLstener listener) {
         this.listener = listener;
     }
@@ -52,9 +59,5 @@ public abstract class Connector<TConfig extends ConnectorConfiguration> {
         doStop();
     }
 
-    public abstract BotConnection createConnection(JID address) throws ConnectorException;
-    public abstract void removeConnection(BotConnection connection) throws ConnectorException;
-    public abstract void doStart() throws ConnectorException;
-    public abstract void doStop() throws ConnectorException;
-    public abstract void doSend(BotConnection connection, Packet packet) throws ConnectorException;
+
 }
