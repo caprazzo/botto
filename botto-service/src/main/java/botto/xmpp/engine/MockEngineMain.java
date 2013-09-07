@@ -1,6 +1,6 @@
 package botto.xmpp.engine;
 
-import botto.xmpp.ConnectionManager;
+import botto.xmpp.BottoConnectionManager;
 import botto.xmpp.annotations.Context;
 import botto.xmpp.annotations.Receive;
 
@@ -8,7 +8,7 @@ import botto.xmpp.botto.xmpp.connector.ConnectorId;
 import botto.xmpp.connectors.mock.MockConnector;
 import botto.xmpp.connectors.mock.MockConnectorConfiguration;
 import botto.xmpp.AbstractBot;
-import botto.xmpp.service.dispatcher.Meters;
+import botto.xmpp.Meters;
 import botto.xmpp.service.reflection.AnnotatedBotObject;
 import com.codahale.metrics.JmxReporter;
 import org.xmpp.packet.JID;
@@ -22,7 +22,7 @@ public class MockEngineMain {
 
     public static void main(String[] args) throws Exception {
 
-        ConnectionManager connectionManager = new ConnectionManager();
+        BottoConnectionManager connectionManager = new BottoConnectionManager();
 
         MockConnectorConfiguration configuration = new MockConnectorConfiguration("example.com");
         configuration.setDomain("example.com");

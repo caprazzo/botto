@@ -1,4 +1,4 @@
-package botto.xmpp.service.dispatcher;
+package botto.xmpp;
 
 import botto.xmpp.botto.xmpp.connector.ConnectorId;
 import com.codahale.metrics.Meter;

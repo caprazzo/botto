@@ -1,7 +1,6 @@
 package botto.xmpp;
 
 import botto.xmpp.botto.xmpp.connector.*;
-import botto.xmpp.service.dispatcher.Meters;
 import botto.xmpp.service.dispatcher.DispatcherService;
 import com.google.common.base.Objects;
 import net.caprazzi.reusables.common.Managed;
@@ -17,9 +16,9 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
 // TODO: this is BottoEngine
-public class ConnectionManager implements Managed {
+public class BottoConnectionManager implements Managed {
 
-    private final Logger Log = LoggerFactory.getLogger(ConnectionManager.class);
+    private final Logger Log = LoggerFactory.getLogger(BottoConnectionManager.class);
 
     private DispatcherService dispatcher = new DispatcherService();
     private Map<ConnectionKey, BotConnection> connections = new HashMap<ConnectionKey, BotConnection>();
