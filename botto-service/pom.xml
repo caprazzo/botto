@@ -73,12 +73,6 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>botto.xmpp</groupId>
-            <artifactId>botto-connector-mock</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-
-        <dependency>
             <groupId>java-reusables</groupId>
             <artifactId>java-reusables-threading</artifactId>
             <version>${java-reusables.version}</version>

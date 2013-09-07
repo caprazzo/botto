@@ -3,10 +3,13 @@ package botto.xmpp;
 import botto.xmpp.botto.xmpp.connector.ConnectorId;
 import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricRegistry;
+import com.codahale.metrics.Timer;
 import org.xmpp.packet.IQ;
 import org.xmpp.packet.Message;
 import org.xmpp.packet.Packet;
 import org.xmpp.packet.Presence;
+
+import static com.codahale.metrics.MetricRegistry.*;
 
 public class Meters {
 
@@ -17,6 +20,9 @@ public class Meters {
     }
 
     public static final ConnectorsMetrics connectors = new ConnectorsMetrics();
+
+    public static final Timer incomingRoutingTimer = Meters.Metrics.timer(name(Meters.class, "engine", "routing", "incoming"));
+    public static final Timer outgoingRoutingTimer = Meters.Metrics.timer(name(Meters.class, "engine", "routing", "outgoing"));
 
     public static final class ConnectorsMetrics {
         private final ConnectorMetrics allConnectors = new ConnectorMetrics(null, "all");
@@ -155,8 +161,8 @@ public class Meters {
         public final Meter sent;
 
         public PacketMetrics(String connector, String name) {
-            received = Meters.Metrics.meter(MetricRegistry.name(Meters.class ,"connectors", connector, "packets", name, "received"));
-            sent = Meters.Metrics.meter(MetricRegistry.name(Meters.class ,"connectors", connector, "packets", name, "sent"));
+            received = Meters.Metrics.meter(name(Meters.class, "connectors", connector, "packets", name, "received"));
+            sent = Meters.Metrics.meter(name(Meters.class, "connectors", connector, "packets", name, "sent"));
         }
     }
 

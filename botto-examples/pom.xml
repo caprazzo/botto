@@ -14,7 +14,9 @@
     <packaging>pom</packaging>
 
     <modules>
+        <module>botto-examples-bots</module>
         <module>botto-examples-dropwizard</module>
+        <module>botto-examples-embedded-mock</module>
     </modules>
 
     <build>

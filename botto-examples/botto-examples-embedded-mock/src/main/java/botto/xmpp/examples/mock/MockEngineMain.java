@@ -1,26 +1,29 @@
-package botto.xmpp.engine;
+package botto.xmpp.examples.mock;
 
 import botto.xmpp.BottoConnectionManager;
-import botto.xmpp.annotations.Context;
-import botto.xmpp.annotations.Receive;
 
 import botto.xmpp.botto.xmpp.connector.ConnectorId;
 import botto.xmpp.connectors.mock.MockConnector;
 import botto.xmpp.connectors.mock.MockConnectorConfiguration;
 import botto.xmpp.AbstractBot;
 import botto.xmpp.Meters;
-import botto.xmpp.service.reflection.AnnotatedBotObject;
-import com.codahale.metrics.JmxReporter;
-import org.xmpp.packet.JID;
-import org.xmpp.packet.Message;
 
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
+import botto.xmpp.examples.bots.EchoBot;
+import botto.xmpp.examples.bots.SpamBot;
+import botto.xmpp.service.reflection.AnnotatedBotObject;
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.Logger;
+import com.codahale.metrics.JmxReporter;
+import org.slf4j.LoggerFactory;
+import org.xmpp.packet.JID;
+
 import java.util.concurrent.TimeUnit;
 
 public class MockEngineMain {
 
     public static void main(String[] args) throws Exception {
+        ch.qos.logback.classic.Logger root = (ch.qos.logback.classic.Logger) org.slf4j.LoggerFactory.getLogger(ch.qos.logback.classic.Logger.ROOT_LOGGER_NAME);
+        root.setLevel(Level.INFO);
 
         BottoConnectionManager connectionManager = new BottoConnectionManager();
 
@@ -31,28 +34,30 @@ public class MockEngineMain {
         ConnectorId mock = connectionManager.registerConnector(connector);
 
         // echo bot
-        ExampleEngineMain.ExampleBot echoBot = new ExampleEngineMain.ExampleBot();
+        EchoBot echoBot = new EchoBot();
         AbstractBot echo = AnnotatedBotObject.from(echoBot).get();
         connectionManager.addBot(echo, new JID("echo@example.com"), mock);
 
-        // add a generator bot
+        /*
+        // add three generator bots
         {
-            GenBot genBot = new GenBot(1, TimeUnit.MILLISECONDS, new JID("echo@example.com"));
+            SpamBot genBot = new SpamBot(1, TimeUnit.MILLISECONDS, new JID("echo@example.com"));
             AbstractBot gen = AnnotatedBotObject.from(genBot).get();
             connectionManager.addBot(gen, new JID("gen@example.com"), mock);
         }
 
         {
-            GenBot genBot = new GenBot(1, TimeUnit.MILLISECONDS, new JID("echo@example.com"));
+            SpamBot genBot = new SpamBot(1, TimeUnit.MILLISECONDS, new JID("echo@example.com"));
             AbstractBot gen = AnnotatedBotObject.from(genBot).get();
             connectionManager.addBot(gen, new JID("gen2@example.com"), mock);
         }
 
         {
-            GenBot genBot = new GenBot(1, TimeUnit.MILLISECONDS, new JID("echo@example.com"));
+            SpamBot genBot = new SpamBot(1, TimeUnit.MILLISECONDS, new JID("echo@example.com"));
             AbstractBot gen = AnnotatedBotObject.from(genBot).get();
             connectionManager.addBot(gen, new JID("gen3@example.com"), mock);
         }
+        */
 
         connector.start();
         connectionManager.start();
@@ -61,35 +66,6 @@ public class MockEngineMain {
         final JmxReporter reporter = JmxReporter.forRegistry(Meters.Metrics).build();
         reporter.start();
 
-    }
-
-    public static class GenBot implements Runnable {
-
-        private final ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
-        private final JID dest;
-        private int count = 0;
-
-        @Context
-        botto.xmpp.annotations.PacketOutput out;
-
-        public GenBot(int delay, TimeUnit unit, JID dest) {
-            this.dest = dest;
-            executor.scheduleAtFixedRate(this, 0, delay, unit);
-        }
-
-        @Receive
-        public void receive(Message message) {
-
-        }
-
-        @Override
-        public void run() {
-            Message message = new Message();
-            message.setBody("Message #" + count);
-            message.setTo(dest);
-            out.send(message);
-            count++;
-        }
     }
 
 }

@@ -12,6 +12,7 @@ import net.caprazzi.reusables.common.Managed;
 import net.caprazzi.reusables.threading.SingleThreadQueueResultExecutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xmpp.packet.JID;
 import org.xmpp.packet.Packet;
 
 import com.codahale.metrics.Timer;
@@ -54,6 +55,11 @@ public class IncomingPacketDispatcher extends EnvelopeDispatcher<BotConnection, 
             });
     }
 
+    @Override
+    protected Timer getRoutingTimer() {
+        return Meters.incomingRoutingTimer;
+    }
+
     // TODO: should dispatch also return a future, so full tracing can be enabled?
     protected ListenableConfirmation doDispatch(final Bot bot, final Packet packet) {
         final ListenableConfirmation confirmation = ListenableConfirmation.create();
@@ -91,6 +97,11 @@ public class IncomingPacketDispatcher extends EnvelopeDispatcher<BotConnection, 
         });
 
         return confirmation;
+    }
+
+    @Override
+    protected JID getRoutingAddress(Packet packet) {
+        return packet.getTo();
     }
 
     @Override

@@ -26,36 +26,21 @@ public class DispatcherService implements Managed {
     }
 
     public synchronized void removeConnection(AbstractBot bot, BotConnection connection) {
-       // TODO: also use connection when removing
-       incomingDispatcher.removeRoute(bot);
-       outgoingDispatcher.removeRoute(bot);
+       incomingDispatcher.removeRoute(connection.getSendAddress());
+       outgoingDispatcher.removeRoute(connection.getSendAddress());
     }
 
     // TODO: return a ConnectionId
     public synchronized void addConnection(final AbstractBot bot, final BotConnection connection) {
-
-        // route incoming packets to this bot.
-        // TODO: can this be done with a table instead of scanning all filters?
-        incomingDispatcher.addRoute(new PacketEnvelopeFilter<BotConnection>() {
-            @Override
-            public boolean accept(PacketEnvelope<BotConnection> packet) {
-                return packet.getLabel().equals(connection);
-            }
-        }, bot);
-
-        // route relevant outgoing packets to this connection
-        outgoingDispatcher.addRoute(new PacketEnvelopeFilter<Bot>() {
-            @Override
-            public boolean accept(PacketEnvelope<Bot> packet) {
-                return packet.getLabel().equals(bot);
-            }
-        }, connection);
+        incomingDispatcher.addRoute(connection.getSendAddress(), bot);
+        outgoingDispatcher.addRoute(connection.getSendAddress(), connection);
 
         // set explicit output of this bot
         // TODO: this could be done in the caller of addConnection
         bot.setPacketOutput(new PacketOutput() {
             @Override
             public void send(Packet packet) {
+                packet.setFrom(connection.getSendAddress());
                 outgoingDispatcher.dispatch(new PacketEnvelope<Bot>(bot, packet));
             }
         });

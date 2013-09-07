@@ -9,8 +9,12 @@ import org.xmpp.packet.Packet;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class MockConnector extends Connector<MockConnectorConfiguration> {
+
+    ExecutorService executor = Executors.newCachedThreadPool();
 
     public MockConnector(MockConnectorConfiguration configuration) {
         super(configuration);
@@ -46,17 +50,28 @@ public class MockConnector extends Connector<MockConnectorConfiguration> {
         send(packet);
     }
 
-    public void send(Packet packet) throws ConnectorException {
+    public void send(final Packet packet) throws ConnectorException {
         // delay by 1s
         // delay(1000);
 
-
         // if found a connection for this destination, deliver directly to it
         // (a normal connector would send to a server instead)
-        MockBotConnection connection = bots.get(packet.getTo().toBareJID());
-        if (connection != null) {
-            receive(connection, packet);
-        }
+
+        executor.submit(new Runnable() {
+            @Override
+            public void run() {
+                MockBotConnection connection = bots.get(packet.getTo().toBareJID());
+                if (connection != null) {
+                    try {
+                        receive(connection, packet);
+                    } catch (ConnectorException e) {
+                        e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                    }
+                }
+            }
+        });
+
+
     }
 
     private void delay(int millis) {

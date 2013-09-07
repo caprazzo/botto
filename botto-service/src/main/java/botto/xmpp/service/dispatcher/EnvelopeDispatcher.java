@@ -1,19 +1,20 @@
 package botto.xmpp.service.dispatcher;
 
-import botto.xmpp.Bot;
 import botto.xmpp.Meters;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
-import com.google.common.base.Optional;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xmpp.packet.JID;
 import org.xmpp.packet.Packet;
+
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public abstract class EnvelopeDispatcher<TLabel, TTarget> {
 
-    private final EnvelopeRouter<TLabel, TTarget> router = new EnvelopeRouter<TLabel, TTarget>();
     private final Logger Log;
     private final Timer mDispatch;
 
@@ -21,6 +22,8 @@ public abstract class EnvelopeDispatcher<TLabel, TTarget> {
         Log = LoggerFactory.getLogger(this.getClass());
         mDispatch = Meters.Metrics.timer(MetricRegistry.name(this.getClass(), "packets", "processing"));
     }
+
+    protected abstract Timer getRoutingTimer();
 
     protected abstract ListenableConfirmation doDispatch(TTarget destination, Packet packet);
 
@@ -30,15 +33,18 @@ public abstract class EnvelopeDispatcher<TLabel, TTarget> {
         // processing in the bot and sending the response if one is generated
         // for outgoing packets, this includes only the time spent in the queue and the time to send it
         final Timer.Context time = mDispatch.time();
-        Optional<TTarget> route = router.route(envelope);
-        if (!route.isPresent()) {
+        Timer.Context routingTime = getRoutingTimer().time();
+        TTarget route = table.get(getRoutingAddress(envelope.getPacket()));
+
+        routingTime.stop();
+
+        if (route == null) {
             Log.warn("No destination found for {}", envelope);
             time.stop();
             return ListenableConfirmation.failed(new RuntimeException("Could not route packet to any destination"));
-
         }
 
-        ListenableConfirmation confirmation = doDispatch(route.get(), envelope.getPacket());
+        ListenableConfirmation confirmation = doDispatch(route, envelope.getPacket());
         Futures.addCallback(confirmation, new FutureCallback<Boolean>() {
             @Override
             public void onSuccess(Boolean result) {
@@ -56,13 +62,16 @@ public abstract class EnvelopeDispatcher<TLabel, TTarget> {
         return confirmation;
     }
 
-    public final void addRoute(PacketEnvelopeFilter<TLabel> filter, TTarget target) {
-        Log.info("Adding route filter {} to {}", filter, target);
-        router.addRoute(filter, target);
+    protected abstract JID getRoutingAddress(Packet packet);
+
+    private final Map<JID, TTarget> table = new ConcurrentHashMap<JID, TTarget>();
+    public final void addRoute(JID address, TTarget target) {
+        Log.info("Adding route {} to {}", address, target);
+        table.put(address, target);
     }
 
-    public final void removeRoute(Bot bot) {
-        Log.info("Removing route to bot {}", bot);
-        router.removeRoute(bot);
+    public final void removeRoute(JID address) {
+        Log.info("Removing route to {}", address);
+        table.remove(address);
     }
 }

@@ -6,6 +6,7 @@ import botto.xmpp.botto.xmpp.connector.BotConnection;
 import botto.xmpp.botto.xmpp.connector.Connector;
 import com.codahale.metrics.Gauge;
 import com.codahale.metrics.MetricRegistry;
+import com.codahale.metrics.Timer;
 import com.google.common.base.Strings;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
@@ -14,6 +15,7 @@ import net.caprazzi.reusables.threading.SingleThreadQueueExecutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xmpp.packet.IQ;
+import org.xmpp.packet.JID;
 import org.xmpp.packet.Message;
 import org.xmpp.packet.Packet;
 
@@ -57,6 +59,11 @@ public class OutgoingPacketDispatcher extends EnvelopeDispatcher<Bot, BotConnect
     }
 
     @Override
+    protected Timer getRoutingTimer() {
+        return Meters.outgoingRoutingTimer;
+    }
+
+    @Override
     // enqueues incoming packets, to be sent in a separate thread
     protected ListenableConfirmation doDispatch(final BotConnection destination, final Packet packet) {
         Log.debug("Dispatching packet {} to connection {}", packet, destination);
@@ -80,6 +87,11 @@ public class OutgoingPacketDispatcher extends EnvelopeDispatcher<Bot, BotConnect
         });
 
         return confirmation;
+    }
+
+    @Override
+    protected JID getRoutingAddress(Packet packet) {
+        return packet.getFrom();
     }
 
     // TODO: should the logic be implemented in BotConnection, or maybe in Connector?
