@@ -40,7 +40,7 @@ public class PerformanceTestingEngine {
 
 
         // 100k bots generating traffic that goes nowhere
-        for (int i = 0; i < 10000; i++) {
+        for (int i = 0; i < 1000000; i++) {
 
             JID echoAddress = new JID("echo" + i + "@example.com");
             JID spamAddress = new JID("spam" + i + "@example.com");
