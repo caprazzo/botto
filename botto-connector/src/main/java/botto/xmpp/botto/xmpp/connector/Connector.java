@@ -34,12 +34,14 @@ public abstract class Connector<TConfig extends ConnectorConfiguration, TConnect
     public Channel openChannel(JID address) throws ConnectorException {
         Channel channel = Channel.from(address);
         doOpenChannel(channel);
+        this.channelListener.onChannelOpen(channel);
         return channel;
     }
 
     public void closeChannel(Channel channel) throws ConnectorException {
         Preconditions.checkNotNull(channel);
         doCloseChannel(channel);
+        this.channelListener.onChannelClose(channel);
     }
 
     public void addChannelListener(ChannelListener channelListener) {

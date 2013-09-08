@@ -9,7 +9,7 @@ import com.google.common.util.concurrent.*;
 import net.caprazzi.reusables.common.Managed;
 
 
-import net.caprazzi.reusables.threading.SingleThreadQueueResultExecutor;
+import net.caprazzi.reusables.threading.ExecutorUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,9 +20,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
-// TODO: this is BottoEngine
 public class BotManager implements Managed {
 
     private final Logger Log = LoggerFactory.getLogger(BotManager.class);
@@ -33,10 +33,8 @@ public class BotManager implements Managed {
 
     private final AtomicInteger connectorCount = new AtomicInteger();
 
-    // executes openChannel, closeChannel and bot.receive
+    // executes connector.openChannel, connector.closeChannel, connector.send, bot.receive
     private final ListeningExecutorService executor = MoreExecutors.listeningDecorator(Executors.newCachedThreadPool());
-
-    private final ListeningExecutorService sender = MoreExecutors.listeningDecorator(Executors.newSingleThreadExecutor());
 
     private BotManager() { }
 
@@ -64,11 +62,8 @@ public class BotManager implements Managed {
     }
 
     private void receive(final Connector connector, final Channel channel, final Packet packet) {
-        // obtain bot
-        final AbstractBot bot = channels.getBot(channel);
-
         // async deliver to bot
-        ListenableFuture<Packet> execute = deliverToBot(packet, bot);
+        ListenableFuture<Packet> execute = deliverToBot(packet, channels.getBot(channel));
         Futures.addCallback(execute, new FutureCallback<Packet>() {
             public void onSuccess(Packet packet) {
                 if (packet != null) {
@@ -185,11 +180,9 @@ public class BotManager implements Managed {
         });
     }
 
-
-
     private void send(final Connector connector, final Channel channel, final Packet packet) {
         // TODO: add to outgoing queue (should have a queue for each connector?)
-        ListenableFuture<?> send = sender.submit(new Runnable() {
+        ListenableFuture<?> send = executor.submit(new Runnable() {
             @Override
             public void run() {
                 try {
@@ -210,6 +203,7 @@ public class BotManager implements Managed {
             public void onFailure(Throwable t) {
                 // TODO: count failure
                 // TODO: send error to bot
+                // channels.getBot(channel).receiveError(packet, t);
             }
         });
     }
@@ -223,6 +217,7 @@ public class BotManager implements Managed {
     @Override
     public void stop() {
         // TODO: stop all started connectors
+        ExecutorUtils.shutdown(Log, executor, 2, TimeUnit.SECONDS);
     }
 
     private class ConnectorChannelListener implements ChannelListener {
@@ -248,7 +243,6 @@ public class BotManager implements Managed {
         @Override
         public void onIncomingPacket(Channel channel, Packet packet) {
             meter.countIncoming(packet);
-            // TODO: consider nofiying the connector if a delivery succeeded or failed
             receive(connector, channel, packet);
         }
 

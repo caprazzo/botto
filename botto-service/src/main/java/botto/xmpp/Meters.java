@@ -1,9 +1,7 @@
 package botto.xmpp;
 
 import botto.xmpp.botto.xmpp.connector.ConnectorId;
-import com.codahale.metrics.Meter;
-import com.codahale.metrics.MetricRegistry;
-import com.codahale.metrics.Timer;
+import com.codahale.metrics.*;
 import org.xmpp.packet.IQ;
 import org.xmpp.packet.Message;
 import org.xmpp.packet.Packet;
@@ -40,9 +38,12 @@ public class Meters {
         private final PacketMetrics iq;
         private final PacketMetrics other;
         private final ConnectorMetrics allConnectors;
+        private final Counter channels;
+
 
         private ConnectorMetrics(ConnectorMetrics allConnectors, String name) {
             this.allConnectors = allConnectors;
+            channels = Meters.Metrics.counter(name(Meters.class, "connectors", name, "channels", "open"));
             all = new PacketMetrics(name, "all");
             message = new PacketMetrics(name, "message");
             presence = new PacketMetrics(name, "presence");
@@ -155,11 +156,17 @@ public class Meters {
         }
 
         public void countOpenChannel() {
-            // TODO implement counter (gauge?)
+            channels.inc();
+            if (allConnectors != null) {
+                allConnectors.channels.inc();
+            }
         }
 
         public void countClosedChannel() {
-            // TODO implement counter (gauge?)
+            channels.dec();
+            if (allConnectors != null) {
+                allConnectors.channels.dec();
+            }
         }
     }
 
