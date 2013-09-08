@@ -1,6 +1,7 @@
 package botto.xmpp.connectors.whack;
 
 import botto.xmpp.botto.xmpp.connector.BotConnectionInfo;
+import botto.xmpp.botto.xmpp.connector.Channel;
 import botto.xmpp.botto.xmpp.connector.ConnectorException;
 import com.google.common.base.Objects;
 import org.slf4j.Logger;
@@ -33,11 +34,11 @@ public class WhackBotComponent implements Component {
 
     public void addConnection(WhackBotConnection connection) {
         connection.setConnectionInfo(connectionInfo);
-        connections.put(connection.getSendAddress().toBareJID(), connection);
+        connections.put(connection.getChannel().getAddress().toBareJID(), connection);
     }
 
     public void removeConnection(WhackBotConnection connection) {
-        connections.remove(connection.getSendAddress().toBareJID());
+        connections.remove(connection.getChannel().getAddress().toBareJID());
     }
 
     @Override
@@ -59,7 +60,7 @@ public class WhackBotComponent implements Component {
             return;
         }
         try {
-            connector.receiveFromComponent(connection, packet);
+            connector.receiveFromComponent(connection.getChannel(), packet);
         } catch (ConnectorException e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         }

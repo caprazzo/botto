@@ -1,9 +1,6 @@
 package botto.xmpp.connectors.whack;
 
-import botto.xmpp.botto.xmpp.connector.BotConnection;
-import botto.xmpp.botto.xmpp.connector.ConnectionInfoListener;
-import botto.xmpp.botto.xmpp.connector.BotConnectionInfo;
-import botto.xmpp.botto.xmpp.connector.Connector;
+import botto.xmpp.botto.xmpp.connector.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xmpp.component.ComponentException;
@@ -16,13 +13,13 @@ class WhackBotConnection implements BotConnection {
 
     private final WhackConnector connector;
     private final WhackBotComponent component;
-    private final JID address;
+    private final Channel channel;
     private BotConnectionInfo connectionInfo;
 
-    public WhackBotConnection(WhackConnector connector, WhackBotComponent component, JID address) {
+    public WhackBotConnection(WhackConnector connector, WhackBotComponent component, Channel channel) {
         this.connector = connector;
         this.component = component;
-        this.address = address;
+        this.channel = channel;
     }
 
     @Override
@@ -44,21 +41,16 @@ class WhackBotConnection implements BotConnection {
         }
     }
 
-
     @Override
     public Connector getConnector() {
         return connector;
     }
 
-    public JID getSendAddress() {
-        return address;
-    }
-
-    //public void receive(Packet packet) {
-    //    packetListener.onIncoming(packet);
-    //}
-
     public void setConnectionInfo(BotConnectionInfo connectionInfo) {
         this.connectionInfo = connectionInfo;
+    }
+
+    public Channel getChannel() {
+        return channel;
     }
 }

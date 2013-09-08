@@ -1,21 +1,18 @@
 package botto.xmpp.connectors.mock;
 
-import botto.xmpp.botto.xmpp.connector.BotConnection;
-import botto.xmpp.botto.xmpp.connector.BotConnectionInfo;
-import botto.xmpp.botto.xmpp.connector.ConnectionInfoListener;
-import botto.xmpp.botto.xmpp.connector.Connector;
+import botto.xmpp.botto.xmpp.connector.*;
 import org.xmpp.packet.JID;
 
 public class MockBotConnection implements BotConnection {
 
-    private final JID address;
     private final MockConnector connector;
+    private final Channel channel;
 
     private final BotConnectionInfo connectionInfo = new BotConnectionInfo();
 
-    public MockBotConnection(MockConnector connector, JID address) {
+    public MockBotConnection(MockConnector connector, Channel channel) {
         this.connector = connector;
-        this.address = address;
+        this.channel = channel;
     }
 
     @Override
@@ -29,8 +26,8 @@ public class MockBotConnection implements BotConnection {
     }
 
     @Override
-    public JID getSendAddress() {
-        return address;
+    public Channel getChannel() {
+        return channel;
     }
 
     @Override

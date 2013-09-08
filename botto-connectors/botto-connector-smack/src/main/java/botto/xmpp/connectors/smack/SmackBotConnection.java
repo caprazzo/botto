@@ -65,8 +65,8 @@ class SmackBotConnection implements BotConnection {
     }
 
     @Override
-    public JID getSendAddress() {
-        return channel.getAddress();
+    public Channel getChannel() {
+        return channel;
     }
 
     synchronized void send(Packet packet) {
@@ -150,7 +150,7 @@ class SmackBotConnection implements BotConnection {
                         }
 
                         try {
-                            connector.receiveFromConnection(botConnection, converted);
+                            connector.receiveFromConnection(channel, converted);
                         }
                         catch(Exception ex) {
                            Log.error("Error while processing packet {}: {}", packet.getPacketID(), ex);

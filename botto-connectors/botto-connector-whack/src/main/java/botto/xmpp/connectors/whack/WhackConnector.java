@@ -49,7 +49,7 @@ public class WhackConnector extends Connector<WhackConnectorConfiguration, Whack
 
         }
 
-        WhackBotConnection connection = new WhackBotConnection(this, component, channel.getAddress());
+        WhackBotConnection connection = new WhackBotConnection(this, component, channel);
         component.addConnection(connection);
         addConnection(channel, connection);
     }
@@ -112,7 +112,7 @@ public class WhackConnector extends Connector<WhackConnectorConfiguration, Whack
         getConnection(channel).send(packet);
     }
 
-    public void receiveFromComponent(WhackBotConnection connection, Packet packet) throws ConnectorException {
-        receive(connection, packet);
+    public void receiveFromComponent(Channel channel, Packet packet) throws ConnectorException {
+        receive(channel, packet);
     }
 }

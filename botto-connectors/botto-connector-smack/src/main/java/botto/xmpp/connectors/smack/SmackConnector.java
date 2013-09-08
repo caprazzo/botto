@@ -53,7 +53,7 @@ public class SmackConnector extends Connector<SmackConnectorConfiguration, Smack
         getConnection(channel).send(packet);
     }
 
-    public void receiveFromConnection(SmackBotConnection connection, org.xmpp.packet.Packet packet) throws ConnectorException {
-        receive(connection, packet);
+    public void receiveFromConnection(Channel channel, org.xmpp.packet.Packet packet) throws ConnectorException {
+        receive(channel, packet);
     }
 }

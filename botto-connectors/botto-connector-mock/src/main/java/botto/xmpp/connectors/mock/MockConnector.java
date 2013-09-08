@@ -1,15 +1,10 @@
 package botto.xmpp.connectors.mock;
 
-
-import botto.xmpp.botto.xmpp.connector.BotConnection;
 import botto.xmpp.botto.xmpp.connector.Channel;
 import botto.xmpp.botto.xmpp.connector.Connector;
 import botto.xmpp.botto.xmpp.connector.ConnectorException;
-import org.xmpp.packet.JID;
 import org.xmpp.packet.Packet;
 
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -23,7 +18,7 @@ public class MockConnector extends Connector<MockConnectorConfiguration, MockBot
 
     @Override
     public void doOpenChannel(Channel channel) throws ConnectorException {
-        MockBotConnection connection = new MockBotConnection(this, channel.getAddress());
+        MockBotConnection connection = new MockBotConnection(this, channel);
         addConnection(channel, connection);
     }
 
@@ -38,7 +33,7 @@ public class MockConnector extends Connector<MockConnectorConfiguration, MockBot
     }
 
     @Override
-    public void doStop()  throws ConnectorException {
+    public void doStop() throws ConnectorException {
         //To change body of implemented methods use File | Settings | File Templates.
     }
 
@@ -47,7 +42,8 @@ public class MockConnector extends Connector<MockConnectorConfiguration, MockBot
         final MockBotConnection connection = getConnection(channel);
         executor.submit(new Runnable() {
             @Override
-            public void run() {                ;
+            public void run() {
+                ;
                 try {
                     receive(channel, packet);
                 } catch (ConnectorException e) {
