@@ -6,6 +6,7 @@ import botto.xmpp.botto.xmpp.connector.*;
 import botto.xmpp.service.dispatcher.ListenableConfirmation;
 
 import com.google.common.util.concurrent.*;
+import net.caprazzi.reusables.common.FormattedRuntimeException;
 import net.caprazzi.reusables.common.Managed;
 
 
@@ -61,19 +62,19 @@ public class BotManager implements Managed {
         return connectorId;
     }
 
-    private void receive(final Connector connector, final Channel channel, final Packet packet) {
+    private void receive(final Connector connector, final Channel channel, final Packet packet, final Meters.ConnectorMetrics meter) {
         // async deliver to bot
-        ListenableFuture<Packet> execute = deliverToBot(packet, channels.getBot(channel));
+        ListenableFuture<Packet> execute = deliverToBot(packet, channels.getBot(channel), meter);
         Futures.addCallback(execute, new FutureCallback<Packet>() {
             public void onSuccess(Packet packet) {
                 if (packet != null) {
-                    // TODO: count response
+                    meter.countBotResponse();
                     send(connector, channel, packet);
                 }
             }
             public void onFailure(Throwable t) {
-                // TODO: log
-                // TODO: count failure
+                Log.error("Error while delivering packet {} to {} on {}", packet, channel, connector);
+                meter.countDeliveryError();
             }
         });
     }
@@ -156,16 +157,17 @@ public class BotManager implements Managed {
         });
     }
 
-    private ListenableFuture<Packet> deliverToBot(final Packet packet, final AbstractBot bot) {
+    private ListenableFuture<Packet> deliverToBot(final Packet packet, final AbstractBot bot, final Meters.ConnectorMetrics metrics) {
         return executor.submit(new Callable<Packet>() {
             public Packet call() throws Exception {
+                long start = metrics.startBotDelivery();
                 try {
-                    // TODO: count and time executed
                     return bot.receive(packet);
                 } catch (Exception ex) {
-                    // TODO: wrap and log
-                    // TODO: count failure
-                    throw ex;
+                    throw new FormattedRuntimeException(ex, "Failed to deliver packet {} to bot {}", packet, bot);
+                }
+                finally {
+                    metrics.timeBotDelivery(start);
                 }
             }
         });
@@ -181,11 +183,11 @@ public class BotManager implements Managed {
     }
 
     private void send(final Connector connector, final Channel channel, final Packet packet) {
-        // TODO: add to outgoing queue (should have a queue for each connector?)
         ListenableFuture<?> send = executor.submit(new Runnable() {
             @Override
             public void run() {
                 try {
+                    // TODO: mind that not all connectors are thread safe
                     connector.send(channel, packet);
                 } catch (ConnectorException e) {
                     throw new RuntimeException("Exception while submitting packet to channel " + channel + ": " + packet, e);
@@ -243,7 +245,7 @@ public class BotManager implements Managed {
         @Override
         public void onIncomingPacket(Channel channel, Packet packet) {
             meter.countIncoming(packet);
-            receive(connector, channel, packet);
+            receive(connector, channel, packet, this.meter);
         }
 
         @Override

@@ -7,6 +7,8 @@ import org.xmpp.packet.Message;
 import org.xmpp.packet.Packet;
 import org.xmpp.packet.Presence;
 
+import java.util.concurrent.TimeUnit;
+
 import static com.codahale.metrics.MetricRegistry.*;
 
 public class Meters {
@@ -39,11 +41,18 @@ public class Meters {
         private final PacketMetrics other;
         private final ConnectorMetrics allConnectors;
         private final Counter channels;
+        private final Timer delivery;
+        private final Meter deliveryError;
+        private final Meter response;
 
 
         private ConnectorMetrics(ConnectorMetrics allConnectors, String name) {
             this.allConnectors = allConnectors;
             channels = Meters.Metrics.counter(name(Meters.class, "connectors", name, "channels", "open"));
+            delivery = Meters.Metrics.timer(name(Meters.class, "connectors", name, "bot", "delivery", "attempt"));
+            deliveryError = Meters.Metrics.meter(name(Meters.class, "connectors", name, "bot", "delivery", "error"));
+            Meters.Metrics.register(name(Meters.class, "connectors", name, "bot", "delivery", "ratio"), new DeliverySucessRatio(delivery, deliveryError));
+            response = Meters.Metrics.meter(name(Meters.class, "connectors", name, "bot", "response"));
             all = new PacketMetrics(name, "all");
             message = new PacketMetrics(name, "message");
             presence = new PacketMetrics(name, "presence");
@@ -166,6 +175,48 @@ public class Meters {
             channels.dec();
             if (allConnectors != null) {
                 allConnectors.channels.dec();
+            }
+        }
+
+        public long startBotDelivery() {
+            return System.nanoTime();
+        }
+
+        public void timeBotDelivery(long start) {
+            long duration = System.nanoTime() - start;
+            delivery.update(duration, TimeUnit.NANOSECONDS);
+            if (allConnectors != null) {
+                allConnectors.delivery.update(duration, TimeUnit.NANOSECONDS);
+            }
+        }
+
+        public void countDeliveryError() {
+            deliveryError.mark();
+            if (allConnectors != null) {
+                allConnectors.deliveryError.mark();
+            }
+        }
+
+        public void countBotResponse() {
+            response.mark();
+            if (allConnectors != null) {
+                allConnectors.response.mark();
+            }
+        }
+
+        private static class DeliverySucessRatio extends RatioGauge {
+
+            private final Timer attempts;
+            private final Meter failed;
+
+            public DeliverySucessRatio(Timer attempts, Meter failed) {
+                this.attempts = attempts;
+                this.failed = failed;
+            }
+
+            @Override
+            protected Ratio getRatio() {
+                return Ratio.of(attempts.getOneMinuteRate(), failed.getOneMinuteRate());
             }
         }
     }
