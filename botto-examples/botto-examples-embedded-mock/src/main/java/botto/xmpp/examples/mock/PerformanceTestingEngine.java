@@ -6,6 +6,7 @@ import botto.xmpp.Meters;
 import botto.xmpp.botto.xmpp.connector.ConnectorId;
 import botto.xmpp.connectors.mock.MockConnector;
 import botto.xmpp.connectors.mock.MockConnectorConfiguration;
+import botto.xmpp.examples.bots.EchoBot;
 import botto.xmpp.examples.bots.SpamBot;
 import botto.xmpp.service.reflection.AnnotatedBotObject;
 import ch.qos.logback.classic.Level;
@@ -37,8 +38,9 @@ public class PerformanceTestingEngine {
 
         ConnectorId connectorId = connectionManager.registerConnector(connector);
 
+
         // 100k bots generating traffic that goes nowhere
-        for (int i = 0; i < 1000000; i++) {
+        for (int i = 0; i < 10000; i++) {
 
             JID echoAddress = new JID("echo" + i + "@example.com");
             JID spamAddress = new JID("spam" + i + "@example.com");
@@ -52,9 +54,9 @@ public class PerformanceTestingEngine {
 
             service.scheduleAtFixedRate(spamBot, 10, 1, TimeUnit.SECONDS);
 
-            //EchoBot echoBot = new EchoBot();
-            //AbstractBot echo = AnnotatedBotObject.from(echoBot).get();
-            //connectionManager.addBot(echo, echoAddress, connectorId);
+            EchoBot echoBot = new EchoBot();
+            AbstractBot echo = AnnotatedBotObject.from(echoBot).get();
+            connectionManager.addBot(connectorId, echoAddress, echo);
         }
 
         connector.start();

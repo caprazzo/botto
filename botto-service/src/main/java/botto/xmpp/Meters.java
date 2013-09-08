@@ -51,7 +51,7 @@ public class Meters {
             channels = Meters.Metrics.counter(name(Meters.class, "connectors", name, "channels", "open"));
             delivery = Meters.Metrics.timer(name(Meters.class, "connectors", name, "bot", "delivery", "attempt"));
             deliveryError = Meters.Metrics.meter(name(Meters.class, "connectors", name, "bot", "delivery", "error"));
-            Meters.Metrics.register(name(Meters.class, "connectors", name, "bot", "delivery", "ratio"), new DeliverySucessRatio(delivery, deliveryError));
+            Meters.Metrics.register(name(Meters.class, "connectors", name, "bot", "delivery", "ratio"), new DeliverySuccessRatio(delivery, deliveryError));
             response = Meters.Metrics.meter(name(Meters.class, "connectors", name, "bot", "response"));
             all = new PacketMetrics(name, "all");
             message = new PacketMetrics(name, "message");
@@ -204,12 +204,12 @@ public class Meters {
             }
         }
 
-        private static class DeliverySucessRatio extends RatioGauge {
+        private static class DeliverySuccessRatio extends RatioGauge {
 
             private final Timer attempts;
             private final Meter failed;
 
-            public DeliverySucessRatio(Timer attempts, Meter failed) {
+            public DeliverySuccessRatio(Timer attempts, Meter failed) {
                 this.attempts = attempts;
                 this.failed = failed;
             }

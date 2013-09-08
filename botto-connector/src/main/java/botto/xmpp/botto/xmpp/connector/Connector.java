@@ -14,7 +14,6 @@ public abstract class Connector<TConfig extends ConnectorConfiguration, TConnect
 
     private final TConfig configuration;
     private final String name;
-    private ConnectorPacketLstener listener;
     private ChannelListener channelListener;
 
     private final ConcurrentHashMap<Channel, TConnection> connections = new ConcurrentHashMap<Channel, TConnection>();
@@ -69,17 +68,11 @@ public abstract class Connector<TConfig extends ConnectorConfiguration, TConnect
         doStop();
     }
 
-    // TODO: allow setting multiple listeners
-    public final void setPacketListener(ConnectorPacketLstener listener) {
-        Preconditions.checkNotNull(listener);
-        this.listener = listener;
-    }
-
-    protected final void receive(BotConnection connection, Packet packet) throws ConnectorException {
-        Preconditions.checkNotNull(connection);
+    protected final void receive(Channel channel, Packet packet) throws ConnectorException {
+        Preconditions.checkNotNull(channel);
         Preconditions.checkNotNull(packet);
         // TODO: catch and log
-        listener.onIncoming(connection, packet);
+        channelListener.onIncomingPacket(channel, packet);
     }
 
     protected final TConfig getConfiguration() {

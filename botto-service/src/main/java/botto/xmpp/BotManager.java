@@ -99,7 +99,7 @@ public class BotManager implements Managed {
         Futures.addCallback(openChannel, new FutureCallback<Channel>() {
             @Override
             public void onSuccess(final Channel channel) {
-                channels.addChannel(channel, address, bot);
+                channels.addChannel(channel, bot);
                 bot.setPacketOutput(new PacketOutput() {
                     @Override
                     public void send(Packet packet) {

@@ -43,13 +43,13 @@ public class MockConnector extends Connector<MockConnectorConfiguration, MockBot
     }
 
     @Override
-    public void doSend(Channel channel, final Packet packet) throws ConnectorException {
+    public void doSend(final Channel channel, final Packet packet) throws ConnectorException {
         final MockBotConnection connection = getConnection(channel);
         executor.submit(new Runnable() {
             @Override
             public void run() {                ;
                 try {
-                    receive(connection, packet);
+                    receive(channel, packet);
                 } catch (ConnectorException e) {
                     e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
                 }
