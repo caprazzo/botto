@@ -1,8 +1,8 @@
 package botto.xmpp.botto.xmpp.connector;
 
+import com.google.common.base.Objects;
 import org.xmpp.packet.JID;
 
-// TODO: make usable as key
 // TODO: add open/close status
 // TODO: add connection status
 public class Channel {
@@ -18,5 +18,29 @@ public class Channel {
 
     public static Channel from(JID address) {
         return new Channel(address);
+    }
+
+    @Override
+    public String toString() {
+        return "Channel(" + address + ")";
+    }
+
+    @Override
+    public int hashCode() {
+        return address.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null)
+        {
+            return false;
+        }
+        if (getClass() != obj.getClass())
+        {
+            return false;
+        }
+        final Channel other = (Channel) obj;
+        return Objects.equal(this.address, other.address);
     }
 }
