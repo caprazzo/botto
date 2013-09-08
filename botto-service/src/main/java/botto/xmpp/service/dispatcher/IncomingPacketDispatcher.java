@@ -60,10 +60,10 @@ public class IncomingPacketDispatcher extends EnvelopeDispatcher<BotConnection, 
         return Meters.incomingRoutingTimer;
     }
 
-    // TODO: should dispatch also return a future, so full tracing can be enabled?
     protected ListenableConfirmation doDispatch(final Bot bot, final Packet packet) {
         final ListenableConfirmation confirmation = ListenableConfirmation.create();
         final PacketEnvelope<Bot> envelope = new PacketEnvelope<Bot>(bot, packet);
+
         Futures.addCallback(dispatcherExecutor.enqueue(envelope), new FutureCallback<Optional<Packet>>() {
             @Override
             public void onSuccess(Optional<Packet> response) {

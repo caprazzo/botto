@@ -40,6 +40,7 @@ public class DispatcherService implements Managed {
         bot.setPacketOutput(new PacketOutput() {
             @Override
             public void send(Packet packet) {
+                // TODO: this should already be done in the outgoing dispatcher, is it not?
                 packet.setFrom(connection.getSendAddress());
                 outgoingDispatcher.dispatch(new PacketEnvelope<Bot>(bot, packet));
             }
