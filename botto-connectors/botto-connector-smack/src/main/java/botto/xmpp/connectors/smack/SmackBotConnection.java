@@ -111,12 +111,28 @@ class SmackBotConnection implements BotConnection {
         return connector;
     }
 
+    public void stop() {
+        setConnectionStatus(false);
+
+        // TODO: remove conn listener
+        // connection.removeConnectionListener();
+
+        // TODO: remove packet listener
+        // connection.removePacketListener();
+
+        // disconnect
+        if (connection.isConnected()) {
+            connection.disconnect();
+        }
+    }
+
     public synchronized void start() {
         final SmackBotConnection botConnection = this;
         Futures.addCallback(connect(), new FutureCallback<Boolean>() {
             @Override
             public void onSuccess(Boolean result) {
                 Log.info("Connection Succesful");
+
                 connection.addConnectionListener(new SmackConnectionListener());
                 connection.addPacketListener(new PacketListener() {
                     @Override
@@ -152,50 +168,55 @@ class SmackBotConnection implements BotConnection {
         });
     }
 
-    public void stop() {
-        setConnectionStatus(false);
-
-        // TODO: remove conn listener
-        // connection.removeConnectionListener();
-
-        // TODO: remove packet listener
-        // connection.removePacketListener();
-
-        // disconnect
-        if (connection.isConnected()) {
-            connection.disconnect();
-        }
-    }
-
     private ListenableFuture<Boolean> connect() {
         final SettableFuture<Boolean> future = SettableFuture.create();
         connectionExecutor.submit(new Runnable() {
 
-            // TODO: add retry in case of retriable failure
+            private int count = 0;
+
             @Override
             public void run() {
-                Log.info("Connecting...");
-                try {
-                    connection.connect();
+                Log.info("Connecting... #" + count++);
+
+                while (!connection.isConnected()) {
                     try {
-                        connection.login(channel.getAddress().getNode(), secret, resource);
-                        future.set(true);
+                        connection.connect();
+                        count = 0;
                     }
                     catch (XMPPException ex) {
-                        Log.error("Could not login as '{}'. Error: {}", channel.getAddress().getNode(), ex.getMessage());
-                        future.setException(ex);
+                        int retryMillis = getReconnectDelay(count);
+                        Log.error("Could not connect to {}:{}. Retry in " + retryMillis+ "ms. Error: " + ex.getMessage(), connection.getHost(), connection.getPort());
+                        sleep(getReconnectDelay(count));
                     }
-                } catch (XMPPException ex) {
-                    Log.error("Could not connect to {}:{}. Error: " + ex.getMessage(), connection.getHost(), connection.getPort());
+                }
+
+                try {
+                    connection.login(channel.getAddress().getNode(), secret, resource);
+                    future.set(true);
+                }
+                catch (XMPPException ex) {
+                    Log.error("Could not login as '{}'. Error: {}", channel.getAddress().getNode(), ex.getMessage());
                     future.setException(ex);
                 }
+            }
+
+            private void sleep(long reconnectDelay) {
+                try {
+                    Thread.sleep(reconnectDelay);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                }
+            }
+
+            private int getReconnectDelay(int count) {
+                return 5000;
             }
         });
         return future;
     }
 
     private void setConnectionStatus(boolean connected) {
-        connectionInfo.setConnectionStatus(false);
+        connectionInfo.setConnectionStatus(connected);
         if (connectionInfoListener != null)
             connectionInfoListener.onConnectionInfo(connectionInfo);
     }
