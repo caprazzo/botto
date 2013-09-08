@@ -1,47 +1,41 @@
 package botto.xmpp.connectors.smack;
 
-import botto.xmpp.botto.xmpp.connector.BotConnection;
+import botto.xmpp.botto.xmpp.connector.Channel;
 import botto.xmpp.botto.xmpp.connector.Connector;
 import botto.xmpp.botto.xmpp.connector.ConnectorException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.xmpp.packet.JID;
+import org.xmpp.packet.Packet;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * A connector that uses the Smack library for single-node bots.
  */
-public class SmackConnector extends Connector<SmackConnectorConfiguration> {
+public class SmackConnector extends Connector<SmackConnectorConfiguration, SmackBotConnection> {
 
     private final Logger Log = LoggerFactory.getLogger(SmackConnector.class);
 
     public SmackConnector(SmackConnectorConfiguration configuration) {
         super(configuration);
         checkNotNull(configuration, "Configuration must not be null");
-
-    }
-
-    public BotConnection createConnection(JID address) {
-        checkNotNull(address, "addresss must not be null");
-
-        SmackBotConnection connection = new SmackBotConnection(this, address, getConfiguration().getHost(), getConfiguration().getPort(), getConfiguration().getSecret(address), getConfiguration().getResource());
-        // TODO: connection should start only if connector.start() has been invoked
-        connection.start();
-        return connection;
     }
 
     @Override
-    public void removeConnection(BotConnection connection) throws ConnectorException {
-        checkNotNull(connection, "connection must not be null");
-        if (!(connection instanceof SmackBotConnection)) {
-            throw new ConnectorException(new IllegalArgumentException("Can only remove connections of type WhackBotConection"));
-        }
-        SmackBotConnection conn = (SmackBotConnection)connection;
-        // TODO: connection should stop() only if it was started
-        conn.stop();
+    public void doOpenChannel(Channel channel) throws ConnectorException {
+        SmackBotConnection connection = new SmackBotConnection(this, channel, getConfiguration().getHost(), getConfiguration().getPort(), getConfiguration().getSecret(channel.getAddress()), getConfiguration().getResource());
+        addConnection(channel, connection);
+        // TODO: propagate the connected status of this channel
+        connection.start();
+        return;
+    }
+
+    @Override
+    public void doCloseChannel(Channel channel) throws ConnectorException {
+        // TODO: propagate the connected status of this channel
+        removeConnection(channel).stop();
     }
 
     @Override
@@ -55,10 +49,8 @@ public class SmackConnector extends Connector<SmackConnectorConfiguration> {
     }
 
     @Override
-    public void doSend(BotConnection connection, org.xmpp.packet.Packet packet) {
-        // TODO: cast? really?
-        SmackBotConnection conn = (SmackBotConnection)connection;
-        conn.send(packet);
+    public void doSend(Channel channel, Packet packet) throws ConnectorException {
+        getConnection(channel).send(packet);
     }
 
     public void receiveFromConnection(SmackBotConnection connection, org.xmpp.packet.Packet packet) throws ConnectorException {

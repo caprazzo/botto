@@ -4,12 +4,12 @@ import net.caprazzi.reusables.common.FormattedException;
 
 public class ConnectorException extends FormattedException {
 
-    public ConnectorException(Exception ex) {
-        super(ex);
+    public ConnectorException(Throwable t) {
+        super(t);
     }
 
-    public ConnectorException(Exception ex, String message, String... params) {
-        super(ex, message, params);
+    public ConnectorException(Throwable t, String message, Object... params) {
+        super(t, message, params);
     }
 
     public ConnectorException(String message, Object... params) {

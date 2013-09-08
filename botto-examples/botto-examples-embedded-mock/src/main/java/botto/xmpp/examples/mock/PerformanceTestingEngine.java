@@ -1,12 +1,11 @@
 package botto.xmpp.examples.mock;
 
 import botto.xmpp.AbstractBot;
-import botto.xmpp.BottoConnectionManager;
+import botto.xmpp.BotManager;
 import botto.xmpp.Meters;
 import botto.xmpp.botto.xmpp.connector.ConnectorId;
 import botto.xmpp.connectors.mock.MockConnector;
 import botto.xmpp.connectors.mock.MockConnectorConfiguration;
-import botto.xmpp.examples.bots.EchoBot;
 import botto.xmpp.examples.bots.SpamBot;
 import botto.xmpp.service.reflection.AnnotatedBotObject;
 import ch.qos.logback.classic.Level;
@@ -30,7 +29,7 @@ public class PerformanceTestingEngine {
 
         ScheduledExecutorService service = Executors.newScheduledThreadPool(10);
 
-        BottoConnectionManager connectionManager = new BottoConnectionManager();
+        BotManager connectionManager = BotManager.create();
 
         MockConnectorConfiguration configuration = new MockConnectorConfiguration("example.com");
         configuration.setDomain("example.com");
@@ -47,7 +46,9 @@ public class PerformanceTestingEngine {
             // setup a bot that keep sending messages to the echo bot
             SpamBot spamBot = new SpamBot(echoAddress);
             AbstractBot spamAnnotatedBot = AnnotatedBotObject.from(spamBot).get();
-            connectionManager.addBot(spamAnnotatedBot, spamAddress, connectorId);
+
+            connectionManager.addBot(connectorId, spamAddress, spamAnnotatedBot);
+
 
             service.scheduleAtFixedRate(spamBot, 10, 1, TimeUnit.SECONDS);
 

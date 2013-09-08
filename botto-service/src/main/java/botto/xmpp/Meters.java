@@ -153,6 +153,14 @@ public class Meters {
                 allConnectors.other.received.mark();
             }
         }
+
+        public void countOpenChannel() {
+            // TODO implement counter (gauge?)
+        }
+
+        public void countClosedChannel() {
+            // TODO implement counter (gauge?)
+        }
     }
 
     private static final class PacketMetrics {

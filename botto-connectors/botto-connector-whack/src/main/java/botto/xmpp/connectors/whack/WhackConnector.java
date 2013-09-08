@@ -1,5 +1,6 @@
 package botto.xmpp.connectors.whack;
 
+import botto.xmpp.botto.xmpp.connector.Channel;
 import botto.xmpp.botto.xmpp.connector.Connector;
 import botto.xmpp.botto.xmpp.connector.BotConnection;
 import botto.xmpp.botto.xmpp.connector.ConnectorException;
@@ -15,7 +16,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-public class WhackConnector extends Connector<WhackConnectorConfiguration> {
+public class WhackConnector extends Connector<WhackConnectorConfiguration, WhackBotConnection> {
 
     private static final Logger Log = LoggerFactory.getLogger(WhackConnector.class);
 
@@ -32,13 +33,12 @@ public class WhackConnector extends Connector<WhackConnectorConfiguration> {
     }
 
     @Override
-    public BotConnection createConnection(JID address) throws ConnectorException {
-        Log.debug("Creating Whack connection for {}", address);
-        checkNotNull(address, "The address must not be null");
-        verifyAddress(address);
+    public void doOpenChannel(Channel channel) throws ConnectorException {
+        Log.debug("Creating Whack connection for {}", channel);
+        verifyAddress(channel.getAddress());
 
         // get subdomain of bot
-        String subdomain = getSubdomain(address);
+        String subdomain = getSubdomain(channel.getAddress());
         WhackBotComponent component = components.get(subdomain);
         if (component == null) {
             try {
@@ -49,20 +49,16 @@ public class WhackConnector extends Connector<WhackConnectorConfiguration> {
 
         }
 
-        WhackBotConnection connection = new WhackBotConnection(this, component, address);
+        WhackBotConnection connection = new WhackBotConnection(this, component, channel.getAddress());
         component.addConnection(connection);
-        return connection;
+        addConnection(channel, connection);
     }
 
     @Override
-    public void removeConnection(BotConnection connection) throws ConnectorException {
-        checkNotNull(connection);
-        if (!(connection instanceof WhackBotConnection)) {
-            throw new ConnectorException(new IllegalArgumentException("Can only remove connections of type WhackBotConection"));
-        }
-
+    public void doCloseChannel(Channel channel) throws ConnectorException {
+        WhackBotConnection connection = removeConnection(channel);
         for(WhackBotComponent component : components.values()) {
-            component.removeConnection((WhackBotConnection)connection);
+            component.removeConnection(connection);
             if (component.isEmpty()) {
                 removeComponent(component);
             }
@@ -112,10 +108,8 @@ public class WhackConnector extends Connector<WhackConnectorConfiguration> {
     }
 
     @Override
-    public void doSend(BotConnection connection, Packet packet) {
-        // TODO: cast? really?
-        WhackBotConnection conn = (WhackBotConnection)connection;
-        conn.send(packet);
+    public void doSend(Channel channel, Packet packet) throws ConnectorException {
+        getConnection(channel).send(packet);
     }
 
     public void receiveFromComponent(WhackBotConnection connection, Packet packet) throws ConnectorException {

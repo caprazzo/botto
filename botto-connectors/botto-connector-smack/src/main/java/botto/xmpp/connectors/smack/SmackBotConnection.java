@@ -1,9 +1,6 @@
 package botto.xmpp.connectors.smack;
 
-import botto.xmpp.botto.xmpp.connector.BotConnection;
-import botto.xmpp.botto.xmpp.connector.ConnectionInfoListener;
-import botto.xmpp.botto.xmpp.connector.BotConnectionInfo;
-import botto.xmpp.botto.xmpp.connector.Connector;
+import botto.xmpp.botto.xmpp.connector.*;
 
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
@@ -29,7 +26,7 @@ class SmackBotConnection implements BotConnection {
     private final static Logger Log = LoggerFactory.getLogger(SmackBotConnection.class);
 
     private final SmackConnector connector;
-    private final JID address;
+    private final Channel channel;
     private final String secret;
     private final String resource;
 
@@ -40,9 +37,9 @@ class SmackBotConnection implements BotConnection {
     private ConnectionInfoListener connectionInfoListener;
 
     // TODO: add a SmackBotConfiguration object, or create the XMPPConnection outside
-    public SmackBotConnection(SmackConnector connector, JID address, String host, int port, String secret, String resource) {
+    public SmackBotConnection(SmackConnector connector, Channel channel, String host, int port, String secret, String resource) {
         this.connector = connector;
-        this.address = address;
+        this.channel = channel;
 
         this.secret = secret;
         this.resource = resource;
@@ -69,7 +66,7 @@ class SmackBotConnection implements BotConnection {
 
     @Override
     public JID getSendAddress() {
-        return address;
+        return channel.getAddress();
     }
 
     synchronized void send(Packet packet) {
@@ -181,11 +178,11 @@ class SmackBotConnection implements BotConnection {
                 try {
                     connection.connect();
                     try {
-                        connection.login(address.getNode(), secret, resource);
+                        connection.login(channel.getAddress().getNode(), secret, resource);
                         future.set(true);
                     }
                     catch (XMPPException ex) {
-                        Log.error("Could not login as '{}'. Error: {}", address.getNode(), ex.getMessage());
+                        Log.error("Could not login as '{}'. Error: {}", channel.getAddress().getNode(), ex.getMessage());
                         future.setException(ex);
                     }
                 } catch (XMPPException ex) {

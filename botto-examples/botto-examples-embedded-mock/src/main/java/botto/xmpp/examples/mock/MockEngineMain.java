@@ -1,6 +1,6 @@
 package botto.xmpp.examples.mock;
 
-import botto.xmpp.BottoConnectionManager;
+import botto.xmpp.BotManager;
 
 import botto.xmpp.botto.xmpp.connector.ConnectorId;
 import botto.xmpp.connectors.mock.MockConnector;
@@ -9,15 +9,10 @@ import botto.xmpp.AbstractBot;
 import botto.xmpp.Meters;
 
 import botto.xmpp.examples.bots.EchoBot;
-import botto.xmpp.examples.bots.SpamBot;
 import botto.xmpp.service.reflection.AnnotatedBotObject;
 import ch.qos.logback.classic.Level;
-import ch.qos.logback.classic.Logger;
 import com.codahale.metrics.JmxReporter;
-import org.slf4j.LoggerFactory;
 import org.xmpp.packet.JID;
-
-import java.util.concurrent.TimeUnit;
 
 public class MockEngineMain {
 
@@ -25,7 +20,7 @@ public class MockEngineMain {
         ch.qos.logback.classic.Logger root = (ch.qos.logback.classic.Logger) org.slf4j.LoggerFactory.getLogger(ch.qos.logback.classic.Logger.ROOT_LOGGER_NAME);
         root.setLevel(Level.INFO);
 
-        BottoConnectionManager connectionManager = new BottoConnectionManager();
+        BotManager connectionManager = BotManager.create();
 
         MockConnectorConfiguration configuration = new MockConnectorConfiguration("example.com");
         configuration.setDomain("example.com");
@@ -36,7 +31,7 @@ public class MockEngineMain {
         // echo bot
         EchoBot echoBot = new EchoBot();
         AbstractBot echo = AnnotatedBotObject.from(echoBot).get();
-        connectionManager.addBot(echo, new JID("echo@example.com"), mock);
+        connectionManager.addBot(mock, new JID("echo@example.com"), echo);
 
         /*
         // add three generator bots

@@ -12,13 +12,14 @@ public class ListenableConfirmation extends AbstractFuture<Boolean> {
         setException(ex);
     }
 
-    public static ListenableConfirmation failed(RuntimeException e) {
+    public static ListenableConfirmation failed(Throwable t) {
         ListenableConfirmation confirmation = new ListenableConfirmation();
-        confirmation.setException(e);
+        confirmation.setException(t);
         return confirmation;
     }
 
     public static ListenableConfirmation create() {
         return new ListenableConfirmation();
     }
+
 }

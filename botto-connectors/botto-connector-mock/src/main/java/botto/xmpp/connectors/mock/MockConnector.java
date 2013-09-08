@@ -2,6 +2,7 @@ package botto.xmpp.connectors.mock;
 
 
 import botto.xmpp.botto.xmpp.connector.BotConnection;
+import botto.xmpp.botto.xmpp.connector.Channel;
 import botto.xmpp.botto.xmpp.connector.Connector;
 import botto.xmpp.botto.xmpp.connector.ConnectorException;
 import org.xmpp.packet.JID;
@@ -12,7 +13,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public class MockConnector extends Connector<MockConnectorConfiguration> {
+public class MockConnector extends Connector<MockConnectorConfiguration, MockBotConnection> {
 
     ExecutorService executor = Executors.newCachedThreadPool();
 
@@ -20,19 +21,15 @@ public class MockConnector extends Connector<MockConnectorConfiguration> {
         super(configuration);
     }
 
-    Map<String, MockBotConnection> bots = new ConcurrentHashMap<String, MockBotConnection>();
-
     @Override
-    public BotConnection createConnection(JID address) throws ConnectorException {
-        MockBotConnection connection = new MockBotConnection(this, address);
-        bots.put(address.toBareJID(), connection);
-        return connection;
-        //To change body of created methods use File | Settings | File Templates.
+    public void doOpenChannel(Channel channel) throws ConnectorException {
+        MockBotConnection connection = new MockBotConnection(this, channel.getAddress());
+        addConnection(channel, connection);
     }
 
     @Override
-    public void removeConnection(BotConnection connection) throws ConnectorException {
-        //To change body of implemented methods use File | Settings | File Templates.
+    public void doCloseChannel(Channel channel) throws ConnectorException {
+        removeConnection(channel);
     }
 
     @Override
@@ -46,32 +43,18 @@ public class MockConnector extends Connector<MockConnectorConfiguration> {
     }
 
     @Override
-    public void doSend(BotConnection connection, Packet packet) throws ConnectorException {
-        send(packet);
-    }
-
-    public void send(final Packet packet) throws ConnectorException {
-        // delay by 1s
-        // delay(1000);
-
-        // if found a connection for this destination, deliver directly to it
-        // (a normal connector would send to a server instead)
-
+    public void doSend(Channel channel, final Packet packet) throws ConnectorException {
+        final MockBotConnection connection = getConnection(channel);
         executor.submit(new Runnable() {
             @Override
-            public void run() {
-                MockBotConnection connection = bots.get(packet.getTo().toBareJID());
-                if (connection != null) {
-                    try {
-                        receive(connection, packet);
-                    } catch (ConnectorException e) {
-                        e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-                    }
+            public void run() {                ;
+                try {
+                    receive(connection, packet);
+                } catch (ConnectorException e) {
+                    e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
                 }
             }
         });
-
-
     }
 
     private void delay(int millis) {
