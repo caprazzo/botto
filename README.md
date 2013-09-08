@@ -1,7 +1,7 @@
 ## Botto - XMPP Bot Service
 
 [![Build Status](https://travis-ci.org/mcaprari/botto.png?branches=snapshot)](https://travis-ci.org/mcaprari/botto)
-[![Coverage Status](https://coveralls.io/repos/mcaprari/botto/badge.png?branches=snapshot)](https://coveralls.io/r/mcaprari/botto)
+[![Coverage Status](https://coveralls.io/repos/mcaprari/botto/badge.png?branch=snapshot)](https://coveralls.io/r/mcaprari/botto?branch=snapshot)
 
 Botto is a Java framework for easy development on XMPP Bots
 
