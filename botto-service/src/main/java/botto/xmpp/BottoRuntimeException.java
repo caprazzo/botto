@@ -3,6 +3,7 @@ package botto.xmpp;
 import net.caprazzi.reusables.common.FormattedRuntimeException;
 
 public class BottoRuntimeException extends FormattedRuntimeException {
+
     public BottoRuntimeException(Throwable t) {
         super(t);
     }
