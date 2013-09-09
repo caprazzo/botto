@@ -107,7 +107,7 @@ public class BotManager implements Managed {
                 @Override
                 public void onFailure(Throwable t) {
                     Log.error("Failed to open channel for {}::{}: {}", address, connector, t);
-                    confirmation.setFailure(new BottoException(t, "Failed to open channel {}, {}, {}", connectorId, address, bot));
+                    confirmation.setFailure(new BottoException(t, "Failed to open channel {0}, {1}, {2}", connectorId, address, bot));
                 }
             });
         }
@@ -134,7 +134,7 @@ public class BotManager implements Managed {
                 }
 
                 public void onFailure(Throwable t) {
-                    confirmation.setFailure(new ConnectorException(t, "Failed to close channel {}, {}, {}", connectorId, address, bot));
+                    confirmation.setFailure(new ConnectorException(t, "Failed to close channel {0}, {1}, {2}", connectorId, address, bot));
                 }
             });
         }
@@ -152,7 +152,7 @@ public class BotManager implements Managed {
                     // TODO: mind that not all connectors are thread safe
                     connector.send(channel, packet);
                 } catch (ConnectorException e) {
-                    throw new BottoRuntimeException(e, "Exception while submitting to channel {}. packet {}", channel, packet);
+                    throw new BottoRuntimeException(e, "Exception while submitting to channel {0}. packet {1}", channel, packet);
                 }
             }
         });
@@ -174,18 +174,16 @@ public class BotManager implements Managed {
     }
 
     private void receive(final Connector connector, final Channel channel, final Packet packet, final Meters.ConnectorMetrics meter) {
-        Log.debug("Received from {}::{}: {}", channel, connector, packet);
+        Log.debug("Received packet on {}::{}: {}", channel, connector, packet);
 
-        final Channel destChannel = channels.getChannel(packet.getTo());
-        final AbstractBot bot = channels.getBot(destChannel);
-
+        final AbstractBot bot = channels.getBot(channel);
         ListenableFuture<Packet> execute = deliverToBot(packet, bot, meter);
         Futures.addCallback(execute, new FutureCallback<Packet>() {
             public void onSuccess(Packet response) {
                 Log.debug("Delivered packet to bot {}: {}, with response {}", bot, packet.getID(), response);
                 if (response != null) {
                     meter.countBotResponse();
-                    send(connector, destChannel, response);
+                    send(connector, channel, response);
                 }
             }
 
@@ -203,7 +201,7 @@ public class BotManager implements Managed {
                 try {
                     return bot.receive(packet);
                 } catch (Exception ex) {
-                    throw new BottoRuntimeException(ex, "Failed to deliver packet {} to bot {}", packet, bot);
+                    throw new BottoRuntimeException(ex, "Failed to deliver packet {0} to bot {1}", packet, bot);
                 } finally {
                     metrics.timeBotDelivery(start);
                 }
@@ -234,7 +232,7 @@ public class BotManager implements Managed {
         try {
             connector.start();
         } catch (ConnectorException e) {
-            throw new BottoRuntimeException(e, "Could not start Connector {}");
+            throw new BottoRuntimeException(e, "Could not start Connector {0}", connector);
         }
     }
 
@@ -242,7 +240,7 @@ public class BotManager implements Managed {
         try {
             connector.stop();
         } catch (ConnectorException e) {
-            throw new BottoRuntimeException(e, "Error while stopping connector {}", connector);
+            throw new BottoRuntimeException(e, "Error while stopping connector {0}", connector);
         }
     }
 
