@@ -13,7 +13,7 @@ public class ConnectorRegistry {
 
     public ConnectorId addConnector(Connector connector) {
         if (connectors.containsValue(connector)) {
-            throw new BottoRuntimeException("Could not register connector {} because it has already been registered", connector);
+            throw new BottoRuntimeException("Could not register connector {0} because it has already been registered", connector);
         }
         final ConnectorId connectorId = new ConnectorId(connectorCount.getAndIncrement(), connector.getClass(), connector.getName());
         connectors.put(connectorId, connector);
@@ -23,7 +23,7 @@ public class ConnectorRegistry {
     public Connector removeConnector(ConnectorId connectorId) {
         Connector removed = connectors.remove(connectorId);
         if (removed == null) {
-            throw new BottoRuntimeException("Could not remove connector with ID {}: not found");
+            throw new BottoRuntimeException("Could not remove connector with ID {0}: not found", connectorId);
         }
         return removed;
     }

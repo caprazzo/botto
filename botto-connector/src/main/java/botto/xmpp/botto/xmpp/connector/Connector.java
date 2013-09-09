@@ -1,6 +1,8 @@
 package botto.xmpp.botto.xmpp.connector;
 
 import com.google.common.base.Preconditions;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xmpp.packet.JID;
 import org.xmpp.packet.Packet;
 
@@ -17,6 +19,8 @@ public abstract class Connector<TConfig extends ConnectorConfiguration, TConnect
     private ChannelListener channelListener;
 
     private final ConcurrentHashMap<Channel, TConnection> connections = new ConcurrentHashMap<Channel, TConnection>();
+
+    private final Logger Log = LoggerFactory.getLogger(this.getClass());
 
     public abstract void doOpenChannel(Channel channel) throws ConnectorException;
     public abstract void doCloseChannel(Channel channel) throws ConnectorException;
@@ -69,10 +73,14 @@ public abstract class Connector<TConfig extends ConnectorConfiguration, TConnect
     }
 
     protected final void receive(Channel channel, Packet packet) throws ConnectorException {
-        Preconditions.checkNotNull(channel);
-        Preconditions.checkNotNull(packet);
-        // TODO: catch and log
-        channelListener.onIncomingPacket(channel, packet);
+        Preconditions.checkNotNull(channel, "Channel can't be null");
+        Preconditions.checkNotNull(packet, "Packet can't be null");
+        try {
+            channelListener.onIncomingPacket(channel, packet);
+        }
+        catch(Exception ex) {
+            Log.error("Error while delivering incoming packet to listener {}: {}:" + ex, channel, packet.toXML());
+        }
     }
 
     protected final TConfig getConfiguration() {

@@ -16,7 +16,7 @@ class ChannelRegistry {
         Preconditions.checkNotNull(bot);
         ChannelBot found = channels.putIfAbsent(channel.getAddress(), new ChannelBot(channel, bot));
         if (found != null) {
-            throw new BottoRuntimeException("There is already a bot for channel {}: {}", channel, bot);
+            throw new BottoRuntimeException("There is already a bot for channel {0}: {1}", channel, bot);
         }
     }
 
@@ -24,7 +24,7 @@ class ChannelRegistry {
         Preconditions.checkNotNull(channel);
         ChannelBot removed = channels.remove(channel.getAddress());
         if (removed == null) {
-            throw new BottoRuntimeException("Could not remove bot for channel {}: not found", channel);
+            throw new BottoRuntimeException("Could not remove bot for channel {0}: not found", channel);
         }
     }
 
@@ -34,7 +34,7 @@ class ChannelRegistry {
         if (channelBot != null) {
             return channelBot.getChannel();
         }
-        throw new BottoRuntimeException("No channel found for address {}", address);
+        throw new BottoRuntimeException("No channel found for address {0}", address);
     }
 
     public AbstractBot getBot(Channel channel) {

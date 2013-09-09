@@ -153,7 +153,7 @@ class SmackBotConnection implements BotConnection {
                             connector.receiveFromConnection(channel, converted);
                         }
                         catch(Exception ex) {
-                           Log.error("Error while processing packet {}: {}", packet.getPacketID(), ex);
+                           Log.error("Error while processing packet {}: {}", packet.toXML(), ex);
                         }
                     }
                 }, null);
@@ -176,7 +176,7 @@ class SmackBotConnection implements BotConnection {
 
             @Override
             public void run() {
-                Log.info("Connecting... #" + count++);
+                Log.info("Connecting {}... #{}", channel.getAddress(), count++);
 
                 while (!connection.isConnected()) {
                     try {
