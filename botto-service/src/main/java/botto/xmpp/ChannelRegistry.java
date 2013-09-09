@@ -8,6 +8,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 class ChannelRegistry {
 
+    // TODO: only use address.toBareJID for indexing
     private final ConcurrentHashMap<JID, ChannelBot> channels = new ConcurrentHashMap<JID, ChannelBot>();
 
     public void addChannel(Channel channel, AbstractBot bot) {
@@ -33,12 +34,21 @@ class ChannelRegistry {
         if (channelBot != null) {
             return channelBot.getChannel();
         }
-        return null;
+        throw new BottoRuntimeException("No channel found for address {}", address);
     }
 
     public AbstractBot getBot(Channel channel) {
         Preconditions.checkNotNull(channel);
         ChannelBot channelBot = channels.get(channel.getAddress());
+        if (channelBot != null) {
+            return channelBot.getBot();
+        }
+        return null;
+    }
+
+    public AbstractBot getBot(JID address) {
+        Preconditions.checkNotNull(address);
+        ChannelBot channelBot = channels.get(address);
         if (channelBot != null) {
             return channelBot.getBot();
         }
