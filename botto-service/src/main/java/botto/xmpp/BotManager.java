@@ -2,40 +2,30 @@ package botto.xmpp;
 
 import botto.xmpp.annotations.PacketOutput;
 import botto.xmpp.botto.xmpp.connector.*;
-
 import botto.xmpp.service.dispatcher.ListenableConfirmation;
-
 import com.google.common.util.concurrent.*;
-import net.caprazzi.reusables.common.FormattedRuntimeException;
 import net.caprazzi.reusables.common.Managed;
-
-
 import net.caprazzi.reusables.threading.ExecutorUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import org.xmpp.packet.JID;
 import org.xmpp.packet.Packet;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
 
 public class BotManager implements Managed {
 
-    private final Logger Log = LoggerFactory.getLogger(BotManager.class);
+    private static final Logger Log = LoggerFactory.getLogger(BotManager.class);
 
     private final ChannelRegistry channels = new ChannelRegistry();
-
-    private Map<ConnectorId, Connector> connectors = new HashMap<ConnectorId, Connector>();
-
-    private final AtomicInteger connectorCount = new AtomicInteger();
+    private final ConnectorRegistry connectors = new ConnectorRegistry();
 
     // executes connector.openChannel, connector.closeChannel, connector.send, bot.receive
     private final ListeningExecutorService executor = MoreExecutors.listeningDecorator(Executors.newCachedThreadPool());
+
+    private boolean started;
 
     private BotManager() { }
 
@@ -43,116 +33,165 @@ public class BotManager implements Managed {
         return new BotManager();
     }
 
-    // TODO: if the manager has already started, also start the connector
-    public synchronized ConnectorId registerConnector(final Connector connector) throws Exception {
+    public boolean isStarted() {
+        return started;
+    }
 
-        if(connectors.containsValue(connector)) {
-            // TODO: any way to not duplicate the error message?
-            Log.error("Could not register connector {} beacause it has already been registered");
-            throw new ConnectorException("Could not register connector {} because it has already been registered", connector);
+    @Override
+    public void start() {
+        if (isStarted()) {
+            throw new BottoRuntimeException("Could not start: already started");
         }
+        started = true;
+        for(Connector connector : connectors.list()) {
+            startConnector(connector);
+        }
+    }
 
-        final ConnectorId connectorId = new ConnectorId(connectorCount.getAndIncrement(), connector.getClass(), connector.getName());
-        connectors.put(connectorId, connector);
+    @Override
+    public void stop() {
+        if (!isStarted()) {
+            throw new BottoRuntimeException("Could not stop: not started");
+        }
+        started = false;
+        try {
+            ExecutorUtils.shutdown(Log, executor, 2, TimeUnit.SECONDS);
+            for(Connector connector : connectors.list()) {
+                stopConnector(connector);
+            }
+        }
+        catch(Exception ex) {
+            Log.error("Error during shutdown - ignoring: {}", ex);
+        }
+    }
 
+    public synchronized ConnectorId registerConnector(final Connector connector) throws BottoException {
+        ConnectorId connectorId = connectors.addConnector(connector);
         connector.addChannelListener(new ConnectorChannelListener(connector, connectorId));
-
         Log.info("Registered connector {} with id {}", connector, connectorId);
-
+        if (isStarted()) {
+            startConnector(connector);
+        }
         return connectorId;
     }
 
-    private void receive(final Connector connector, final Channel channel, final Packet packet, final Meters.ConnectorMetrics meter) {
-        // async deliver to bot
-        ListenableFuture<Packet> execute = deliverToBot(packet, channels.getBot(channel), meter);
-        Futures.addCallback(execute, new FutureCallback<Packet>() {
-            public void onSuccess(Packet packet) {
-                if (packet != null) {
-                    meter.countBotResponse();
-                    send(connector, channel, packet);
-                }
-            }
-            public void onFailure(Throwable t) {
-                Log.error("Error while delivering packet {} to {} on {}", packet, channel, connector);
-                meter.countDeliveryError();
-            }
-        });
-    }
-
     public synchronized void removeConnector(ConnectorId connectorId) {
-        // TODO: implement removal code
-        // TODO: remove my listeners
-        // TODO: should also un-register meters for removed connectors?
-        // TODO: stop it if started
+        Log.info("Removing connector {}", connectorId);
+        Connector removed = connectors.removeConnector(connectorId);
+        stopConnector(removed);
     }
 
     public ListenableConfirmation addBot(final ConnectorId connectorId, final JID address, final AbstractBot bot) {
-
+        Log.info("Adding bot to {}::{}: {}", address, connectorId, bot);
         final ListenableConfirmation confirmation = new ListenableConfirmation();
-        final Connector connector = connectors.get(connectorId);
-        if (connector == null) {
-            return ListenableConfirmation.failed(new ConnectorException("Connector not found for {}", connectorId));
+        try {
+            final Connector connector = connectors.getConnector(connectorId);
+
+            // asynchronously open channel
+            Log.debug("Opening channel for {}|{}", address, connector);
+            ListenableFuture<Channel> openChannel = openChannel(connector, address);
+            Futures.addCallback(openChannel, new FutureCallback<Channel>() {
+                @Override
+                public void onSuccess(final Channel channel) {
+                    Log.debug("Channel {} opened for {}|{}", address, connector);
+                    channels.addChannel(channel, bot);
+                    bot.setPacketOutput(new PacketOutput() {
+                        @Override
+                        public void send(Packet packet) {
+                            BotManager.this.send(connector, channel, packet);
+                        }
+                    });
+                    confirmation.setSuccess();
+                }
+
+                @Override
+                public void onFailure(Throwable t) {
+                    Log.error("Failed to open channel for {}::{}: {}", address, connector, t);
+                    confirmation.setFailure(new BottoException(t, "Failed to open channel {}, {}, {}", connectorId, address, bot));
+                }
+            });
         }
-
-        // asynchronously open channel
-        ListenableFuture<Channel> openChannel =  openChannel(connector, address);
-        Futures.addCallback(openChannel, new FutureCallback<Channel>() {
-            @Override
-            public void onSuccess(final Channel channel) {
-                channels.addChannel(channel, bot);
-                bot.setPacketOutput(new PacketOutput() {
-                    @Override
-                    public void send(Packet packet) {
-                        BotManager.this.send(connector, channel, packet);
-                    }
-                });
-                confirmation.setSuccess();
-            }
-
-            @Override
-            public void onFailure(Throwable t) {
-                // TODO: log
-                confirmation.setFailure(new ConnectorException(t, "Failed to open channel {}, {}, {}", connectorId, address, bot));
-            }
-        });
-
+        catch(Exception ex) {
+            confirmation.setFailure(ex);
+        }
         return confirmation;
     }
 
     public ListenableConfirmation removeBot(final ConnectorId connectorId, final JID address, final AbstractBot bot) {
 
         final ListenableConfirmation confirmation = new ListenableConfirmation();
-        final Connector connector = connectors.get(connectorId);
-        if (connector == null) {
-            return ListenableConfirmation.failed(new ConnectorException("Connector not found for {}", connectorId));
+        try {
+            final Connector connector = connectors.getConnector(connectorId);
+            final Channel channel = channels.getChannel(address);
+
+            // asynchronously close channel
+            ListenableFuture<Channel> closeChannel = closeChannel(connector, channel);
+            Futures.addCallback(closeChannel, new FutureCallback<Channel>() {
+                public void onSuccess(Channel channel) {
+                    // TODO: should remove the channel from the registry even if closing fails?
+                    channels.removeChannel(channel);
+                    confirmation.setSuccess();
+                }
+
+                public void onFailure(Throwable t) {
+                    confirmation.setFailure(new ConnectorException(t, "Failed to close channel {}, {}, {}", connectorId, address, bot));
+                }
+            });
         }
-
-        final Channel channel = channels.getChannel(address);
-        if (channel == null) {
-            return ListenableConfirmation.failed(new ConnectorException("Channel not found for ...."));
+        catch(Exception ex) {
+            confirmation.setFailure(ex);
         }
-
-        // asynchronously close channel
-        ListenableFuture<Channel> closeChannel = closeChannel(connector, channel);
-        Futures.addCallback(closeChannel, new FutureCallback<Channel>() {
-            public void onSuccess(Channel channel) {
-                // TODO: should remove the channel from the registry anyway?
-                channels.removeChannel(channel);
-                confirmation.setSuccess();
-            }
-            public void onFailure(Throwable t) {
-                confirmation.setFailure(new ConnectorException(t, "Failed to close channel {}, {}, {}", connectorId, address, bot));
-            }
-        });
-
         return confirmation;
     }
 
-    private ListenableFuture<Channel> openChannel(final Connector connector, final JID address) {
-        return executor.submit(new Callable<Channel>() {
+    private void send(final Connector connector, final Channel channel, final Packet packet) {
+        Log.debug("Sending packet to {}::{}: {}", channel, connector, packet);
+        ListenableFuture<?> send = executor.submit(new Runnable() {
+            public void run() {
+                try {
+                    // TODO: mind that not all connectors are thread safe
+                    connector.send(channel, packet);
+                } catch (ConnectorException e) {
+                    throw new BottoRuntimeException(e, "Exception while submitting to channel {}. packet {}", channel, packet);
+                }
+            }
+        });
+
+        Futures.addCallback(send, new FutureCallback<Object>() {
             @Override
-            public Channel call() throws Exception {
-                return connector.openChannel(address);
+            public void onSuccess(Object result) {
+                Log.debug("Packet sent OK to {}::{}: {}", channel, connector, packet.getID());
+            }
+
+            @Override
+            public void onFailure(Throwable t) {
+                Log.debug("Error sending packet to {}::{}: {}: {}", channel, connector, packet.getID(), t);
+                // TODO: count failure
+                // TODO: send error to bot
+                // channels.getBot(channel).receiveError(packet, t);
+            }
+        });
+    }
+
+    private void receive(final Connector connector, final Channel channel, final Packet packet, final Meters.ConnectorMetrics meter) {
+        Log.debug("Received from {}::{}: {}", channel, connector, packet);
+
+        final Channel destChannel = channels.getChannel(packet.getTo());
+        final AbstractBot bot = channels.getBot(destChannel);
+
+        ListenableFuture<Packet> execute = deliverToBot(packet, bot, meter);
+        Futures.addCallback(execute, new FutureCallback<Packet>() {
+            public void onSuccess(Packet response) {
+                Log.debug("Delivered packet to bot {}: {}, with response {}", bot, packet.getID(), response);
+                if (response != null) {
+                    meter.countBotResponse();
+                    send(connector, destChannel, response);
+                }
+            }
+
+            public void onFailure(Throwable t) {
+                Log.error("Error while delivering packet {} to {} on {}", packet, channel, connector);
+                meter.countDeliveryError();
             }
         });
     }
@@ -164,11 +203,20 @@ public class BotManager implements Managed {
                 try {
                     return bot.receive(packet);
                 } catch (Exception ex) {
-                    throw new FormattedRuntimeException(ex, "Failed to deliver packet {} to bot {}", packet, bot);
-                }
-                finally {
+                    throw new BottoRuntimeException(ex, "Failed to deliver packet {} to bot {}", packet, bot);
+                } finally {
                     metrics.timeBotDelivery(start);
                 }
+            }
+        });
+    }
+
+    private ListenableFuture<Channel> openChannel(final Connector connector, final JID address) {
+        return executor.submit(new Callable<Channel>() {
+            @Override
+            public Channel call() throws Exception {
+                Channel channel = connector.openChannel(address);
+                return channel;
             }
         });
     }
@@ -182,44 +230,20 @@ public class BotManager implements Managed {
         });
     }
 
-    private void send(final Connector connector, final Channel channel, final Packet packet) {
-        ListenableFuture<?> send = executor.submit(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    // TODO: mind that not all connectors are thread safe
-                    connector.send(channel, packet);
-                } catch (ConnectorException e) {
-                    throw new RuntimeException("Exception while submitting packet to channel " + channel + ": " + packet, e);
-                }
-            }
-        });
-
-        Futures.addCallback(send, new FutureCallback<Object>() {
-            @Override
-            public void onSuccess(Object result) {
-                // packet sent to connector OK
-            }
-
-            @Override
-            public void onFailure(Throwable t) {
-                // TODO: count failure
-                // TODO: send error to bot
-                // channels.getBot(channel).receiveError(packet, t);
-            }
-        });
+    private void startConnector(Connector connector) {
+        try {
+            connector.start();
+        } catch (ConnectorException e) {
+            throw new BottoRuntimeException(e, "Could not start Connector {}");
+        }
     }
 
-
-    @Override
-    public void start() {
-        // TODO: start all non-started connectors
-    }
-
-    @Override
-    public void stop() {
-        // TODO: stop all started connectors
-        ExecutorUtils.shutdown(Log, executor, 2, TimeUnit.SECONDS);
+    private void stopConnector(Connector connector) {
+        try {
+            connector.stop();
+        } catch (ConnectorException e) {
+            throw new BottoRuntimeException(e, "Error while stopping connector {}", connector);
+        }
     }
 
     private class ConnectorChannelListener implements ChannelListener {
@@ -253,5 +277,4 @@ public class BotManager implements Managed {
             meter.countOutgoing(packet);
         }
     }
-
 }
