@@ -174,8 +174,6 @@ public class BotManager implements Managed {
         });
     }
 
-
-
     private void receive(final Connector connector, final Channel channel, final Packet packet, final Meters.ConnectorMetrics meter) {
         Log.debug("Received packet on {}::{}: {}", channel, connector, packet);
 
