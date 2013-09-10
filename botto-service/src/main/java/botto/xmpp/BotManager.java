@@ -3,6 +3,7 @@ package botto.xmpp;
 import botto.xmpp.annotations.PacketOutput;
 import botto.xmpp.botto.xmpp.connector.*;
 import botto.xmpp.service.dispatcher.ListenableConfirmation;
+import botto.xmpp.utils.Packets;
 import com.google.common.util.concurrent.*;
 import net.caprazzi.reusables.common.Managed;
 import net.caprazzi.reusables.threading.ExecutorUtils;
@@ -150,7 +151,7 @@ public class BotManager implements Managed {
             public void run() {
                 try {
                     // TODO: mind that not all connectors are thread safe
-                    connector.send(channel, packet);
+                    connector.send(channel, Packets.preparePacketForSending(channel, packet));
                 } catch (ConnectorException e) {
                     throw new BottoRuntimeException(e, "Exception while submitting to channel {0}. packet {1}", channel, packet);
                 }
@@ -172,6 +173,8 @@ public class BotManager implements Managed {
             }
         });
     }
+
+
 
     private void receive(final Connector connector, final Channel channel, final Packet packet, final Meters.ConnectorMetrics meter) {
         Log.debug("Received packet on {}::{}: {}", channel, connector, packet);

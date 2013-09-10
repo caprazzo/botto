@@ -2,7 +2,7 @@ package botto.xmpp.service.reflection;
 
 import botto.xmpp.annotations.ConnectionInfo;
 import botto.xmpp.AbstractBot;
-import botto.xmpp.utils.Helpers;
+import botto.xmpp.utils.Packets;
 import com.google.common.base.Objects;
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
@@ -92,7 +92,7 @@ public class AnnotatedBotObject extends AbstractBot {
     protected Packet doReceive(Packet packet) {
         for (ReceiverMethod method : receiverMethods) {
             if (method.canReceive(packet)) {
-                Log.debug("Delivering {} to method {}", Helpers.toString(packet), method);
+                Log.debug("Delivering {} to method {}", Packets.toString(packet), method);
                 return method.receive(obj, packet).orNull();
             }
         }

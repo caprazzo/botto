@@ -1,12 +1,12 @@
 package botto.xmpp.utils;
 
+import botto.xmpp.botto.xmpp.connector.Channel;
 import com.google.common.base.Objects;
-import org.xmpp.packet.IQ;
-import org.xmpp.packet.Message;
-import org.xmpp.packet.Packet;
-import org.xmpp.packet.Presence;
+import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
+import org.xmpp.packet.*;
 
-public class Helpers {
+public class Packets {
 
     public static String toString(Packet packet) {
 
@@ -54,4 +54,41 @@ public class Helpers {
             .toString();
     }
 
+    public static boolean equalBareJid(JID first, JID second) {
+        Preconditions.checkNotNull(first);
+        return second != null && first.toBareJID().equals(second.toBareJID());
+    }
+
+    public static boolean requireId(Packet packet) {
+        return (packet instanceof Message || packet instanceof IQ);
+    }
+
+    public static boolean hasId(Packet packet) {
+        return !Strings.isNullOrEmpty(packet.getID());
+    }
+
+    public static String createId() {
+        return null;  //To change body of created methods use File | Settings | File Templates.
+    }
+
+    public static Packet preparePacketForSending(Channel channel, Packet packet) {
+        boolean fixId = Packets.requireId(packet) && !Packets.hasId(packet);
+        boolean fixSender = !Packets.equalBareJid(channel.getAddress(), packet.getFrom());
+
+        if (!fixId && !fixSender) {
+            return packet;
+        }
+
+        Packet copy = packet.createCopy();
+
+        if (fixId) {
+            copy.setID(Packets.createId());
+        }
+
+        if (fixSender) {
+            copy.setFrom(channel.getAddress());
+        }
+
+        return copy;
+    }
 }
