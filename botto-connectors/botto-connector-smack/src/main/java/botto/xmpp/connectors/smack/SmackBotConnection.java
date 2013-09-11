@@ -10,7 +10,6 @@ import org.jivesoftware.smack.*;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xmpp.packet.JID;
 import org.xmpp.packet.Packet;
 
 import java.util.concurrent.ExecutorService;
@@ -46,7 +45,7 @@ class SmackBotConnection implements BotConnection {
 
         // TODO: smack specific behaviour should be configurable
         ConnectionConfiguration configuration = new ConnectionConfiguration(host, port);
-        configuration.setReconnectionAllowed(true);
+        configuration.setReconnectionAllowed(false);
         configuration.setSendPresence(true);
         configuration.setCompressionEnabled(true);
 
@@ -112,8 +111,6 @@ class SmackBotConnection implements BotConnection {
     }
 
     public void stop() {
-        setConnectionStatus(false);
-
         // TODO: remove conn listener
         // connection.removeConnectionListener();
 
@@ -122,17 +119,20 @@ class SmackBotConnection implements BotConnection {
 
         // disconnect
         if (connection.isConnected()) {
+            connector.channelEvent(ChannelEvent.disconnecting(channel, "Connection stop requested"));
             connection.disconnect();
         }
     }
 
     public synchronized void start() {
         final SmackBotConnection botConnection = this;
+        connector.channelEvent(ChannelEvent.connecting(channel));
         Futures.addCallback(connect(), new FutureCallback<Boolean>() {
             @Override
             public void onSuccess(Boolean result) {
-                Log.info("Connection Succesful");
+                Log.info("Connection Successful");
 
+                //connection.
                 connection.addConnectionListener(new SmackConnectionListener());
                 connection.addPacketListener(new PacketListener() {
                     @Override
@@ -158,7 +158,7 @@ class SmackBotConnection implements BotConnection {
                     }
                 }, null);
 
-                setConnectionStatus(true);
+                connector.channelEvent(ChannelEvent.connected(channel));
             }
 
             @Override
@@ -178,9 +178,15 @@ class SmackBotConnection implements BotConnection {
             public void run() {
                 Log.info("Connecting {}... #{}", channel.getAddress(), count++);
 
+                if (connection.isConnected()) {
+                    connection.disconnect();
+                }
+                Log.trace("connection is connected {}", connection.isConnected());
                 while (!connection.isConnected()) {
                     try {
+                        Log.trace("before connect()");
                         connection.connect();
+                        Log.trace("after connect()");
                         count = 0;
                     }
                     catch (XMPPException ex) {
@@ -191,13 +197,17 @@ class SmackBotConnection implements BotConnection {
                 }
 
                 try {
+                    Log.trace("before login()");
                     connection.login(channel.getAddress().getNode(), secret, resource);
+                    Log.trace("after login()");
                     future.set(true);
                 }
                 catch (XMPPException ex) {
                     Log.error("Could not login as '{}'. Error: {}", channel.getAddress().getNode(), ex.getMessage());
                     future.setException(ex);
                 }
+
+                Log.trace("exit connect thread");
             }
 
             private void sleep(long reconnectDelay) {
@@ -215,42 +225,41 @@ class SmackBotConnection implements BotConnection {
         return future;
     }
 
-    private void setConnectionStatus(boolean connected) {
-        connectionInfo.setConnectionStatus(connected);
-        if (connectionInfoListener != null)
-            connectionInfoListener.onConnectionInfo(connectionInfo);
-    }
-
     private class SmackConnectionListener implements ConnectionListener {
 
         @Override
         public void connectionClosed() {
             Log.info("Connection {}: closed", connection);
-            setConnectionStatus(false);
+            // smack's embedded connection logic does not seem to work without this fix
+            // Could it be related to threading?
+            //if (connection.isConnected())
+            //    connection.disconnect();
+            connector.channelEvent(ChannelEvent.disconnected(channel, "Disconnected"));
+            connect();
         }
 
         @Override
         public void connectionClosedOnError(Exception e) {
             Log.warn("Connection {}: closed with exception {}", connection, e);
-            setConnectionStatus(false);
+            connector.channelEvent(ChannelEvent.disconnected(channel, "Disconnected with error", e));
         }
 
         @Override
         public void reconnectingIn(int i) {
             Log.info("Connection {}: reconnecting in ", i);
-            setConnectionStatus(false);
+            connector.channelEvent(ChannelEvent.connecting(channel, "reconnecting in " + i + "s"));
         }
 
         @Override
         public void reconnectionSuccessful() {
-            Log.info("Connection {}: reconnected");
-            setConnectionStatus(true);
+            Log.info("Connection for {}: reconnected", channel);
+            connector.channelEvent(ChannelEvent.connected(channel, "Reconnection successful"));
         }
 
         @Override
         public void reconnectionFailed(Exception e) {
             Log.error("Connection {}: reconnection failed with exception {}", e);
-            setConnectionStatus(false);
+            connector.channelEvent(ChannelEvent.disconnected(channel, "Reconnection failed with error ", e));
         }
     }
 }

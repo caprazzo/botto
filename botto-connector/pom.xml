@@ -33,6 +33,11 @@
             <artifactId>guava</artifactId>
             <version>${guava.version}</version>
         </dependency>
+        <dependency>
+            <groupId>com.googlecode</groupId>
+            <artifactId>stateless4j</artifactId>
+            <version>1.0</version>
+        </dependency>
     </dependencies>
 
     <build>

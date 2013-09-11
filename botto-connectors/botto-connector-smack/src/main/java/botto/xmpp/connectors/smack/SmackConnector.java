@@ -1,8 +1,6 @@
 package botto.xmpp.connectors.smack;
 
-import botto.xmpp.botto.xmpp.connector.Channel;
-import botto.xmpp.botto.xmpp.connector.Connector;
-import botto.xmpp.botto.xmpp.connector.ConnectorException;
+import botto.xmpp.botto.xmpp.connector.*;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,7 +27,12 @@ public class SmackConnector extends Connector<SmackConnectorConfiguration, Smack
         addConnection(channel, connection);
         // TODO: propagate the connected status of this channel
         connection.start();
+        setChannelEvent(ChannelEvent.opened(channel));
         return;
+    }
+
+    void channelEvent(ChannelEvent event) {
+        setChannelEvent(event);
     }
 
     @Override

@@ -9,8 +9,7 @@ import botto.xmpp.connectors.mock.MockConnector;
 import botto.xmpp.connectors.mock.MockConnectorConfiguration;
 import botto.xmpp.connectors.smack.SmackConnector;
 import botto.xmpp.connectors.smack.SmackConnectorConfiguration;
-import botto.xmpp.connectors.whack.WhackConnector;
-import botto.xmpp.connectors.whack.WhackConnectorConfiguration;
+
 import botto.xmpp.examples.bots.EchoBot;
 import botto.xmpp.examples.bots.SpamBot;
 import botto.xmpp.service.reflection.AnnotatedBotObject;
@@ -20,7 +19,7 @@ import org.xmpp.packet.JID;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
+
 
 public class ExampleEmbeddedBotServer {
 
@@ -29,7 +28,7 @@ public class ExampleEmbeddedBotServer {
         reporter.start();
 
         ch.qos.logback.classic.Logger root = (ch.qos.logback.classic.Logger) org.slf4j.LoggerFactory.getLogger(ch.qos.logback.classic.Logger.ROOT_LOGGER_NAME);
-        root.setLevel(Level.DEBUG);
+        root.setLevel(Level.INFO);
 
         ScheduledExecutorService service = Executors.newScheduledThreadPool(10);
 
@@ -62,6 +61,6 @@ public class ExampleEmbeddedBotServer {
 
         botManager.start();
 
-        service.scheduleAtFixedRate(spamBot, 1, 5, TimeUnit.SECONDS);
+        //service.scheduleAtFixedRate(spamBot, 1, 5, TimeUnit.SECONDS);
     }
 }

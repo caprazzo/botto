@@ -256,16 +256,6 @@ public class BotManager implements Managed {
         }
 
         @Override
-        public void onChannelOpen(Channel channel) {
-            meter.countOpenChannel();
-        }
-
-        @Override
-        public void onChannelClose(Channel channel) {
-            meter.countClosedChannel();
-        }
-
-        @Override
         public void onIncomingPacket(Channel channel, Packet packet) {
             meter.countIncoming(packet);
             receive(connector, channel, packet, this.meter);
@@ -274,6 +264,11 @@ public class BotManager implements Managed {
         @Override
         public void onOutgoingPacket(Channel channel, Packet packet) {
             meter.countOutgoing(packet);
+        }
+
+        @Override
+        public void channelEvent(ChannelEvent event) {
+            Log.info("{}", event);
         }
     }
 }
