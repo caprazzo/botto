@@ -1,10 +1,10 @@
 package botto.xmpp.connectors.whack;
 
 import botto.xmpp.botto.xmpp.connector.*;
+import botto.xmpp.botto.xmpp.connector.channel.Channel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xmpp.component.ComponentException;
-import org.xmpp.packet.JID;
 import org.xmpp.packet.Packet;
 
 class WhackBotConnection implements BotConnection {

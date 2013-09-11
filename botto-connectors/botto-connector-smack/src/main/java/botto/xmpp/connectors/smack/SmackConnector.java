@@ -2,6 +2,8 @@ package botto.xmpp.connectors.smack;
 
 import botto.xmpp.botto.xmpp.connector.*;
 
+import botto.xmpp.botto.xmpp.connector.channel.Channel;
+import botto.xmpp.botto.xmpp.connector.channel.ChannelEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,7 +27,6 @@ public class SmackConnector extends Connector<SmackConnectorConfiguration, Smack
     public void doOpenChannel(Channel channel) throws ConnectorException {
         SmackBotConnection connection = new SmackBotConnection(this, channel, getConfiguration().getHost(), getConfiguration().getPort(), getConfiguration().getSecret(channel.getAddress()), getConfiguration().getResource());
         addConnection(channel, connection);
-        // TODO: propagate the connected status of this channel
         connection.start();
         setChannelEvent(ChannelEvent.opened(channel));
         return;
@@ -37,7 +38,6 @@ public class SmackConnector extends Connector<SmackConnectorConfiguration, Smack
 
     @Override
     public void doCloseChannel(Channel channel) throws ConnectorException {
-        // TODO: propagate the connected status of this channel
         removeConnection(channel).stop();
     }
 

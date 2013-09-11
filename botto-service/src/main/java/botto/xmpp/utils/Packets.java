@@ -1,6 +1,6 @@
 package botto.xmpp.utils;
 
-import botto.xmpp.botto.xmpp.connector.Channel;
+import botto.xmpp.botto.xmpp.connector.channel.Channel;
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;

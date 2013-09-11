@@ -5,6 +5,9 @@ import botto.xmpp.BotManager;
 import botto.xmpp.BottoException;
 import botto.xmpp.Meters;
 import botto.xmpp.botto.xmpp.connector.ConnectorId;
+import botto.xmpp.botto.xmpp.connector.channel.ChannelContext;
+import botto.xmpp.botto.xmpp.connector.channel.ChannelContextListener;
+import botto.xmpp.botto.xmpp.connector.channel.ChannelEvent;
 import botto.xmpp.connectors.mock.MockConnector;
 import botto.xmpp.connectors.mock.MockConnectorConfiguration;
 import botto.xmpp.connectors.smack.SmackConnector;
@@ -15,6 +18,8 @@ import botto.xmpp.examples.bots.SpamBot;
 import botto.xmpp.service.reflection.AnnotatedBotObject;
 import ch.qos.logback.classic.Level;
 import com.codahale.metrics.JmxReporter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xmpp.packet.JID;
 
 import java.util.concurrent.Executors;
@@ -22,6 +27,8 @@ import java.util.concurrent.ScheduledExecutorService;
 
 
 public class ExampleEmbeddedBotServer {
+
+    private static final Logger Log = LoggerFactory.getLogger(ExampleEmbeddedBotServer.class);
 
     public static void main(String[] args) throws BottoException {
         final JmxReporter reporter = com.codahale.metrics.JmxReporter.forRegistry(Meters.Metrics).build();
@@ -33,6 +40,12 @@ public class ExampleEmbeddedBotServer {
         ScheduledExecutorService service = Executors.newScheduledThreadPool(10);
 
         BotManager botManager = BotManager.create();
+        botManager.addChannelEventListener(new ChannelContextListener() {
+            @Override
+            public void onChannelEvent(ChannelContext context, ChannelEvent event) {
+                Log.info("Event {} for {}", event, context);
+            }
+        });
 
         MockConnectorConfiguration configuration = new MockConnectorConfiguration("example.com");
         configuration.setDomain("example.com");

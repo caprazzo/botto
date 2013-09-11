@@ -2,6 +2,8 @@ package botto.xmpp.connectors.smack;
 
 import botto.xmpp.botto.xmpp.connector.*;
 
+import botto.xmpp.botto.xmpp.connector.channel.Channel;
+import botto.xmpp.botto.xmpp.connector.channel.ChannelEvent;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;

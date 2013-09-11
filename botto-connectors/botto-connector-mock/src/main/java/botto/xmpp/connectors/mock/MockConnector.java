@@ -1,6 +1,6 @@
 package botto.xmpp.connectors.mock;
 
-import botto.xmpp.botto.xmpp.connector.Channel;
+import botto.xmpp.botto.xmpp.connector.channel.Channel;
 import botto.xmpp.botto.xmpp.connector.Connector;
 import botto.xmpp.botto.xmpp.connector.ConnectorException;
 import org.xmpp.packet.Packet;

@@ -1,4 +1,4 @@
-import botto.xmpp.annotations.ConnectionInfo;
+import botto.xmpp.annotations.BotContext;
 import botto.xmpp.annotations.Context;
 import botto.xmpp.annotations.PacketOutput;
 import org.xmpp.packet.JID;
@@ -13,10 +13,10 @@ public class SayHelloBot {
     private PacketOutput output;
 
     @Context
-    private ConnectionInfo connectionInfo;
+    private BotContext botContext;
 
     public boolean isConnected() {
-        return connectionInfo.isConnected();
+        return botContext.isConnected();
     }
 
     /**

@@ -2,6 +2,10 @@ package botto.xmpp;
 
 import botto.xmpp.annotations.PacketOutput;
 import botto.xmpp.botto.xmpp.connector.*;
+import botto.xmpp.botto.xmpp.connector.channel.Channel;
+import botto.xmpp.botto.xmpp.connector.channel.ChannelContext;
+import botto.xmpp.botto.xmpp.connector.channel.ChannelContextListener;
+import botto.xmpp.botto.xmpp.connector.channel.ChannelEvent;
 import botto.xmpp.service.dispatcher.ListenableConfirmation;
 import botto.xmpp.utils.Packets;
 import com.google.common.util.concurrent.*;
@@ -66,9 +70,14 @@ public class BotManager implements Managed {
         }
     }
 
+    public void addChannelEventListener(ChannelContextListener listener) {
+        channels.addChannelContextListener(listener);
+
+    }
+
     public synchronized ConnectorId registerConnector(final Connector connector) throws BottoException {
         ConnectorId connectorId = connectors.addConnector(connector);
-        connector.addChannelListener(new ConnectorChannelListener(connector, connectorId));
+        connector.addChannelListener(new ConnectorChannelListener(this, connector, connectorId));
         Log.info("Registered connector {} with id {}", connector, connectorId);
         if (isStarted()) {
             startConnector(connector);
@@ -82,40 +91,40 @@ public class BotManager implements Managed {
         stopConnector(removed);
     }
 
-    public ListenableConfirmation addBot(final ConnectorId connectorId, final JID address, final AbstractBot bot) {
+    public ListenableFuture<ChannelContext> addBot(final ConnectorId connectorId, final JID address, final AbstractBot bot) {
         Log.info("Adding bot to {}::{}: {}", address, connectorId, bot);
-        final ListenableConfirmation confirmation = new ListenableConfirmation();
+        final SettableFuture<ChannelContext> result = SettableFuture.create();
         try {
             final Connector connector = connectors.getConnector(connectorId);
 
             // asynchronously open channel
             Log.debug("Opening channel for {}|{}", address, connector);
-            ListenableFuture<Channel> openChannel = openChannel(connector, address);
-            Futures.addCallback(openChannel, new FutureCallback<Channel>() {
+            ListenableFuture<ChannelContext> openChannel = openChannel(connector, address);
+            Futures.addCallback(openChannel, new FutureCallback<ChannelContext>() {
                 @Override
-                public void onSuccess(final Channel channel) {
+                public void onSuccess(final ChannelContext context) {
                     Log.debug("Channel {} opened for {}|{}", address, connector);
-                    channels.addChannel(channel, bot);
+                    channels.addChannel(context, bot);
                     bot.setPacketOutput(new PacketOutput() {
                         @Override
                         public void send(Packet packet) {
-                            BotManager.this.send(connector, channel, packet);
+                            BotManager.this.send(connector, context.getChannel(), packet);
                         }
                     });
-                    confirmation.setSuccess();
+                    result.set(context);
                 }
 
                 @Override
                 public void onFailure(Throwable t) {
                     Log.error("Failed to open channel for {}::{}: {}", address, connector, t);
-                    confirmation.setFailure(new BottoException(t, "Failed to open channel {0}, {1}, {2}", connectorId, address, bot));
+                    result.setException(new BottoException(t, "Failed to open channel {0}, {1}, {2}", connectorId, address, bot));
                 }
             });
         }
         catch(Exception ex) {
-            confirmation.setFailure(ex);
+            result.setException(ex);
         }
-        return confirmation;
+        return result;
     }
 
     public ListenableConfirmation removeBot(final ConnectorId connectorId, final JID address, final AbstractBot bot) {
@@ -174,7 +183,7 @@ public class BotManager implements Managed {
         });
     }
 
-    private void receive(final Connector connector, final Channel channel, final Packet packet, final Meters.ConnectorMetrics meter) {
+    void receive(final Connector connector, final Channel channel, final Packet packet, final Meters.ConnectorMetrics meter) {
         Log.debug("Received packet on {}::{}: {}", channel, connector, packet);
 
         final AbstractBot bot = channels.getBot(channel);
@@ -210,11 +219,11 @@ public class BotManager implements Managed {
         });
     }
 
-    private ListenableFuture<Channel> openChannel(final Connector connector, final JID address) {
-        return executor.submit(new Callable<Channel>() {
+    private ListenableFuture<ChannelContext> openChannel(final Connector connector, final JID address) {
+        return executor.submit(new Callable<ChannelContext>() {
             @Override
-            public Channel call() throws Exception {
-                Channel channel = connector.openChannel(address);
+            public ChannelContext call() throws Exception {
+                ChannelContext channel = connector.openChannel(address);
                 return channel;
             }
         });
@@ -245,30 +254,7 @@ public class BotManager implements Managed {
         }
     }
 
-    private class ConnectorChannelListener implements ChannelListener {
-
-        private final Meters.ConnectorMetrics meter;
-        private final Connector connector;
-
-        public ConnectorChannelListener(Connector connector, ConnectorId connectorId) {
-            this.connector = connector;
-            this.meter = Meters.connectors.forConnector(connectorId);
-        }
-
-        @Override
-        public void onIncomingPacket(Channel channel, Packet packet) {
-            meter.countIncoming(packet);
-            receive(connector, channel, packet, this.meter);
-        }
-
-        @Override
-        public void onOutgoingPacket(Channel channel, Packet packet) {
-            meter.countOutgoing(packet);
-        }
-
-        @Override
-        public void channelEvent(ChannelEvent event) {
-            Log.info("{}", event);
-        }
+    public void setChannelEvent(ChannelEvent event) {
+        channels.setChannelEvent(event);
     }
 }

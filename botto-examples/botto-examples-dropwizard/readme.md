@@ -20,10 +20,10 @@ public class SayHelloBot {
     private PacketOutput output;
 
     @Context
-    private ConnectionInfo connectionInfo;
+    private ConnectionInfo botContext;
 
     public boolean isConnected() {
-        return connectionInfo.isConnected();
+        return botContext.isConnected();
     }
 
     /**

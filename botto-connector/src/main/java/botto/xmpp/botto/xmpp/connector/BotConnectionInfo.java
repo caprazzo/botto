@@ -1,10 +1,10 @@
 package botto.xmpp.botto.xmpp.connector;
 
-import botto.xmpp.annotations.ConnectionInfo;
+import botto.xmpp.annotations.BotContext;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
-public final class BotConnectionInfo implements ConnectionInfo {
+public final class BotConnectionInfo implements BotContext {
 
     private final AtomicBoolean isConnected = new AtomicBoolean();
 

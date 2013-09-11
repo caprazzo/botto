@@ -1,6 +1,6 @@
 package botto.xmpp.botto.xmpp.connector;
 
-import org.xmpp.packet.JID;
+import botto.xmpp.botto.xmpp.connector.channel.Channel;
 
 /**
  * Represents the binding between a Bot and the underlying Connector

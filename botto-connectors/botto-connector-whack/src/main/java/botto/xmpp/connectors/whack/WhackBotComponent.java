@@ -1,7 +1,6 @@
 package botto.xmpp.connectors.whack;
 
 import botto.xmpp.botto.xmpp.connector.BotConnectionInfo;
-import botto.xmpp.botto.xmpp.connector.Channel;
 import botto.xmpp.botto.xmpp.connector.ConnectorException;
 import com.google.common.base.Objects;
 import org.slf4j.Logger;

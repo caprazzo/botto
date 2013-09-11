@@ -1,8 +1,7 @@
 package botto.xmpp.connectors.whack;
 
-import botto.xmpp.botto.xmpp.connector.Channel;
+import botto.xmpp.botto.xmpp.connector.channel.Channel;
 import botto.xmpp.botto.xmpp.connector.Connector;
-import botto.xmpp.botto.xmpp.connector.BotConnection;
 import botto.xmpp.botto.xmpp.connector.ConnectorException;
 import org.jivesoftware.whack.ExternalComponentManager;
 import org.slf4j.Logger;

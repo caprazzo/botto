@@ -1,4 +1,4 @@
-package botto.xmpp.botto.xmpp.connector;
+package botto.xmpp.botto.xmpp.connector.channel;
 
 public class ChannelEvent {
 

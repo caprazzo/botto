@@ -1,5 +1,9 @@
 package botto.xmpp.botto.xmpp.connector;
 
+import botto.xmpp.botto.xmpp.connector.channel.Channel;
+import botto.xmpp.botto.xmpp.connector.channel.ChannelContext;
+import botto.xmpp.botto.xmpp.connector.channel.ChannelEvent;
+import botto.xmpp.botto.xmpp.connector.channel.ChannelListener;
 import com.google.common.base.Preconditions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,11 +38,12 @@ public abstract class Connector<TConfig extends ConnectorConfiguration, TConnect
         this.name = configuration.getName();
     }
 
-    public Channel openChannel(JID address) throws ConnectorException {
+    public ChannelContext openChannel(JID address) throws ConnectorException {
         Channel channel = Channel.from(address);
+        ChannelContext context = ChannelContext.of(channel);
         setChannelEvent(ChannelEvent.opening(channel));
         doOpenChannel(channel);
-        return channel;
+        return context;
     }
 
     public void closeChannel(Channel channel) throws ConnectorException {
@@ -112,6 +117,6 @@ public abstract class Connector<TConfig extends ConnectorConfiguration, TConnect
     }
 
     protected void setChannelEvent(ChannelEvent event) {
-        channelListener.channelEvent(event);
+        channelListener.onChannelEvent(event);
     }
 }

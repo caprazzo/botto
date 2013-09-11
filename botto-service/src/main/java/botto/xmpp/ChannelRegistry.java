@@ -1,7 +1,11 @@
 package botto.xmpp;
 
-import botto.xmpp.botto.xmpp.connector.Channel;
+import botto.xmpp.botto.xmpp.connector.channel.Channel;
+import botto.xmpp.botto.xmpp.connector.channel.ChannelContext;
+import botto.xmpp.botto.xmpp.connector.channel.ChannelContextListener;
+import botto.xmpp.botto.xmpp.connector.channel.ChannelEvent;
 import com.google.common.base.Preconditions;
+import org.apache.commons.lang3.event.EventListenerSupport;
 import org.xmpp.packet.JID;
 
 import java.util.concurrent.ConcurrentHashMap;
@@ -11,12 +15,15 @@ class ChannelRegistry {
     // TODO: only use address.toBareJID for indexing
     private final ConcurrentHashMap<JID, ChannelBot> channels = new ConcurrentHashMap<JID, ChannelBot>();
 
-    public void addChannel(Channel channel, AbstractBot bot) {
-        Preconditions.checkNotNull(channel);
+    private EventListenerSupport<ChannelContextListener> listeners =
+            EventListenerSupport.create(ChannelContextListener.class);
+
+    public void addChannel(ChannelContext context, AbstractBot bot) {
+        Preconditions.checkNotNull(context);
         Preconditions.checkNotNull(bot);
-        ChannelBot found = channels.putIfAbsent(channel.getAddress(), new ChannelBot(channel, bot));
+        ChannelBot found = channels.putIfAbsent(context.getChannel().getAddress(), new ChannelBot(context, bot));
         if (found != null) {
-            throw new BottoRuntimeException("There is already a bot for channel {0}: {1}", channel, bot);
+            throw new BottoRuntimeException("There is already a bot for channel {0}: {1}", context, bot);
         }
     }
 
@@ -32,7 +39,7 @@ class ChannelRegistry {
         Preconditions.checkNotNull(address);
         ChannelBot channelBot = channels.get(address);
         if (channelBot != null) {
-            return channelBot.getChannel();
+            return channelBot.getContext().getChannel();
         }
         throw new BottoRuntimeException("No channel found for address {0}", address);
     }
@@ -55,17 +62,31 @@ class ChannelRegistry {
         return null;
     }
 
+    public void setChannelEvent(ChannelEvent event) {
+        Preconditions.checkNotNull(event);
+        ChannelBot entry = channels.get(event.getChannel().getAddress());
+        if (entry == null) {
+            return;
+        }
+        entry.getContext().setEvent(event);
+        listeners.fire().onChannelEvent(entry.getContext(), event);
+    }
+
+    public void addChannelContextListener(ChannelContextListener listener) {
+        listeners.addListener(listener);
+    }
+
     private static class ChannelBot {
-        private final Channel channel;
+        private final ChannelContext context;
         private final AbstractBot bot;
 
-        public ChannelBot(Channel channel, AbstractBot bot) {
-            this.channel = channel;
+        public ChannelBot(ChannelContext context, AbstractBot bot) {
+            this.context = context;
             this.bot = bot;
         }
 
-        private Channel getChannel() {
-            return channel;
+        private ChannelContext getContext() {
+            return context;
         }
 
         private AbstractBot getBot() {

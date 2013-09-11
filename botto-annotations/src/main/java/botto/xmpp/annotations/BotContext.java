@@ -1,6 +1,6 @@
 package botto.xmpp.annotations;
 
-public interface ConnectionInfo {
-
+public interface BotContext {
     public boolean isConnected();
+
 }

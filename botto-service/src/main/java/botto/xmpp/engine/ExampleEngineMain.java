@@ -5,6 +5,7 @@ import botto.xmpp.annotations.Context;
 import botto.xmpp.annotations.Receive;
 import botto.xmpp.botto.xmpp.connector.ConnectorException;
 import botto.xmpp.botto.xmpp.connector.ConnectorId;
+import botto.xmpp.botto.xmpp.connector.channel.ChannelContext;
 import botto.xmpp.connectors.smack.SmackConnector;
 import botto.xmpp.connectors.smack.SmackConnectorConfiguration;
 import botto.xmpp.connectors.whack.WhackConnector;
@@ -49,9 +50,9 @@ public class ExampleEngineMain {
 
         {
             AbstractBot bot = makeBot(new ExampleBot());
-            Futures.addCallback(connectionManager.addBot(smackConnectorId, new JID("bot@caprazzi.net"), bot), new FutureCallback<Boolean>() {
+            Futures.addCallback(connectionManager.addBot(smackConnectorId, new JID("bot@caprazzi.net"), bot), new FutureCallback<ChannelContext>() {
                 @Override
-                public void onSuccess(Boolean result) {
+                public void onSuccess(ChannelContext result) {
                     // bot added
                 }
 

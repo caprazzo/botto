@@ -1,8 +1,7 @@
 package botto.xmpp;
 
-import botto.xmpp.annotations.ConnectionInfo;
+import botto.xmpp.annotations.BotContext;
 import botto.xmpp.annotations.PacketOutput;
-import botto.xmpp.Bot;
 import org.xmpp.packet.Packet;
 
 public abstract class AbstractBot implements Bot {
@@ -11,8 +10,8 @@ public abstract class AbstractBot implements Bot {
         doSetPacketOutput(output);
     }
 
-    public final void setConnectionInfo(ConnectionInfo connectionInfo) {
-        doSetConnectionInfo(connectionInfo);
+    public final void setConnectionInfo(BotContext botContext) {
+        doSetConnectionInfo(botContext);
     }
 
     @Override
@@ -24,5 +23,5 @@ public abstract class AbstractBot implements Bot {
 
     protected abstract Packet doReceive(Packet packet);
 
-    protected abstract void doSetConnectionInfo(ConnectionInfo connectionInfo);
+    protected abstract void doSetConnectionInfo(BotContext botContext);
 }
