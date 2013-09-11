@@ -96,7 +96,7 @@ public class ChannelEvent {
 
     @Override
     public String toString() {
-        return "ChannelEvent(" + channel + ", " + status + ", " + message + ")";
+        return "Event(" + channel + ", " + status + ", message='" + message + "', error=" + error + ")";
     }
 
 }

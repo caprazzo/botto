@@ -10,8 +10,8 @@ public abstract class AbstractBot implements Bot {
         doSetPacketOutput(output);
     }
 
-    public final void setConnectionInfo(BotContext botContext) {
-        doSetConnectionInfo(botContext);
+    public final void setContext(BotContext botContext) {
+        doSetcontext(botContext);
     }
 
     @Override
@@ -23,5 +23,5 @@ public abstract class AbstractBot implements Bot {
 
     protected abstract Packet doReceive(Packet packet);
 
-    protected abstract void doSetConnectionInfo(BotContext botContext);
+    protected abstract void doSetcontext(BotContext botContext);
 }

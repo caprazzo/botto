@@ -15,7 +15,7 @@ import botto.xmpp.connectors.smack.SmackConnectorConfiguration;
 
 import botto.xmpp.examples.bots.EchoBot;
 import botto.xmpp.examples.bots.SpamBot;
-import botto.xmpp.service.reflection.AnnotatedBotObject;
+import botto.xmpp.reflection.AnnotatedBotObject;
 import ch.qos.logback.classic.Level;
 import com.codahale.metrics.JmxReporter;
 import org.slf4j.Logger;
@@ -24,6 +24,7 @@ import org.xmpp.packet.JID;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 
 public class ExampleEmbeddedBotServer {
@@ -35,7 +36,7 @@ public class ExampleEmbeddedBotServer {
         reporter.start();
 
         ch.qos.logback.classic.Logger root = (ch.qos.logback.classic.Logger) org.slf4j.LoggerFactory.getLogger(ch.qos.logback.classic.Logger.ROOT_LOGGER_NAME);
-        root.setLevel(Level.INFO);
+        root.setLevel(Level.DEBUG);
 
         ScheduledExecutorService service = Executors.newScheduledThreadPool(10);
 
@@ -66,14 +67,17 @@ public class ExampleEmbeddedBotServer {
         SpamBot spamBot = new SpamBot(echoAddress);
         AbstractBot spamAnnotatedBot = AnnotatedBotObject.from(spamBot).get();
 
+
         botManager.addBot(connectorId, spamAddress, spamAnnotatedBot);
+
+
 
         EchoBot echoBot = new EchoBot();
         AbstractBot echo = AnnotatedBotObject.from(echoBot).get();
         botManager.addBot(connectorId, echoAddress, echo);
 
         botManager.start();
+        service.scheduleAtFixedRate(spamBot, 0, 1, TimeUnit.SECONDS);
 
-        //service.scheduleAtFixedRate(spamBot, 1, 5, TimeUnit.SECONDS);
     }
 }

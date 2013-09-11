@@ -1,5 +1,6 @@
 package botto.xmpp;
 
+import botto.xmpp.annotations.BotContext;
 import botto.xmpp.annotations.PacketOutput;
 import botto.xmpp.botto.xmpp.connector.*;
 import botto.xmpp.botto.xmpp.connector.channel.Channel;
@@ -93,9 +94,13 @@ public class BotManager implements Managed {
 
     public ListenableFuture<ChannelContext> addBot(final ConnectorId connectorId, final JID address, final AbstractBot bot) {
         Log.info("Adding bot to {}::{}: {}", address, connectorId, bot);
+        // TODO: abstractBot should be pre-initialized with a BotContext
+        final ChannelBotContext botcontext = new ChannelBotContext(null);
+        bot.setContext(botcontext);
         final SettableFuture<ChannelContext> result = SettableFuture.create();
         try {
             final Connector connector = connectors.getConnector(connectorId);
+
 
             // asynchronously open channel
             Log.debug("Opening channel for {}|{}", address, connector);
@@ -104,6 +109,7 @@ public class BotManager implements Managed {
                 @Override
                 public void onSuccess(final ChannelContext context) {
                     Log.debug("Channel {} opened for {}|{}", address, connector);
+                    botcontext.setChannelContext(context);
                     channels.addChannel(context, bot);
                     bot.setPacketOutput(new PacketOutput() {
                         @Override

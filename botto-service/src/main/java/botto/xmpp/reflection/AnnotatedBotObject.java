@@ -1,4 +1,4 @@
-package botto.xmpp.service.reflection;
+package botto.xmpp.reflection;
 
 import botto.xmpp.annotations.BotContext;
 import botto.xmpp.AbstractBot;
@@ -108,16 +108,17 @@ public class AnnotatedBotObject extends AbstractBot {
             Log.debug("Injecting {} to field {}", value, field);
 
             if (!field.getType().isAssignableFrom(value.getClass())) {
-                Log.debug("Injected value is not compatible with field {}", field);
-                return;
+                Log.debug("Injected value {} is not compatible with field {}", value.getClass(), field.getType());
+                continue;
             }
 
             try {
                 field.set(obj, value);
+                Log.debug("Injected {} to field {}", value.getClass(), field);
+                return;
             } catch (IllegalAccessException e) {
                 throw new RuntimeException(e);
             }
-
         }
     }
 
@@ -128,7 +129,7 @@ public class AnnotatedBotObject extends AbstractBot {
     }
 
     @Override
-    protected void doSetConnectionInfo(BotContext botContext) {
+    protected void doSetcontext(BotContext botContext) {
         Preconditions.checkNotNull(botContext, "botContext can't be null");
         inject(botContext);
     }

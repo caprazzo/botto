@@ -1,4 +1,4 @@
-package botto.xmpp.service.reflection;
+package botto.xmpp.reflection;
 
 import com.google.common.base.Objects;
 import com.google.common.base.Optional;
