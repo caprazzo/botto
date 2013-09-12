@@ -1,19 +1,19 @@
-## Botto - XMPP Bot Service
+## Botto - XMPP Infrastructure Components
 
 [![Build Status](https://travis-ci.org/mcaprari/botto.png?branches=snapshot)](https://travis-ci.org/mcaprari/botto)
 [![Coverage Status](https://coveralls.io/repos/mcaprari/botto/badge.png?branch=snapshot)](https://coveralls.io/r/mcaprari/botto?branch=snapshot)
 
-Botto is a Java framework for easy development on XMPP Bots
 
+Botto is a collection of components to build messaging infrastructures over XMPP.
 
 Botto has out-of-the-box support for:
 * annotation-only pojo bots
 * multiple single-bot per instance (bot@example.com)
 * multiple bot-component per instance (bot@component.example.com)
+* connection to multiple XMPP servers per instance
+* Deep realtime metrics via JMX
 
-For a working example, see: https://github.com/mcaprari/botto/blob/master/botto-service/src/test/java/net/caprazzi/xmpp/EchoBotService.java
-
-For integration with Dropwizard, see: https://github.com/mcaprari/botto/tree/master/botto-examples/botto-examples-dropwizard
+For a working example, see: https://github.com/mcaprari/botto/blob/master/botto-examples/botto-examples-embedded/src/main/java/botto/xmpp/examples/embedded/server/ExampleEmbeddedBotServer.java
 
 ### Quick start:
 
@@ -35,48 +35,66 @@ Import using maven:
         <dependency>
             <groupId>botto.xmpp</groupId>
             <artifactId>botto-service</artifactId>
-            <version>0.6.2</version>
+            <version>0.7.0-SNAPSHOT</version>
         </dependency>
     </dependencies>
 ```
 
-Create a new botService:
+Write your first embbedded bot system:
 
 ```java
-public class EchoBotService extends AbstractBotService {
+public class ExampleEmbeddedBotServer {    
+    public static void main(String[] args) throws BottoException {
+        // start the JMX reporter - use Visual VM to see a number of runtime metrics
+        final JmxReporter reporter = com.codahale.metrics.JmxReporter.forRegistry(Meters.Metrics).build();
+        reporter.start();
+            
+        BotManager botManager = BotManager.create();
 
-    public static void main(String[] main) {
-        BotServiceConfiguration configuration = new BotServiceConfiguration();
-        configuration.setHost("localhost");
-        configuration.setPort(5275);
-        configuration.setSecret("secret");
-        new EchoBotService().run(configuration);
-    }
+        // listen to all changes to all channel events
+        botManager.addChannelEventListener(new ChannelContextListener() {
+            @Override
+            public void onChannelEvent(ChannelContext context, ChannelEvent event) {
+                Log.info("Event {} for {}", event, context);
+            }
+        });       
 
-    @Override
-    public void run(ServiceEnvironment environment) {
+        // create a new connector
+        SmackConnectorConfiguration smackConfiguration = new SmackConnectorConfiguration();
+        smackConfiguration.setHost("localhost");
+        smackConfiguration.setPort(5222);
+        smackConfiguration.setSecret("secret");
+
+        SmackConnector smackConnector = new SmackConnector(smackConfiguration);
+
+        // activate the connector
+        ConnectorId connectorId = botManager.registerConnector(smackConnector);
+
+        JID echoAddress = new JID("echo@caprazzi.net");
+        JID spamAddress = new JID("spam@caprazzi.net");
+
+        // create a concrete bot from
+        // an annotated spam bot (see https://github.com/mcaprari/botto/blob/master/botto-examples/botto-examples-bots/src/main/java/botto/xmpp/examples/bots/SpamBot.java)
+        SpamBot spamBot = new SpamBot(echoAddress);
+        AbstractBot spamAnnotatedBot = AnnotatedBotObject.from(spamBot).get();
+
+        botManager.addBot(connectorId, spamAddress, spamAnnotatedBot);
+
+        // create a concrete bot from
+        // an annotated echo bot (see https://github.com/mcaprari/botto/blob/master/botto-examples/botto-examples-bots/src/main/java/botto/xmpp/examples/bots/EchoBot.java)
         EchoBot echoBot = new EchoBot();
+        AbstractBot echo = AnnotatedBotObject.from(echoBot).get();
+        botManager.addBot(connectorId, echoAddress, echo);
 
-        // setup echo bot to listen at echo@subdomain1.yourdomain.com
-        SubdomainEnvironment subdomain = environment.getSubdomain("subdomain1");
-        subdomain.addBot(echoBot, "echo");
+        botManager.start();
 
-        RelayBot relayBot = new RelayBot();
-
-        // setup echo bot to listen at relay@subdomain2.yourdomain.com
-        SubdomainEnvironment subdomain2 = environment.getSubdomain("subdomain2");
-        subdomain2.addBot(relayBot, "relay");
-
-        // setup relay bot to listen at echo@yourdomain.com
-        // (you need to create a matching user in your xmpp server)
-        BotEnvironment echoSingleBotEnv = environment.getBot("echo");
-        echoSingleBotEnv.setBot(echoBot);
-        echoSingleBotEnv.setSecret("secret");
+        // every second, execute the SpamBot
+        service.scheduleAtFixedRate(spamBot, 0, 1, TimeUnit.SECONDS);
     }
 }
 ```
 
-Echo Bot:
+## Echo Bot Example:
 
 ```java
 /**
@@ -94,7 +112,7 @@ public class EchoBot {
 }
 ```
 
-Relay Bot:
+## Relay Bot Example:
 
 ```java
 /**
