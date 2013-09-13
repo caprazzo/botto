@@ -59,6 +59,7 @@ public class AnnotatedBotObjectTest {
                 objectAssignment(new MessageRespondMessageBot()),
                 objectAssignment(new PresenceRespondPresenceBot()),
                 objectAssignment(new IQRespondIQBot()),
+                objectAssignment(new MultiRespondMultiBot()),
                 objectAssignment(new TaggedOutputBot()),
                 objectAssignment(new TaggedBotContextBot())
             });
@@ -157,6 +158,30 @@ public class AnnotatedBotObjectTest {
     private static class MessageRespondMessageBot {
         @Receive
         public Packet onMessage(Packet packet) {
+            return null;
+        }
+    }
+
+
+    // one method for each packet type
+    private static class MultiRespondMultiBot {
+        @Receive
+        public Packet onPacket(Packet packet) {
+            return null;
+        }
+
+        @Receive
+        public Message onPacket(Message packet) {
+            return null;
+        }
+
+        @Receive
+        public Presence onPacket(Presence packet) {
+            return null;
+        }
+
+        @Receive
+        public IQ onPacket(IQ packet) {
             return null;
         }
     }
