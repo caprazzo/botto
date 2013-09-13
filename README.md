@@ -1,7 +1,7 @@
 ## Botto - XMPP Infrastructure Components
 
-[![Build Status](https://travis-ci.org/mcaprari/botto.png?branches=snapshot)](https://travis-ci.org/mcaprari/botto)
-[![Coverage Status](https://coveralls.io/repos/mcaprari/botto/badge.png?branch=snapshot)](https://coveralls.io/r/mcaprari/botto?branch=snapshot)
+[![Build Status](https://travis-ci.org/mcaprari/botto.png)](https://travis-ci.org/mcaprari/botto)
+[![Coverage Status](https://coveralls.io/repos/mcaprari/botto/badge.png?)](https://coveralls.io/r/mcaprari/botto)
 
 
 Botto is a collection of components to build messaging infrastructures over XMPP.
