@@ -1,5 +1,7 @@
 package botto.xmpp.botto.xmpp.connector.channel;
 
+import com.google.common.base.Objects;
+
 public class ChannelContext {
     private final Channel channel;
     private ChannelStatus status = ChannelStatus.Opening;
@@ -22,5 +24,13 @@ public class ChannelContext {
 
     public void setEvent(ChannelEvent event) {
         status = event.getStatus();
+    }
+
+    @Override
+    public String toString() {
+        return Objects.toStringHelper(this)
+            .addValue(channel.getAddress())
+            .addValue(status)
+            .toString();
     }
 }

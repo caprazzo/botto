@@ -36,7 +36,7 @@ public class ExampleEmbeddedBotServer {
         reporter.start();
 
         ch.qos.logback.classic.Logger root = (ch.qos.logback.classic.Logger) org.slf4j.LoggerFactory.getLogger(ch.qos.logback.classic.Logger.ROOT_LOGGER_NAME);
-        root.setLevel(Level.DEBUG);
+        root.setLevel(Level.INFO);
 
         ScheduledExecutorService service = Executors.newScheduledThreadPool(10);
 
@@ -55,7 +55,7 @@ public class ExampleEmbeddedBotServer {
         SmackConnectorConfiguration smackConfiguration = new SmackConnectorConfiguration();
         smackConfiguration.setHost("localhost");
         smackConfiguration.setPort(5222);
-        smackConfiguration.setSecret("secret");
+        smackConfiguration.setSecret("secret-x");
 
         SmackConnector smackConnector = new SmackConnector(smackConfiguration);
 
@@ -67,10 +67,7 @@ public class ExampleEmbeddedBotServer {
         SpamBot spamBot = new SpamBot(echoAddress);
         AbstractBot spamAnnotatedBot = AnnotatedBotObject.from(spamBot).get();
 
-
         botManager.addBot(connectorId, spamAddress, spamAnnotatedBot);
-
-
 
         EchoBot echoBot = new EchoBot();
         AbstractBot echo = AnnotatedBotObject.from(echoBot).get();
@@ -78,6 +75,5 @@ public class ExampleEmbeddedBotServer {
 
         botManager.start();
         service.scheduleAtFixedRate(spamBot, 0, 1, TimeUnit.SECONDS);
-
     }
 }

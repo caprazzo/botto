@@ -35,7 +35,7 @@ class ConnectorChannelListener implements ChannelListener {
 
     @Override
     public void onChannelEvent(ChannelEvent event) {
-        Log.info("{}", event);
+        Log.debug("{}", event);
         manager.setChannelEvent(event);
     }
 }

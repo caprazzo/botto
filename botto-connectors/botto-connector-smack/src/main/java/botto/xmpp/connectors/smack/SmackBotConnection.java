@@ -205,8 +205,8 @@ class SmackBotConnection implements BotConnection {
                     future.set(true);
                 }
                 catch (XMPPException ex) {
-                    Log.error("Could not login as '{}'. Error: {}", channel.getAddress().getNode(), ex.getMessage());
-                    future.setException(ex);
+                    connector.channelEvent(ChannelEvent.disconnected(channel, "Login failed", ex));
+                    future.setException(new ConnectorException("Could not login as '{}'. Error: {}", channel.getAddress().getNode(), ex.getMessage()));
                 }
 
                 Log.trace("exit connect thread");
