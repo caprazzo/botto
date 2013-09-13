@@ -1,6 +1,5 @@
 package botto.xmpp;
 
-import botto.xmpp.annotations.BotContext;
 import botto.xmpp.annotations.PacketOutput;
 import botto.xmpp.botto.xmpp.connector.*;
 import botto.xmpp.botto.xmpp.connector.channel.Channel;

@@ -55,7 +55,7 @@ public class ExampleEmbeddedBotServer {
         SmackConnectorConfiguration smackConfiguration = new SmackConnectorConfiguration();
         smackConfiguration.setHost("localhost");
         smackConfiguration.setPort(5222);
-        smackConfiguration.setSecret("secret-x");
+        smackConfiguration.setSecret("secret");
 
         SmackConnector smackConnector = new SmackConnector(smackConfiguration);
 
