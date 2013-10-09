@@ -20,6 +20,8 @@ class ChannelRegistry {
 
     public void addChannel(ChannelContext context, AbstractBot bot) {
         Preconditions.checkNotNull(context);
+        Preconditions.checkNotNull(context.getChannel());
+        Preconditions.checkNotNull(context.getChannel().getAddress());
         Preconditions.checkNotNull(bot);
         ChannelBot found = channels.putIfAbsent(context.getChannel().getAddress(), new ChannelBot(context, bot));
         if (found != null) {

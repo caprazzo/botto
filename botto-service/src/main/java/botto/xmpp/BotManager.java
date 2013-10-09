@@ -8,6 +8,7 @@ import botto.xmpp.botto.xmpp.connector.channel.ChannelContextListener;
 import botto.xmpp.botto.xmpp.connector.channel.ChannelEvent;
 import botto.xmpp.service.dispatcher.ListenableConfirmation;
 import botto.xmpp.utils.Packets;
+import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
 import com.google.common.util.concurrent.*;
 import net.caprazzi.reusables.common.Managed;
@@ -104,25 +105,51 @@ public class BotManager implements Managed {
         // TODO: abstractBot should be pre-initialized with a BotContext
         final ChannelBotContext botcontext = new ChannelBotContext(null);
         bot.setContext(botcontext);
-        final SettableFuture<ChannelContext> result = SettableFuture.create();
         try {
             final Connector connector = connectors.getConnector(connectorId);
+
+            Preconditions.checkNotNull(connector);
 
             // asynchronously open channel
             Log.debug("Opening channel for {}|{}", address, connector);
             ListenableFuture<ChannelContext> openChannel = openChannel(connector, address);
+
+            Function<ChannelContext, ChannelContext> setupChannelFunction = new Function<ChannelContext, ChannelContext>() {
+                @Override
+                public ChannelContext apply(final ChannelContext context)  {
+                    Log.debug("Channel {} opened for {}|{}", context, address, connector);
+                    botcontext.setChannelContext(context);
+                    channels.addChannel(context, bot);
+                    bot.setPacketOutput(new ConnectorPacketOutput(BotManager.this, connector, context.getChannel()));
+                    return context;
+                }
+            };
+
+            ListenableFuture<ChannelContext> opened = Futures.transform(openChannel, setupChannelFunction);
+
+            Futures.addCallback(opened, new FutureCallback<ChannelContext>() {
+                @Override
+                public void onSuccess(ChannelContext context) {
+                    Log.debug("Channel {} opened for {}|{}", context, address, connector);
+                }
+
+                @Override
+                public void onFailure(Throwable t) {
+                    Log.error("Failed to open channel for {}::{}: {}", address, connector, t);
+                    t.printStackTrace();
+                }
+            });
+
+            return opened;
+
+            /*
             Futures.addCallback(openChannel, new FutureCallback<ChannelContext>() {
                 @Override
                 public void onSuccess(final ChannelContext context) {
                     Log.debug("Channel {} opened for {}|{}", context, address, connector);
                     botcontext.setChannelContext(context);
                     channels.addChannel(context, bot);
-                    bot.setPacketOutput(new PacketOutput() {
-                        @Override
-                        public void send(Packet packet) {
-                            BotManager.this.send(connector, context.getChannel(), packet);
-                        }
-                    });
+                    bot.setPacketOutput(new ConnectorPacketOutput(BotManager.this, connector, context.getChannel()));
                     result.set(context);
                 }
 
@@ -132,11 +159,12 @@ public class BotManager implements Managed {
                     result.setException(new BottoException(t, "Failed to open channel {0}, {1}, {2}", connectorId, address, bot));
                 }
             });
+            */
+
         }
         catch(Exception ex) {
-            result.setException(ex);
+            return Futures.immediateFailedFuture(ex);
         }
-        return result;
     }
 
     public ListenableConfirmation removeBot(final ConnectorId connectorId, final JID address, final AbstractBot bot) {
@@ -166,12 +194,14 @@ public class BotManager implements Managed {
         return confirmation;
     }
 
-    private void send(final Connector connector, final Channel channel, final Packet packet) {
+    // TODO: return a future so any error can easily be reported back
+    void send(final Connector connector, final Channel channel, final Packet packet) {
         Log.debug("Sending packet to {}::{}: {}", channel, connector, packet);
         ListenableFuture<?> send = executor.submit(new Runnable() {
             public void run() {
                 try {
                     // TODO: mind that not all connectors are thread safe
+                    // TODO: prepare packet for sending
                     connector.send(channel, packet); //Packets.preparePacketForSending(channel, packet));
                 } catch (ConnectorException e) {
                     throw new BottoRuntimeException(e, "Exception while submitting to channel {0}. packet {1}", channel, packet);
@@ -269,5 +299,28 @@ public class BotManager implements Managed {
 
     public void setChannelEvent(ChannelEvent event) {
         channels.setChannelEvent(event);
+    }
+
+    public static class ConnectorPacketOutput implements PacketOutput {
+
+        private final BotManager manager;
+        private final Connector connector;
+        private final Channel channel;
+
+        public ConnectorPacketOutput(BotManager manager, Connector connector, Channel channel) {
+
+            Preconditions.checkNotNull(manager);
+            Preconditions.checkNotNull(connector);
+            Preconditions.checkNotNull(channel);
+
+            this.manager = manager;
+            this.connector = connector;
+            this.channel = channel;
+        }
+
+        @Override
+        public void send(Packet packet) {
+           manager.send(connector, channel, packet);
+        }
     }
 }
