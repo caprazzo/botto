@@ -18,6 +18,7 @@ import botto.xmpp.examples.bots.SpamBot;
 import botto.xmpp.reflection.AnnotatedBotObject;
 import ch.qos.logback.classic.Level;
 import com.codahale.metrics.JmxReporter;
+import com.google.common.util.concurrent.ListenableFuture;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xmpp.packet.JID;
@@ -71,7 +72,7 @@ public class ExampleEmbeddedBotServer {
 
         EchoBot echoBot = new EchoBot();
         AbstractBot echo = AnnotatedBotObject.from(echoBot).get();
-        botManager.addBot(connectorId, echoAddress, echo);
+        ListenableFuture<ChannelContext> channelContextListenableFuture = botManager.addBot(connectorId, echoAddress, echo);
 
         botManager.start();
         service.scheduleAtFixedRate(spamBot, 0, 1, TimeUnit.SECONDS);

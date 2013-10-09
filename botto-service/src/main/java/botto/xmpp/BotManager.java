@@ -8,6 +8,7 @@ import botto.xmpp.botto.xmpp.connector.channel.ChannelContextListener;
 import botto.xmpp.botto.xmpp.connector.channel.ChannelEvent;
 import botto.xmpp.service.dispatcher.ListenableConfirmation;
 import botto.xmpp.utils.Packets;
+import com.google.common.base.Preconditions;
 import com.google.common.util.concurrent.*;
 import net.caprazzi.reusables.common.Managed;
 import net.caprazzi.reusables.threading.ExecutorUtils;
@@ -17,6 +18,7 @@ import org.xmpp.packet.JID;
 import org.xmpp.packet.Packet;
 
 import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
@@ -28,14 +30,20 @@ public class BotManager implements Managed {
     private final ConnectorRegistry connectors = new ConnectorRegistry();
 
     // executes connector.openChannel, connector.closeChannel, connector.send, bot.receive
-    private final ListeningExecutorService executor = MoreExecutors.listeningDecorator(Executors.newCachedThreadPool());
+    private final ListeningExecutorService executor;
 
     private boolean started;
 
-    private BotManager() { }
+    private BotManager(ExecutorService executorService) {
+        executor = MoreExecutors.listeningDecorator(executorService);
+    }
 
     public static BotManager create() {
-        return new BotManager();
+        return new BotManager(Executors.newSingleThreadExecutor());
+    }
+
+    protected static BotManager create(ExecutorService executorService) {
+        return new BotManager(executorService);
     }
 
     public boolean isStarted() {
@@ -100,14 +108,13 @@ public class BotManager implements Managed {
         try {
             final Connector connector = connectors.getConnector(connectorId);
 
-
             // asynchronously open channel
             Log.debug("Opening channel for {}|{}", address, connector);
             ListenableFuture<ChannelContext> openChannel = openChannel(connector, address);
             Futures.addCallback(openChannel, new FutureCallback<ChannelContext>() {
                 @Override
                 public void onSuccess(final ChannelContext context) {
-                    Log.debug("Channel {} opened for {}|{}", address, connector);
+                    Log.debug("Channel {} opened for {}|{}", context, address, connector);
                     botcontext.setChannelContext(context);
                     channels.addChannel(context, bot);
                     bot.setPacketOutput(new PacketOutput() {
@@ -165,7 +172,7 @@ public class BotManager implements Managed {
             public void run() {
                 try {
                     // TODO: mind that not all connectors are thread safe
-                    connector.send(channel, Packets.preparePacketForSending(channel, packet));
+                    connector.send(channel, packet); //Packets.preparePacketForSending(channel, packet));
                 } catch (ConnectorException e) {
                     throw new BottoRuntimeException(e, "Exception while submitting to channel {0}. packet {1}", channel, packet);
                 }
@@ -229,6 +236,7 @@ public class BotManager implements Managed {
             @Override
             public ChannelContext call() throws Exception {
                 ChannelContext channel = connector.openChannel(address);
+                Preconditions.checkNotNull(channel);
                 return channel;
             }
         });

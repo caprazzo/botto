@@ -45,13 +45,18 @@ public class Meters {
         private final Meter deliveryError;
         private final Meter response;
 
-
         private ConnectorMetrics(ConnectorMetrics allConnectors, String name) {
             this.allConnectors = allConnectors;
             channels = Meters.Metrics.counter(name(Meters.class, "connectors", name, "channels", "open"));
             delivery = Meters.Metrics.timer(name(Meters.class, "connectors", name, "bot", "delivery", "attempt"));
             deliveryError = Meters.Metrics.meter(name(Meters.class, "connectors", name, "bot", "delivery", "error"));
-            Meters.Metrics.register(name(Meters.class, "connectors", name, "bot", "delivery", "ratio"), new DeliverySuccessRatio(delivery, deliveryError));
+            try {
+                Meters.Metrics.register(name(Meters.class, "connectors", name, "bot", "delivery", "ratio"), new DeliverySuccessRatio(delivery, deliveryError));
+            }
+            catch (Exception ex) {
+                // TODO: this nly happens if metrics are created for multiple connectors with the same name.
+                //ex.printStackTrace();
+            }
             response = Meters.Metrics.meter(name(Meters.class, "connectors", name, "bot", "response"));
             all = new PacketMetrics(name, "all");
             message = new PacketMetrics(name, "message");
