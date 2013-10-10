@@ -113,7 +113,7 @@ public class BotManagerTest {
         Connector connector = Mockito.mock(Connector.class);
         ChannelContext context = Mockito.mock(ChannelContext.class);
         Channel channel = Mockito.mock(Channel.class);
-        FutureCallback<Boolean> removeCallback = Mockito.mock(FutureCallback.class);
+        FutureCallback<Void> removeCallback = Mockito.mock(FutureCallback.class);
 
         Mockito.when(connector.openChannel(addressFirstBot)).thenReturn(context);
         Mockito.when(context.getChannel()).thenReturn(channel);
@@ -123,11 +123,11 @@ public class BotManagerTest {
 
         botManager.addBot(connectorId, addressFirstBot, firstBot);
 
-        ListenableConfirmation future = botManager.removeBot(connectorId, addressFirstBot, firstBot);
+        ListenableFuture<Void> future = botManager.removeBot(connectorId, addressFirstBot, firstBot);
 
         Futures.addCallback(future, removeCallback);
 
-        Mockito.verify(removeCallback).onSuccess(true);
+        Mockito.verify(removeCallback).onSuccess(null);
     }
 
     @Test
@@ -152,7 +152,7 @@ public class BotManagerTest {
         ListenableFuture<ChannelContext> future = botManager.addBot(id, addressFirstBot, firstBot);
 
         Futures.addCallback(future, callback);
-        Mockito.verify(callback).onFailure(exception);
+        Mockito.verify(callback).onFailure(Mockito.any(Throwable.class));
     }
 
     //@Test

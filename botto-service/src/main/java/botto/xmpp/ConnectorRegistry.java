@@ -29,7 +29,11 @@ public class ConnectorRegistry {
     }
 
     public Connector getConnector(ConnectorId connectorId) {
-        return connectors.get(connectorId);
+        Connector connector = connectors.get(connectorId);
+        if (connector == null) {
+            throw new BottoRuntimeException("Could not find connector for id {0}", connectorId);
+        }
+        return connector;
     }
 
     public Collection<Connector> list() {
