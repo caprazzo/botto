@@ -1,23 +1,19 @@
 package botto.xmpp;
 
 import botto.xmpp.annotations.PacketOutput;
-import botto.xmpp.botto.xmpp.connector.*;
+import botto.xmpp.botto.xmpp.connector.Connector;
+import botto.xmpp.botto.xmpp.connector.ConnectorException;
+import botto.xmpp.botto.xmpp.connector.ConnectorId;
 import botto.xmpp.botto.xmpp.connector.channel.Channel;
 import botto.xmpp.botto.xmpp.connector.channel.ChannelContext;
 import botto.xmpp.botto.xmpp.connector.channel.ChannelContextListener;
 import botto.xmpp.botto.xmpp.connector.channel.ChannelEvent;
-import botto.xmpp.service.dispatcher.ListenableConfirmation;
-import botto.xmpp.utils.Packets;
-import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
 import com.google.common.util.concurrent.*;
-import com.sun.istack.internal.Nullable;
-import com.sun.javaws.exceptions.InvalidArgumentException;
 import net.caprazzi.reusables.common.Managed;
 import net.caprazzi.reusables.threading.ExecutorUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.slf4j.helpers.FormattingTuple;
 import org.slf4j.helpers.MessageFormatter;
 import org.xmpp.packet.JID;
 import org.xmpp.packet.Packet;
@@ -30,13 +26,10 @@ import java.util.concurrent.TimeUnit;
 public class BotManager implements Managed {
 
     private static final Logger Log = LoggerFactory.getLogger(BotManager.class);
-
     private final ChannelRegistry channels = new ChannelRegistry();
     private final ConnectorRegistry connectors = new ConnectorRegistry();
-
     // executes connector.openChannel, connector.closeChannel, connector.send, bot.receive
     private final ListeningExecutorService executor;
-
     private boolean started;
 
     private BotManager(ExecutorService executorService) {
@@ -61,7 +54,7 @@ public class BotManager implements Managed {
             throw new BottoRuntimeException("Could not start: already started");
         }
         started = true;
-        for(Connector connector : connectors.list()) {
+        for (Connector connector : connectors.list()) {
             startConnector(connector);
         }
     }
@@ -74,11 +67,10 @@ public class BotManager implements Managed {
         started = false;
         try {
             ExecutorUtils.shutdown(Log, executor, 2, TimeUnit.SECONDS);
-            for(Connector connector : connectors.list()) {
+            for (Connector connector : connectors.list()) {
                 stopConnector(connector);
             }
-        }
-        catch(Exception ex) {
+        } catch (Exception ex) {
             Log.error("Error during shutdown - ignoring: {}", ex);
         }
     }
@@ -106,7 +98,8 @@ public class BotManager implements Managed {
 
     public ListenableFuture<ChannelContext> addBot(final ConnectorId connectorId, final JID address, final AbstractBot bot) {
         return async(message("opening new channel for {}::{} on {}", address, bot, connectorId), new Callable<ChannelContext>() {
-            @Override public ChannelContext call() throws Exception {
+            @Override
+            public ChannelContext call() throws Exception {
                 final Connector connector = connectors.getConnector(connectorId);
                 ChannelContext context = connector.openChannel(address);
                 bot.setContext(new ChannelBotContext(context));
@@ -119,7 +112,8 @@ public class BotManager implements Managed {
 
     public ListenableFuture<Void> removeBot(final ConnectorId connectorId, final JID address, final AbstractBot bot) {
         return async(message("Removing bot {}::{} on {}", bot, address, connectorId), new Callable<Void>() {
-            @Override public Void call() throws Exception {
+            @Override
+            public Void call() throws Exception {
                 Connector connector = connectors.getConnector(connectorId);
                 Channel channel = channels.getChannel(address);
                 connector.closeChannel(channel);
@@ -209,8 +203,7 @@ public class BotManager implements Managed {
                     T value = callable.call();
                     Log.debug("Success: {}", message);
                     return value;
-                }
-                catch (Throwable t) {
+                } catch (Throwable t) {
                     Log.error("Failure: {}", message);
                     throw new BottoException(t, "Failure: {0}", message);
                 }
@@ -237,7 +230,7 @@ public class BotManager implements Managed {
 
         @Override
         public void send(Packet packet) {
-           manager.send(connector, channel, packet);
+            manager.send(connector, channel, packet);
         }
     }
 
