@@ -1,9 +1,6 @@
 package botto.xmpp.botto.xmpp.connector;
 
-import botto.xmpp.botto.xmpp.connector.channel.Channel;
-import botto.xmpp.botto.xmpp.connector.channel.ChannelContext;
-import botto.xmpp.botto.xmpp.connector.channel.ChannelEvent;
-import botto.xmpp.botto.xmpp.connector.channel.ChannelListener;
+import botto.xmpp.botto.xmpp.connector.channel.*;
 import com.google.common.base.Preconditions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,7 +13,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * Base class for implementations of low-level XMPP Connectors.
  */
 // TODO: implement address and channel validation
-public abstract class Connector<TConfig extends ConnectorConfiguration, TConnection extends BotConnection> {
+public abstract class Connector<TConfig extends ConnectorConfiguration, TConnection extends ChannelConnection> {
 
     private final TConfig configuration;
     private final String name;

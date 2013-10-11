@@ -2,8 +2,9 @@ package botto.xmpp.connectors.mock;
 
 import botto.xmpp.botto.xmpp.connector.*;
 import botto.xmpp.botto.xmpp.connector.channel.Channel;
+import botto.xmpp.botto.xmpp.connector.channel.ChannelConnection;
 
-public class MockBotConnection implements BotConnection {
+public class MockBotConnection implements ChannelConnection {
 
     private final MockConnector connector;
     private final Channel channel;

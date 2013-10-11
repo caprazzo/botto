@@ -3,6 +3,7 @@ package botto.xmpp.connectors.smack;
 import botto.xmpp.botto.xmpp.connector.*;
 
 import botto.xmpp.botto.xmpp.connector.channel.Channel;
+import botto.xmpp.botto.xmpp.connector.channel.ChannelConnection;
 import botto.xmpp.botto.xmpp.connector.channel.ChannelEvent;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
@@ -18,13 +19,13 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 /**
- * A BotConnection that uses the Smack library.
+ * A ChannelConnection that uses the Smack library.
  *
  * Each connection wraps an XMPPConnection, which is allocated in its own thread.
  */
-class SmackBotConnection implements BotConnection {
+class SmackChannelConnection implements ChannelConnection {
 
-    private final static Logger Log = LoggerFactory.getLogger(SmackBotConnection.class);
+    private final static Logger Log = LoggerFactory.getLogger(SmackChannelConnection.class);
 
     private final SmackConnector connector;
     private final Channel channel;
@@ -36,7 +37,7 @@ class SmackBotConnection implements BotConnection {
     private final ExecutorService connectionExecutor = Executors.newSingleThreadExecutor();
 
     // TODO: add a SmackBotConfiguration object, or create the XMPPConnection outside
-    public SmackBotConnection(SmackConnector connector, Channel channel, String host, int port, String secret, String resource) {
+    public SmackChannelConnection(SmackConnector connector, Channel channel, String host, int port, String secret, String resource) {
         this.connector = connector;
         this.channel = channel;
 
@@ -115,7 +116,7 @@ class SmackBotConnection implements BotConnection {
     }
 
     public synchronized void start() {
-        final SmackBotConnection botConnection = this;
+        final SmackChannelConnection botConnection = this;
         connector.channelEvent(ChannelEvent.connecting(channel));
         Futures.addCallback(connect(), new FutureCallback<Boolean>() {
             @Override

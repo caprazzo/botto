@@ -20,7 +20,7 @@ public class WhackBotComponent implements Component {
 
     private final WhackConnector connector;
     private final String subdomain;
-    private final Map<String, WhackBotConnection> connections = new ConcurrentHashMap<String, WhackBotConnection>();
+    private final Map<String, WhackChannelConnection> connections = new ConcurrentHashMap<String, WhackChannelConnection>();
 
     private JID jid;
     private ComponentManager componentManager;
@@ -30,11 +30,11 @@ public class WhackBotComponent implements Component {
         this.subdomain = subdomain;
     }
 
-    public void addConnection(WhackBotConnection connection) {
+    public void addConnection(WhackChannelConnection connection) {
         connections.put(connection.getChannel().getAddress().toBareJID(), connection);
     }
 
-    public void removeConnection(WhackBotConnection connection) {
+    public void removeConnection(WhackChannelConnection connection) {
         connections.remove(connection.getChannel().getAddress().toBareJID());
     }
 
@@ -51,7 +51,7 @@ public class WhackBotComponent implements Component {
     @Override
     public void processPacket(Packet packet) {
         Log.debug("Received packet {}", packet);
-        WhackBotConnection connection = connections.get(packet.getTo().toBareJID());
+        WhackChannelConnection connection = connections.get(packet.getTo().toBareJID());
         if (connection == null) {
             Log.warn("Could not find a connection to route packet: {}", packet);
             return;

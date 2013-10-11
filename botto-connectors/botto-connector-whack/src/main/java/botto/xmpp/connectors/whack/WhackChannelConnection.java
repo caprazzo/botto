@@ -2,20 +2,21 @@ package botto.xmpp.connectors.whack;
 
 import botto.xmpp.botto.xmpp.connector.*;
 import botto.xmpp.botto.xmpp.connector.channel.Channel;
+import botto.xmpp.botto.xmpp.connector.channel.ChannelConnection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xmpp.component.ComponentException;
 import org.xmpp.packet.Packet;
 
-class WhackBotConnection implements BotConnection {
+class WhackChannelConnection implements ChannelConnection {
 
-    private static final Logger Log = LoggerFactory.getLogger(WhackBotConnection.class);
+    private static final Logger Log = LoggerFactory.getLogger(WhackChannelConnection.class);
 
     private final WhackConnector connector;
     private final WhackBotComponent component;
     private final Channel channel;
 
-    public WhackBotConnection(WhackConnector connector, WhackBotComponent component, Channel channel) {
+    public WhackChannelConnection(WhackConnector connector, WhackBotComponent component, Channel channel) {
         this.connector = connector;
         this.component = component;
         this.channel = channel;

@@ -15,7 +15,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-public class WhackConnector extends Connector<WhackConnectorConfiguration, WhackBotConnection> {
+public class WhackConnector extends Connector<WhackConnectorConfiguration, WhackChannelConnection> {
 
     private static final Logger Log = LoggerFactory.getLogger(WhackConnector.class);
 
@@ -48,14 +48,14 @@ public class WhackConnector extends Connector<WhackConnectorConfiguration, Whack
 
         }
 
-        WhackBotConnection connection = new WhackBotConnection(this, component, channel);
+        WhackChannelConnection connection = new WhackChannelConnection(this, component, channel);
         component.addConnection(connection);
         addConnection(channel, connection);
     }
 
     @Override
     public void doCloseChannel(Channel channel) throws ConnectorException {
-        WhackBotConnection connection = removeConnection(channel);
+        WhackChannelConnection connection = removeConnection(channel);
         for(WhackBotComponent component : components.values()) {
             component.removeConnection(connection);
             if (component.isEmpty()) {

@@ -14,7 +14,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * A connector that uses the Smack library for single-node bots.
  */
-public class SmackConnector extends Connector<SmackConnectorConfiguration, SmackBotConnection> {
+public class SmackConnector extends Connector<SmackConnectorConfiguration, SmackChannelConnection> {
 
     private final Logger Log = LoggerFactory.getLogger(SmackConnector.class);
 
@@ -25,7 +25,7 @@ public class SmackConnector extends Connector<SmackConnectorConfiguration, Smack
 
     @Override
     public void doOpenChannel(Channel channel) throws ConnectorException {
-        SmackBotConnection connection = new SmackBotConnection(this, channel, getConfiguration().getHost(), getConfiguration().getPort(), getConfiguration().getSecret(channel.getAddress()), getConfiguration().getResource());
+        SmackChannelConnection connection = new SmackChannelConnection(this, channel, getConfiguration().getHost(), getConfiguration().getPort(), getConfiguration().getSecret(channel.getAddress()), getConfiguration().getResource());
         addConnection(channel, connection);
         connection.start();
         setChannelEvent(ChannelEvent.opened(channel));
