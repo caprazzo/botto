@@ -74,7 +74,6 @@ public class WhackConnector extends Connector<WhackConnectorConfiguration, Whack
         manager.setMultipleAllowed(subdomain, true);
         manager.removeComponent(subdomain);
         manager.addComponent(subdomain, component);
-        component.setConnected(true);
         Log.info("Components Connected");
 
         return component;

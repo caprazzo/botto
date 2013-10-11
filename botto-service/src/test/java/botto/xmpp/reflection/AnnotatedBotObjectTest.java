@@ -2,7 +2,6 @@ package botto.xmpp.reflection;
 
 import botto.xmpp.annotations.BotContext;
 import botto.xmpp.annotations.Context;
-import botto.xmpp.annotations.PacketOutput;
 import botto.xmpp.annotations.Receive;
 import com.google.common.base.Optional;
 
@@ -60,7 +59,6 @@ public class AnnotatedBotObjectTest {
                 objectAssignment(new PresenceRespondPresenceBot()),
                 objectAssignment(new IQRespondIQBot()),
                 objectAssignment(new MultiRespondMultiBot()),
-                objectAssignment(new TaggedOutputBot()),
                 objectAssignment(new TaggedBotContextBot()),
                 objectAssignment(new CompleteBot())
             });
@@ -202,12 +200,6 @@ public class AnnotatedBotObjectTest {
         }
     }
 
-    // bot with a packetOutput
-    private static class TaggedOutputBot {
-        @Context
-        private PacketOutput out;
-    }
-
     // bot with a context
     private static class TaggedBotContextBot {
         @Context
@@ -216,8 +208,6 @@ public class AnnotatedBotObjectTest {
 
     // bot with both context annotations
     private static class TaggedMultiBot {
-        @Context
-        private PacketOutput out;
 
         @Context
         private BotContext context;
@@ -244,9 +234,6 @@ public class AnnotatedBotObjectTest {
         public IQ onPacket(IQ packet) {
             return null;
         }
-
-        @Context
-        private PacketOutput out;
 
         @Context
         private BotContext context;

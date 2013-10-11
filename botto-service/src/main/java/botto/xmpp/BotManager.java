@@ -1,6 +1,5 @@
 package botto.xmpp;
 
-import botto.xmpp.annotations.PacketOutput;
 import botto.xmpp.botto.xmpp.connector.Connector;
 import botto.xmpp.botto.xmpp.connector.ConnectorException;
 import botto.xmpp.botto.xmpp.connector.ConnectorId;
@@ -8,7 +7,6 @@ import botto.xmpp.botto.xmpp.connector.channel.Channel;
 import botto.xmpp.botto.xmpp.connector.channel.ChannelContext;
 import botto.xmpp.botto.xmpp.connector.channel.ChannelContextListener;
 import botto.xmpp.botto.xmpp.connector.channel.ChannelEvent;
-import com.google.common.base.Preconditions;
 import com.google.common.util.concurrent.*;
 import net.caprazzi.reusables.common.Managed;
 import net.caprazzi.reusables.threading.ExecutorUtils;
@@ -102,8 +100,7 @@ public class BotManager implements Managed {
             public ChannelContext call() throws Exception {
                 final Connector connector = connectors.getConnector(connectorId);
                 ChannelContext context = connector.openChannel(address);
-                bot.setContext(new ChannelBotContext(context));
-                bot.setPacketOutput(new ConnectorPacketOutput(BotManager.this, connector, context.getChannel()));
+                bot.setContext(new ChannelBotContext(context, BotManager.this, connector));
                 channels.addChannel(context, bot);
                 return context;
             }
@@ -210,28 +207,4 @@ public class BotManager implements Managed {
             }
         });
     }
-
-    public static class ConnectorPacketOutput implements PacketOutput {
-
-        private final BotManager manager;
-        private final Connector connector;
-        private final Channel channel;
-
-        public ConnectorPacketOutput(BotManager manager, Connector connector, Channel channel) {
-
-            Preconditions.checkNotNull(manager);
-            Preconditions.checkNotNull(connector);
-            Preconditions.checkNotNull(channel);
-
-            this.manager = manager;
-            this.connector = connector;
-            this.channel = channel;
-        }
-
-        @Override
-        public void send(Packet packet) {
-            manager.send(connector, channel, packet);
-        }
-    }
-
 }

@@ -15,7 +15,7 @@ class ChannelRegistry {
     // TODO: only use address.toBareJID for indexing
     private final ConcurrentHashMap<JID, ChannelBot> channels = new ConcurrentHashMap<JID, ChannelBot>();
 
-    private EventListenerSupport<ChannelContextListener> listeners =
+    private final EventListenerSupport<ChannelContextListener> listeners =
             EventListenerSupport.create(ChannelContextListener.class);
 
     public void addChannel(ChannelContext context, AbstractBot bot) {

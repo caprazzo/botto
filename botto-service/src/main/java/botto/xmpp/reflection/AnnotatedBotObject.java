@@ -7,7 +7,6 @@ import com.google.common.base.Objects;
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import botto.xmpp.annotations.Context;
-import botto.xmpp.annotations.PacketOutput;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xmpp.packet.Packet;
@@ -74,9 +73,6 @@ public class AnnotatedBotObject extends AbstractBot {
         if (annotation == null) {
             return false;
         }
-        else if (PacketOutput.class.isAssignableFrom(field.getType())) {
-            return true;
-        }
         else if (BotContext.class.isAssignableFrom(field.getType())) {
             return true;
         }
@@ -120,12 +116,6 @@ public class AnnotatedBotObject extends AbstractBot {
                 throw new RuntimeException(e);
             }
         }
-    }
-
-    @Override
-    protected void doSetPacketOutput(PacketOutput output) {
-        Preconditions.checkNotNull(output, "packetOutput can't be null");
-        inject(output);
     }
 
     @Override

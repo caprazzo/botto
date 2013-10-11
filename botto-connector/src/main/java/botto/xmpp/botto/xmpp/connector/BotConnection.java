@@ -7,11 +7,7 @@ import botto.xmpp.botto.xmpp.connector.channel.Channel;
  */
 public interface BotConnection  {
 
-    public BotConnectionInfo getConnectionInfo();
-    public void setConnectionInfoListener(ConnectionInfoListener infoListener);
-
     public Channel getChannel();
 
     public Connector getConnector();
-
 }

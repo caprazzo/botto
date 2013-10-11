@@ -1,6 +1,5 @@
 package botto.xmpp.connectors.whack;
 
-import botto.xmpp.botto.xmpp.connector.BotConnectionInfo;
 import botto.xmpp.botto.xmpp.connector.ConnectorException;
 import com.google.common.base.Objects;
 import org.slf4j.Logger;
@@ -21,10 +20,10 @@ public class WhackBotComponent implements Component {
 
     private final WhackConnector connector;
     private final String subdomain;
+    private final Map<String, WhackBotConnection> connections = new ConcurrentHashMap<String, WhackBotConnection>();
+
     private JID jid;
     private ComponentManager componentManager;
-    private Map<String, WhackBotConnection> connections = new ConcurrentHashMap<String, WhackBotConnection>();
-    private final BotConnectionInfo connectionInfo = new BotConnectionInfo();
 
     public WhackBotComponent(WhackConnector connector, String subdomain) {
         this.connector = connector;
@@ -32,7 +31,6 @@ public class WhackBotComponent implements Component {
     }
 
     public void addConnection(WhackBotConnection connection) {
-        connection.setConnectionInfo(connectionInfo);
         connections.put(connection.getChannel().getAddress().toBareJID(), connection);
     }
 
@@ -102,10 +100,6 @@ public class WhackBotComponent implements Component {
 
     public String getSubdomain() {
         return subdomain;
-    }
-
-    public void setConnected(boolean connected) {
-        connectionInfo.setConnectionStatus(connected);
     }
 
     @Override

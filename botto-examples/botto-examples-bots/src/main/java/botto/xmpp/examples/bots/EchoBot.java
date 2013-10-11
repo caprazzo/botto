@@ -7,9 +7,6 @@ import org.xmpp.packet.Message;
 
 public class EchoBot {
 
-    @Context
-    botto.xmpp.annotations.PacketOutput out;
-
     @Context BotContext botcontext;
 
     @Receive

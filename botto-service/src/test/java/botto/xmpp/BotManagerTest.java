@@ -243,17 +243,4 @@ public class BotManagerTest {
         verify(firstConnector);
     }
 
-    @Test
-    public void test_connector_packet_output() {
-        BotManager manager = Mockito.mock(BotManager.class);
-        Connector connector = Mockito.mock(Connector.class);
-        Channel channel = Mockito.mock(Channel.class);
-        Packet packet = Mockito.mock(Packet.class);
-        BotManager.ConnectorPacketOutput packetOutput = new BotManager.ConnectorPacketOutput(manager, connector, channel);
-
-        packetOutput.send(packet);
-
-        Mockito.verify(manager).send(connector, channel, packet);
-    }
-
 }

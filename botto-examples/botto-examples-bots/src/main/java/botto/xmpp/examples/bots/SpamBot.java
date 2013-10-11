@@ -11,9 +11,6 @@ public class SpamBot implements Runnable {
     private int count = 0;
 
     @Context
-    botto.xmpp.annotations.PacketOutput out;
-
-    @Context
     BotContext context;
 
     public SpamBot(JID dest) {
@@ -29,7 +26,7 @@ public class SpamBot implements Runnable {
         Message message = new Message();
         message.setBody("Message #" + count);
         message.setTo(dest);
-        out.send(message);
+        context.send(message);
         count++;
     }
 }

@@ -10,7 +10,7 @@ import java.util.concurrent.Executors;
 
 public class MockConnector extends Connector<MockConnectorConfiguration, MockBotConnection> {
 
-    ExecutorService executor = Executors.newCachedThreadPool();
+    private final ExecutorService executor = Executors.newCachedThreadPool();
 
     public MockConnector(MockConnectorConfiguration configuration) {
         super(configuration);

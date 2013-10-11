@@ -87,9 +87,6 @@ public class ExampleEngineMain {
 
     public static class ExampleBot {
 
-        @Context
-        botto.xmpp.annotations.PacketOutput out;
-
         @Receive
         public Message receive(Message message) {
             System.out.println("Received message " + message.getID());

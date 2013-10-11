@@ -34,8 +34,6 @@ class SmackBotConnection implements BotConnection {
     private final XMPPConnection connection;
 
     private final ExecutorService connectionExecutor = Executors.newSingleThreadExecutor();
-    private final BotConnectionInfo connectionInfo = new BotConnectionInfo();
-    private ConnectionInfoListener connectionInfoListener;
 
     // TODO: add a SmackBotConfiguration object, or create the XMPPConnection outside
     public SmackBotConnection(SmackConnector connector, Channel channel, String host, int port, String secret, String resource) {
@@ -53,16 +51,6 @@ class SmackBotConnection implements BotConnection {
 
         Roster.setDefaultSubscriptionMode(Roster.SubscriptionMode.accept_all);
         connection = new XMPPConnection(configuration);
-    }
-
-    @Override
-    public BotConnectionInfo getConnectionInfo() {
-        return connectionInfo;
-    }
-
-    @Override
-    public void setConnectionInfoListener(ConnectionInfoListener infoListener) {
-        this.connectionInfoListener = infoListener;
     }
 
     @Override
