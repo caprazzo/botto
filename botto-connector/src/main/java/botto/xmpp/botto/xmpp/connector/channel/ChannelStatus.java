@@ -7,5 +7,9 @@ public enum ChannelStatus {
     Connected,
     Disconnecting,
     Disconnected,
-    Closing, Closed
+    Closing, Closed;
+
+    public boolean isConnected() {
+        return this == Connected;
+    }
 }

@@ -24,11 +24,14 @@ public class ChannelBotContext implements BotContext {
 
     @Override
     public boolean isConnected() {
-        return context != null && context.getStatus() == ChannelStatus.Connected;
+        return context.getStatus().isConnected();
     }
 
     @Override
     public void send(Packet packet) {
+        if (!isConnected()) {
+            throw new RuntimeException("Could not send packet because this BotContext is not connected: " + packet);
+        }
         manager.send(connector, context.getChannel(), packet);
     }
 }
