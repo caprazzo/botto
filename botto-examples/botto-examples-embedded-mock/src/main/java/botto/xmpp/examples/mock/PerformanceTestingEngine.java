@@ -32,11 +32,13 @@ public class PerformanceTestingEngine {
 
         BotManager connectionManager = BotManager.create();
 
+        ConnectorId mockConnectorId = new ConnectorId(0, MockConnector.class, "example.com");
+
         MockConnectorConfiguration configuration = new MockConnectorConfiguration("example.com");
         configuration.setDomain("example.com");
-        MockConnector connector = new MockConnector(configuration);
+        MockConnector connector = new MockConnector(mockConnectorId, configuration);
 
-        ConnectorId connectorId = connectionManager.registerConnector(connector);
+        connectionManager.registerConnector(connector);
 
 
         // 100k bots generating traffic that goes nowhere
@@ -49,14 +51,14 @@ public class PerformanceTestingEngine {
             SpamBot spamBot = new SpamBot(echoAddress);
             AbstractBot spamAnnotatedBot = AnnotatedBotObject.from(spamBot).get();
 
-            connectionManager.addBot(connectorId, spamAddress, spamAnnotatedBot);
+            connectionManager.addBot(connector.getConnectorId(), spamAddress, spamAnnotatedBot);
 
 
             service.scheduleAtFixedRate(spamBot, 10, 1, TimeUnit.SECONDS);
 
             EchoBot echoBot = new EchoBot();
             AbstractBot echo = AnnotatedBotObject.from(echoBot).get();
-            connectionManager.addBot(connectorId, echoAddress, echo);
+            connectionManager.addBot(connector.getConnectorId(), echoAddress, echo);
         }
 
         connector.start();

@@ -49,18 +49,20 @@ public class ExampleEmbeddedBotServer {
             }
         });
 
+        ConnectorId mockConnectorId = new ConnectorId(0, MockConnector.class, "example.com");
         MockConnectorConfiguration configuration = new MockConnectorConfiguration("example.com");
         configuration.setDomain("example.com");
-        MockConnector connector = new MockConnector(configuration);
+        MockConnector connector = new MockConnector(mockConnectorId, configuration);
 
+        ConnectorId smackConnectorId = new ConnectorId(1, SmackConnector.class, "example.com");
         SmackConnectorConfiguration smackConfiguration = new SmackConnectorConfiguration();
         smackConfiguration.setHost("localhost");
         smackConfiguration.setPort(5222);
         smackConfiguration.setSecret("secret");
 
-        SmackConnector smackConnector = new SmackConnector(smackConfiguration);
+        SmackConnector smackConnector = new SmackConnector(smackConnectorId, smackConfiguration);
 
-        ConnectorId connectorId = botManager.registerConnector(smackConnector);
+        botManager.registerConnector(smackConnector);
 
         JID echoAddress = new JID("echo@caprazzi.net");
         JID spamAddress = new JID("spam@caprazzi.net");
@@ -68,11 +70,11 @@ public class ExampleEmbeddedBotServer {
         SpamBot spamBot = new SpamBot(echoAddress);
         AbstractBot spamAnnotatedBot = AnnotatedBotObject.from(spamBot).get();
 
-        botManager.addBot(connectorId, spamAddress, spamAnnotatedBot);
+        botManager.addBot(connector.getConnectorId(), spamAddress, spamAnnotatedBot);
 
         EchoBot echoBot = new EchoBot();
         AbstractBot echo = AnnotatedBotObject.from(echoBot).get();
-        ListenableFuture<ChannelContext> channelContextListenableFuture = botManager.addBot(connectorId, echoAddress, echo);
+        ListenableFuture<ChannelContext> channelContextListenableFuture = botManager.addBot(connector.getConnectorId(), echoAddress, echo);
 
         botManager.start();
         service.scheduleAtFixedRate(spamBot, 0, 1, TimeUnit.SECONDS);

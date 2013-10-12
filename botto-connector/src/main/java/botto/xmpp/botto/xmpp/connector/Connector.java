@@ -2,6 +2,8 @@ package botto.xmpp.botto.xmpp.connector;
 
 import botto.xmpp.botto.xmpp.connector.channel.*;
 import com.google.common.base.Preconditions;
+import org.apache.commons.lang.builder.ToStringBuilder;
+import org.apache.commons.lang.builder.ToStringStyle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xmpp.packet.JID;
@@ -11,17 +13,23 @@ import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Base class for implementations of low-level XMPP Connectors.
+ *
+ * A Connector handles xmpp connections
+ * It allows to send/receive packets from/to an Address
+ * A Channel is an immutable binding between an Address and a Connector
+ * A ChannelContext is a mutable descriptor of a Channel
  */
 // TODO: implement address and channel validation
 public abstract class Connector<TConfig extends ConnectorConfiguration, TConnection extends ChannelConnection> {
 
+    private final Logger Log = LoggerFactory.getLogger(this.getClass());
+
+    private final ConnectorId connectorId;
     private final TConfig configuration;
     private final String name;
     private ChannelListener channelListener;
 
     private final ConcurrentHashMap<Channel, TConnection> connections = new ConcurrentHashMap<Channel, TConnection>();
-
-    private final Logger Log = LoggerFactory.getLogger(this.getClass());
 
     public abstract void doOpenChannel(Channel channel) throws ConnectorException;
     public abstract void doCloseChannel(Channel channel) throws ConnectorException;
@@ -29,12 +37,23 @@ public abstract class Connector<TConfig extends ConnectorConfiguration, TConnect
     public abstract void doStop() throws ConnectorException;
     public abstract void doSend(Channel channel, Packet packet) throws ConnectorException;
 
-    public Connector(TConfig configuration) {
+    /**
+     * @param connectorId
+     * @param configuration
+     */
+    public Connector(ConnectorId connectorId, TConfig configuration) {
+        this.connectorId = connectorId;
         // TODO: check configuration has a minimum validity
         this.configuration = configuration;
         this.name = configuration.getName();
     }
 
+    /**
+     * Open a channel for this address.
+     * @param address the address
+     * @return a ChannelContext for this address
+     * @throws ConnectorException
+     */
     public ChannelContext openChannel(JID address) throws ConnectorException {
         Channel channel = Channel.from(address);
         ChannelContext context = ChannelContext.of(channel);
@@ -115,5 +134,16 @@ public abstract class Connector<TConfig extends ConnectorConfiguration, TConnect
 
     protected void setChannelEvent(ChannelEvent event) {
         channelListener.onChannelEvent(event);
+    }
+
+    public ConnectorId getConnectorId() {
+        return connectorId;
+    }
+
+    @Override
+    public String toString() {
+        return new ToStringBuilder(this, ToStringStyle.SHORT_PREFIX_STYLE)
+            .append("id", connectorId)
+            .toString();
     }
 }

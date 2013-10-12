@@ -2,6 +2,9 @@ package botto.xmpp.botto.xmpp.connector.channel;
 
 import com.google.common.base.Objects;
 
+/**
+ * Mutable information about a Channel
+ */
 public class ChannelContext {
     private final Channel channel;
     private ChannelStatus status = ChannelStatus.Opening;

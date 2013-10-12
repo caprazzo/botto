@@ -22,16 +22,17 @@ public class MockEngineMain {
 
         BotManager connectionManager = BotManager.create();
 
+        ConnectorId mockConnectorId = new ConnectorId(0, MockConnector.class, "example.com");
         MockConnectorConfiguration configuration = new MockConnectorConfiguration("example.com");
         configuration.setDomain("example.com");
-        MockConnector connector = new MockConnector(configuration);
+        MockConnector connector = new MockConnector(mockConnectorId, configuration);
 
-        ConnectorId mock = connectionManager.registerConnector(connector);
+        connectionManager.registerConnector(connector);
 
         // echo bot
         EchoBot echoBot = new EchoBot();
         AbstractBot echo = AnnotatedBotObject.from(echoBot).get();
-        connectionManager.addBot(mock, new JID("echo@example.com"), echo);
+        connectionManager.addBot(connector.getConnectorId(), new JID("echo@example.com"), echo);
 
         /*
         // add three generator bots

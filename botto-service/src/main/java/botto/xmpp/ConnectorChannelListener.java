@@ -8,6 +8,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xmpp.packet.Packet;
 
+import java.util.Objects;
+
 class ConnectorChannelListener implements ChannelListener {
 
     private static final Logger Log = LoggerFactory.getLogger(ConnectorChannelListener.class);
@@ -16,10 +18,10 @@ class ConnectorChannelListener implements ChannelListener {
     private final BotManager manager;
     private final Connector connector;
 
-    public ConnectorChannelListener(BotManager manager, Connector connector, ConnectorId connectorId) {
+    public ConnectorChannelListener(BotManager manager, Connector connector) {
         this.manager = manager;
         this.connector = connector;
-        this.meter = Meters.connectors.forConnector(connectorId);
+        this.meter = Meters.connectors.forConnector(connector.getConnectorId());
     }
 
     @Override
@@ -37,5 +39,15 @@ class ConnectorChannelListener implements ChannelListener {
     public void onChannelEvent(ChannelEvent event) {
         Log.debug("{}", event);
         manager.setChannelEvent(event);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null || !(obj instanceof ConnectorChannelListener))
+            return false;
+
+        ConnectorChannelListener other = (ConnectorChannelListener) obj;
+        return Objects.equals(manager, other.manager)
+            && Objects.equals(connector, other.connector);
     }
 }

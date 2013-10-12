@@ -18,7 +18,11 @@ import com.google.common.util.concurrent.Futures;
 import org.xmpp.packet.JID;
 import org.xmpp.packet.Message;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 public class ExampleEngineMain {
+
+    private final static AtomicInteger connectorCount = new AtomicInteger();
 
     public static void main(String[] args) throws Exception {
 
@@ -31,8 +35,10 @@ public class ExampleEngineMain {
         whackConfiguration.setPort(5275);
         whackConfiguration.setSecret("secret");
 
-        WhackConnector whackConnector = new WhackConnector(whackConfiguration);
-        ConnectorId whackConnectorId = connectionManager.registerConnector(whackConnector);
+
+        ConnectorId whackConnectorId = new ConnectorId(connectorCount.getAndIncrement(), WhackConnector.class, "localhost/caprazzi.net");
+        WhackConnector whackConnector = new WhackConnector(whackConnectorId, whackConfiguration);
+        connectionManager.registerConnector(whackConnector);
 
         // setup smack connector
         SmackConnectorConfiguration smackConfiguration = new SmackConnectorConfiguration();
@@ -41,10 +47,9 @@ public class ExampleEngineMain {
         smackConfiguration.setSecret("bot");
         smackConfiguration.setResource("any");
 
-        SmackConnector smackConnector = new SmackConnector(smackConfiguration);
-        ConnectorId smackConnectorId = connectionManager.registerConnector(smackConnector);
-
-
+        ConnectorId smackConnectorId = new ConnectorId(connectorCount.getAndIncrement(), SmackConnector.class, "localhost/caprazzi.net");
+        SmackConnector smackConnector = new SmackConnector(smackConnectorId, smackConfiguration);
+        connectionManager.registerConnector(smackConnector);
 
 
         {

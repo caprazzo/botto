@@ -1,5 +1,6 @@
 package botto.xmpp.connectors.whack;
 
+import botto.xmpp.botto.xmpp.connector.ConnectorId;
 import botto.xmpp.botto.xmpp.connector.channel.Channel;
 import botto.xmpp.botto.xmpp.connector.Connector;
 import botto.xmpp.botto.xmpp.connector.ConnectorException;
@@ -23,8 +24,8 @@ public class WhackConnector extends Connector<WhackConnectorConfiguration, Whack
 
     private final Map<String, WhackBotComponent> components = new ConcurrentHashMap<String, WhackBotComponent>();
 
-    public WhackConnector(WhackConnectorConfiguration configuration) {
-        super(configuration);
+    public WhackConnector(ConnectorId connectorId, WhackConnectorConfiguration configuration) {
+        super(connectorId, configuration);
         checkNotNull(configuration);
 
         // TODO the connector should be configured with host, port, domain, secret and a map subdomain -> password

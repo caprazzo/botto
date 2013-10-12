@@ -7,6 +7,7 @@ import botto.xmpp.botto.xmpp.connector.channel.Channel;
 import botto.xmpp.botto.xmpp.connector.channel.ChannelContext;
 import botto.xmpp.botto.xmpp.connector.channel.ChannelContextListener;
 import botto.xmpp.botto.xmpp.connector.channel.ChannelEvent;
+import com.google.common.base.Preconditions;
 import com.google.common.util.concurrent.*;
 import net.caprazzi.reusables.common.Managed;
 import net.caprazzi.reusables.threading.ExecutorUtils;
@@ -78,19 +79,22 @@ public class BotManager implements Managed {
     }
 
     // TODO: why is this sinchronized and not other methods?
-    public synchronized ConnectorId registerConnector(final Connector connector) throws BottoException {
-        ConnectorId connectorId = connectors.addConnector(connector);
-        connector.addChannelListener(new ConnectorChannelListener(this, connector, connectorId));
-        Log.info("Registered connector {} with id {}", connector, connectorId);
+    // TODO: should a connector generate its own ConnectorId?
+    public synchronized void registerConnector(final Connector connector) throws BottoException {
+        Preconditions.checkNotNull(connector, "Connector can't be null");
+        Preconditions.checkNotNull(connector.getConnectorId(), "Connector ID can't be null");
+
+        connectors.addConnector(connector);
+        connector.addChannelListener(new ConnectorChannelListener(this, connector));
+        Log.info("Registered connector {} with id {}", connector);
         if (isStarted()) {
             startConnector(connector);
         }
-        return connectorId;
     }
 
-    public synchronized void removeConnector(ConnectorId connectorId) {
+    public synchronized void removeConnector(Connector connectorId) {
         Log.info("Removing connector {}", connectorId);
-        Connector removed = connectors.removeConnector(connectorId);
+        Connector removed = connectors.removeConnector(connectorId.getConnectorId());
         stopConnector(removed);
     }
 
@@ -201,7 +205,7 @@ public class BotManager implements Managed {
                     Log.debug("Success: {}", message);
                     return value;
                 } catch (Throwable t) {
-                    Log.error("Failure: {}", message);
+                    Log.error("Failure: {}: {}", message, t);
                     throw new BottoException(t, "Failure: {0}", message);
                 }
             }

@@ -1,5 +1,6 @@
 package botto.xmpp.connectors.mock;
 
+import botto.xmpp.botto.xmpp.connector.ConnectorId;
 import botto.xmpp.botto.xmpp.connector.channel.Channel;
 import botto.xmpp.botto.xmpp.connector.Connector;
 import botto.xmpp.botto.xmpp.connector.ConnectorException;
@@ -12,8 +13,8 @@ public class MockConnector extends Connector<MockConnectorConfiguration, MockBot
 
     private final ExecutorService executor = Executors.newCachedThreadPool();
 
-    public MockConnector(MockConnectorConfiguration configuration) {
-        super(configuration);
+    public MockConnector(ConnectorId connectorId, MockConnectorConfiguration configuration) {
+        super(connectorId, configuration);
     }
 
     @Override

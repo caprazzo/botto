@@ -32,11 +32,13 @@ public class SimplePingPongEngine {
 
         BotManager botManager = BotManager.create();
 
+        ConnectorId mockConnectorId = new ConnectorId(0, MockConnector.class, "example.com");
+
         MockConnectorConfiguration configuration = new MockConnectorConfiguration("example.com");
         configuration.setDomain("example.com");
-        MockConnector connector = new MockConnector(configuration);
+        MockConnector connector = new MockConnector(mockConnectorId, configuration);
 
-        ConnectorId connectorId = botManager.registerConnector(connector);
+        botManager.registerConnector(connector);
 
         JID echoAddress = new JID("echo@example.com");
         JID spamAddress = new JID("spam@example.com");
@@ -44,11 +46,11 @@ public class SimplePingPongEngine {
         SpamBot spamBot = new SpamBot(echoAddress);
         AbstractBot spamAnnotatedBot = AnnotatedBotObject.from(spamBot).get();
 
-        botManager.addBot(connectorId, spamAddress, spamAnnotatedBot);
+        botManager.addBot(connector.getConnectorId(), spamAddress, spamAnnotatedBot);
 
         EchoBot echoBot = new EchoBot();
         AbstractBot echo = AnnotatedBotObject.from(echoBot).get();
-        botManager.addBot(connectorId, echoAddress, echo);
+        botManager.addBot(connector.getConnectorId(), echoAddress, echo);
 
         botManager.start();
 

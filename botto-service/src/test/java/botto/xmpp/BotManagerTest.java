@@ -22,10 +22,12 @@ import org.xmpp.packet.Packet;
 
 import java.util.concurrent.ExecutionException;
 
-import static org.easymock.EasyMock.anyObject;
-import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.verify;
+import static org.easymock.EasyMock.*;
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 public class BotManagerTest {
 
@@ -34,12 +36,12 @@ public class BotManagerTest {
     private Connector secondConnector = EasyMock.createMock(Connector.class);
     private TestBot firstBot = new TestBot();
     private TestBot secondBot = new TestBot();
-    private ConnectorId firstConnectorId;
+    private ConnectorId firstConnectorId = createMock(ConnectorId.class);
     private Message firstMessage;
     private JID addressFirstBot;
     private JID addressSecondBot;
     private Message secondMessage;
-    private ConnectorId secondConnectorId;
+    private ConnectorId secondConnectorId = createMock(ConnectorId.class);
 
     @Before
     public void setUp() throws Exception {
@@ -70,64 +72,75 @@ public class BotManagerTest {
 
     @Test
     public void add_connector() throws BottoException, ConnectorException {
-        Connector connector = Mockito.mock(Connector.class);
+        Connector connector = mock(Connector.class);
+        ConnectorId id = mock(ConnectorId.class);
+        when(connector.getConnectorId()).thenReturn(id);
         botManager.registerConnector(connector);
-        Mockito.verify(connector).addChannelListener(Mockito.any(ConnectorChannelListener.class));
-        Mockito.verify(connector).start();
+        verify(connector).addChannelListener(any(ConnectorChannelListener.class));
+        verify(connector).start();
     }
 
     @Test
     public void add_remove_connector() throws ConnectorException, BottoException {
-        Connector connector = Mockito.mock(Connector.class);
+        Connector connector = mock(Connector.class);
+        ConnectorId id = mock(ConnectorId.class);
+        when(connector.getConnectorId()).thenReturn(id);
 
-        ConnectorId connectorId = botManager.registerConnector(connector);
-        botManager.removeConnector(connectorId);
+        botManager.registerConnector(connector);
+        botManager.removeConnector(connector);
 
-        Mockito.verify(connector).addChannelListener(Mockito.any(ConnectorChannelListener.class));
-        Mockito.verify(connector).start();
-        Mockito.verify(connector).stop();
+        verify(connector).addChannelListener(any(ConnectorChannelListener.class));
+        verify(connector).start();
+        verify(connector).stop();
     }
 
     @Test
     public void add_bot() throws BottoException, ConnectorException {
-        Connector connector = Mockito.mock(Connector.class);
-        ChannelContext context = Mockito.mock(ChannelContext.class);
-        Channel channel = Mockito.mock(Channel.class);
-        FutureCallback<ChannelContext> addCallback = Mockito.mock(FutureCallback.class);
-        ConnectorId connectorId = botManager.registerConnector(connector);
+        Connector connector = mock(Connector.class);
+        ConnectorId connectorId = mock(ConnectorId.class);
+        when(connector.getConnectorId()).thenReturn(connectorId);
+        ChannelContext context = mock(ChannelContext.class);
+        Channel channel = mock(Channel.class);
+        FutureCallback<ChannelContext> addCallback = mock(FutureCallback.class);
 
-        Mockito.when(connector.openChannel(addressFirstBot)).thenReturn(context);
-        Mockito.when(context.getChannel()).thenReturn(channel);
-        Mockito.when(channel.getAddress()).thenReturn(addressFirstBot);
+        botManager.registerConnector(connector);
 
-        ListenableFuture<ChannelContext> future = botManager.addBot(connectorId, addressFirstBot, firstBot);
+
+        when(connector.openChannel(addressFirstBot)).thenReturn(context);
+        when(context.getChannel()).thenReturn(channel);
+        when(channel.getAddress()).thenReturn(addressFirstBot);
+
+        ListenableFuture<ChannelContext> future = botManager.addBot(connector.getConnectorId(), addressFirstBot, firstBot);
 
         Futures.addCallback(future, addCallback);
 
-        Mockito.verify(connector).openChannel(addressFirstBot);
-        Mockito.verify(addCallback).onSuccess(context);
+        verify(connector).openChannel(addressFirstBot);
+        verify(addCallback).onSuccess(context);
     }
 
     @Test
     public void add_remove_bot() throws BottoException, ConnectorException {
-        Connector connector = Mockito.mock(Connector.class);
-        ChannelContext context = Mockito.mock(ChannelContext.class);
-        Channel channel = Mockito.mock(Channel.class);
-        FutureCallback<Void> removeCallback = Mockito.mock(FutureCallback.class);
+        Connector connector = mock(Connector.class);
+        ConnectorId id = mock(ConnectorId.class);
+        when(connector.getConnectorId()).thenReturn(id);
 
-        Mockito.when(connector.openChannel(addressFirstBot)).thenReturn(context);
-        Mockito.when(context.getChannel()).thenReturn(channel);
-        Mockito.when(channel.getAddress()).thenReturn(addressFirstBot);
+        ChannelContext context = mock(ChannelContext.class);
+        Channel channel = mock(Channel.class);
+        FutureCallback<Void> removeCallback = mock(FutureCallback.class);
 
-        ConnectorId connectorId = botManager.registerConnector(connector);
+        when(connector.openChannel(addressFirstBot)).thenReturn(context);
+        when(context.getChannel()).thenReturn(channel);
+        when(channel.getAddress()).thenReturn(addressFirstBot);
 
-        botManager.addBot(connectorId, addressFirstBot, firstBot);
+        botManager.registerConnector(connector);
 
-        ListenableFuture<Void> future = botManager.removeBot(connectorId, addressFirstBot, firstBot);
+        botManager.addBot(connector.getConnectorId(), addressFirstBot, firstBot);
+
+        ListenableFuture<Void> future = botManager.removeBot(connector.getConnectorId(), addressFirstBot, firstBot);
 
         Futures.addCallback(future, removeCallback);
 
-        Mockito.verify(removeCallback).onSuccess(null);
+        verify(removeCallback).onSuccess(null);
     }
 
     @Test
@@ -141,18 +154,21 @@ public class BotManagerTest {
 
     @Test
     public void add_bot_with_openchannel_failure() throws BottoException, ConnectorException, ExecutionException, InterruptedException {
-        Connector connector = Mockito.mock(Connector.class);
-        ConnectorId id = botManager.registerConnector(connector);
+        Connector connector = mock(Connector.class);
+        ConnectorId id = mock(ConnectorId.class);
+        when(connector.getConnectorId()).thenReturn(id);
 
-        FutureCallback<ChannelContext> callback = Mockito.mock(FutureCallback.class);
+        botManager.registerConnector(connector);
+
+        FutureCallback<ChannelContext> callback = mock(FutureCallback.class);
 
         RuntimeException exception = new RuntimeException("Random open channel failure");
-        Mockito.when(connector.openChannel(addressFirstBot)).thenThrow(exception);
+        when(connector.openChannel(addressFirstBot)).thenThrow(exception);
 
-        ListenableFuture<ChannelContext> future = botManager.addBot(id, addressFirstBot, firstBot);
+        ListenableFuture<ChannelContext> future = botManager.addBot(connector.getConnectorId(), addressFirstBot, firstBot);
 
         Futures.addCallback(future, callback);
-        Mockito.verify(callback).onFailure(Mockito.any(Throwable.class));
+        verify(callback).onFailure(any(Throwable.class));
     }
 
     //@Test
@@ -176,7 +192,7 @@ public class BotManagerTest {
 
         EasyMock.replay(firstConnector);
 
-        firstConnectorId = botManager.registerConnector(firstConnector);
+        botManager.registerConnector(firstConnector);
 
         //botManager.start();
 
@@ -193,7 +209,7 @@ public class BotManagerTest {
 
         //botManager.stop();
 
-        verify(firstConnector);
+        EasyMock.verify(firstConnector);
     }
 
     //@Test
@@ -222,8 +238,8 @@ public class BotManagerTest {
         EasyMock.replay(firstConnector);
         EasyMock.replay(secondConnector);
 
-        firstConnectorId = botManager.registerConnector(firstConnector);
-        secondConnectorId = botManager.registerConnector(secondConnector);
+        botManager.registerConnector(firstConnector);
+        botManager.registerConnector(secondConnector);
 
         //botManager.start();
 
@@ -240,7 +256,7 @@ public class BotManagerTest {
 
         //botManager.stop();
 
-        verify(firstConnector);
+        EasyMock.verify(firstConnector);
     }
 
 }

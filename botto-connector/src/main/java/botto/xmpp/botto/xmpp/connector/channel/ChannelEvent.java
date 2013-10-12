@@ -1,5 +1,7 @@
 package botto.xmpp.botto.xmpp.connector.channel;
 
+import java.util.Objects;
+
 public class ChannelEvent {
 
     private final Channel channel;
@@ -99,4 +101,16 @@ public class ChannelEvent {
         return "Event(" + channel + ", " + status + ", message='" + message + "', error=" + error + ")";
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null || !(obj instanceof ChannelEvent))
+            return false;
+
+        ChannelEvent other = (ChannelEvent) obj;
+
+        return Objects.equals(message, other.message)
+            && Objects.equals(status, other.status)
+            && Objects.equals(channel, other.channel)
+            && Objects.equals(error, other.error);
+    }
 }

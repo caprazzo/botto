@@ -18,8 +18,8 @@ public class SmackConnector extends Connector<SmackConnectorConfiguration, Smack
 
     private final Logger Log = LoggerFactory.getLogger(SmackConnector.class);
 
-    public SmackConnector(SmackConnectorConfiguration configuration) {
-        super(configuration);
+    public SmackConnector(ConnectorId connectorId, SmackConnectorConfiguration configuration) {
+        super(connectorId, configuration);
         checkNotNull(configuration, "Configuration must not be null");
     }
 

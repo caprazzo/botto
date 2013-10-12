@@ -16,7 +16,7 @@ public class Meters {
     public static final MetricRegistry Metrics = new MetricRegistry();
 
     private static String metricName(ConnectorId connectorId) {
-        return ("#" + connectorId.getId() + "_" + connectorId.getClazz().getSimpleName() + "_" + connectorId.getName()).replaceAll("\\.", "_");
+        return connectorId.toString();
     }
 
     public static final ConnectorsMetrics connectors = new ConnectorsMetrics();
