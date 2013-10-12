@@ -55,7 +55,7 @@ public abstract class Connector<TConfig extends ConnectorConfiguration, TConnect
      * @throws ConnectorException
      */
     public ChannelContext openChannel(JID address) throws ConnectorException {
-        Channel channel = Channel.from(address);
+        Channel channel = Channel.from(getConnectorId(), address);
         ChannelContext context = ChannelContext.of(channel);
         setChannelEvent(ChannelEvent.opening(channel));
         doOpenChannel(channel);

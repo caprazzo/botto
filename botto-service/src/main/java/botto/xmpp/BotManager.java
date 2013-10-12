@@ -124,6 +124,12 @@ public class BotManager implements Managed {
         });
     }
 
+    /**
+     * Asynchronously send a packet from a Channel using a Connector
+     * @param connector Connector to use for sending
+     * @param channel Channel source channel
+     * @param packet The packet to send
+     */
     // TODO: return a future so any error can easily be reported back
     void send(final Connector connector, final Channel channel, final Packet packet) {
         async(message("Sending packet to {}::{}: {}", channel, connector, packet), new Callable<Void>() {

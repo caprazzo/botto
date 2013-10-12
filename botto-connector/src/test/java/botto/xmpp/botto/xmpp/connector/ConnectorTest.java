@@ -30,10 +30,10 @@ public class ConnectorTest {
 
         spy.openChannel(address);
 
-        ChannelEvent expected = ChannelEvent.opening(Channel.from(address));
+        ChannelEvent expected = ChannelEvent.opening(Channel.from(connectorId, address));
 
         verify(listener).onChannelEvent(eq(expected));
-        verify(spy).doOpenChannel(eq(Channel.from(address)));
+        verify(spy).doOpenChannel(eq(Channel.from(connectorId, address)));
     }
 
     public static class TestConnector extends Connector<TestConnectorConfig, TestConnectorConnection> {

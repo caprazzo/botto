@@ -56,6 +56,19 @@ public class ConnectorRegistryTest {
     }
 
     @Test
+    public void should_reject_duplicate_connector_id() {
+        Connector connectorA = mock(Connector.class);
+        Connector connectorB = mock(Connector.class);
+        ConnectorId connectorId = mock(ConnectorId.class);
+        when(connectorA.getConnectorId()).thenReturn(connectorId);
+        when(connectorB.getConnectorId()).thenReturn(connectorId);
+        registry.addConnector(connectorA);
+        exex.expect(BottoRuntimeException.class);
+        exex.expectMessage(org.hamcrest.Matchers.startsWith("Could not register connector"));
+        registry.addConnector(connectorB);
+    }
+
+    @Test
     public void should_throw_if_connector_not_found_on_get() {
         ConnectorId connectorId = mock(ConnectorId.class);
         exex.expect(BottoRuntimeException.class);

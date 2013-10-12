@@ -10,15 +10,21 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class ConnectorRegistry {
     private final ConcurrentHashMap<ConnectorId, Connector> connectors = new ConcurrentHashMap<ConnectorId, Connector>();
 
-    public ConnectorId addConnector(Connector connector) {
-        if (connectors.containsValue(connector)) {
-            throw new BottoRuntimeException("Could not register connector {0} because it has already been registered", connector);
-        }
+    public void addConnector(Connector connector) {
+
         if (connector.getConnectorId() == null) {
             throw new BottoRuntimeException("Could not register connector {0} because it has null ID", connector);
         }
+
+        if (connectors.containsKey(connector.getConnectorId())) {
+            throw new BottoRuntimeException("Could not register connector {0} bcause its ID has already been registered", connector);
+        }
+
+        if (connectors.containsValue(connector)) {
+            throw new BottoRuntimeException("Could not register connector {0} because it has already been registered", connector);
+        }
+
         connectors.put(connector.getConnectorId(), connector);
-        return connector.getConnectorId();
     }
 
     public Connector removeConnector(ConnectorId connectorId) {
