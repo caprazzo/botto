@@ -22,6 +22,12 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * Object bindings overview:
+ * - A Channel uniquely binds an Address to a Connector
+ * - A Bot is uniquely bound to a Channel
+ * - An Address is a JID (could be an expression in the future(
+ */
 public class BotManager implements Managed {
 
     private static final Logger Log = LoggerFactory.getLogger(BotManager.class);
@@ -125,7 +131,7 @@ public class BotManager implements Managed {
     }
 
     /**
-     * Asynchronously send a packet from a Channel using a Connector
+     * Asynchronously send a Packet to a Connector over a specific Channel
      * @param connector Connector to use for sending
      * @param channel Channel source channel
      * @param packet The packet to send
@@ -141,6 +147,13 @@ public class BotManager implements Managed {
         });
     }
 
+    /**
+     * Asynchronously dispatch a Packet to a bot and send back any response.
+     * @param connector The connector where the Packet originated
+     * @param channel The channel where the Packet originated
+     * @param packet The incoming packet
+     * @param meter Metrics object to use
+     */
     void receive(final Connector connector, final Channel channel, final Packet packet, final Meters.ConnectorMetrics meter) {
         Log.debug("Received packet on {}::{}: {}", channel, connector, packet);
 

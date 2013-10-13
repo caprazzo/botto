@@ -10,6 +10,11 @@ import org.xmpp.packet.Packet;
 
 import java.util.Objects;
 
+/**
+ * This ChannelListener routes Connector Channel Events to Bot Manager.
+ * It also maintains some per-connector stats using Meters.
+ * TODO: metering logic should be in a decorator
+ */
 class ConnectorChannelListener implements ChannelListener {
 
     private static final Logger Log = LoggerFactory.getLogger(ConnectorChannelListener.class);
